@@ -64,4 +64,4 @@ if __name__ == "__main__":
     sys.path.append(GetRuntimePath())
     module = __import__("nsiqcppstyle_exe")
     sys.exit(module.main())
-    
+
