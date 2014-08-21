@@ -19,6 +19,9 @@ def RunRule(lexer, line, lineno) :
     if not Match("^\s*$", line) :
         if len(line) > 120 :
             nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, line, lineno, 0), __name__, 'Lines should very rarely be longer than 120 characters')
+        else:
+            # add code to recognise tabs as charachters
+            pass
 
 ruleManager.AddLineRule(RunRule)
 
@@ -33,16 +36,16 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddLineRule(RunRule)
     def test1(self):
-        self.Analyze("test/thisFile.c", 
+        self.Analyze("test/thisFile.c",
 """
 void function(int k, int j, int pp)
 {
 %s
 }
 """ % ("d"*121))
-        assert CheckErrorContent(__name__)    
+        assert CheckErrorContent(__name__)
     def test2(self):
-        self.Analyze("test/thisFile.c", 
+        self.Analyze("test/thisFile.c",
 """
 void function(int k, int j, int pp)
 {
@@ -50,4 +53,4 @@ void function(int k, int j, int pp)
 %s
 }
 """ % ("d"*119, " "*130))
-        assert not CheckErrorContent(__name__)    
+        assert not CheckErrorContent(__name__)

@@ -1,12 +1,12 @@
 """
-Avoid too deep blocks.
+Avoid too deep blocks(4).
 If the block depth in the function is more than 4, it reports a violation.
 
-== Violation == 
+== Violation ==
 
     void f() {
     {{{{{ <== Violation. Too deep. it's more than 4 blocks
-        
+
     }}}}}
     }
 
@@ -14,7 +14,7 @@ If the block depth in the function is more than 4, it reports a violation.
 
     void f() {
     {{{{ <== OK!
-        
+
     }}}}
     }
 
@@ -37,7 +37,7 @@ def RunRule(lexer, contextStack) :
             reported = True
     elif t.type == "RBRACE" :
         depth -= 1
-        
+
 def RunFunctionScopeRule(lexer, fullName, decl, contextStack, context) :
     global depth
     global reported
@@ -56,9 +56,9 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunFunctionScopeRule)
         ruleManager.AddFunctionScopeRule(RunRule)
-        
+
     def test1(self):
-        self.Analyze("thisfile.c", 
+        self.Analyze("thisfile.c",
 """
 void func1() {
 {{{{{{{
@@ -67,7 +67,7 @@ void func1() {
 """)
         assert CheckErrorContent(__name__)
     def test2(self):
-        self.Analyze("thisfile.c", 
+        self.Analyze("thisfile.c",
 """
 
 void func1() {
@@ -77,50 +77,50 @@ void func1() {
 }
 """)
         assert not CheckErrorContent(__name__)
-        
+
     def test3(self):
-        self.Analyze("thisfile.c", 
+        self.Analyze("thisfile.c",
 """
-void func(void) 
-{ 
-if (...) 
-{ // depth-1 
+void func(void)
+{
+if (...)
+{ // depth-1
 
-{ // depth-2 
+{ // depth-2
 
-{ // depth-3 
+{ // depth-3
 
-{ // depth-4 
+{ // depth-4
 
-printf("..."); 
+printf("...");
 
-} 
-} 
-} 
-} 
+}
+}
+}
+}
 }
 """)
         assert not CheckErrorContent(__name__)
     def test4(self):
-        self.Analyze("thisfile.c", 
+        self.Analyze("thisfile.c",
 """
-void func(void) 
-{ 
-if (...) 
-{ // depth-1 
+void func(void)
+{
+if (...)
+{ // depth-1
 
-{ // depth-2 
+{ // depth-2
 
-{ // depth-3 
+{ // depth-3
 
-{ // depth-4 
+{ // depth-4
 { // depth-5
-printf("..."); 
+printf("...");
 }
-} 
-} 
-} 
-} 
+}
+}
+}
+}
 }
 """)
         assert CheckErrorContent(__name__)
