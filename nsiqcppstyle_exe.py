@@ -3,7 +3,7 @@
 # Copyright (c) 2009 NHN Inc. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
-# met: 
+# met:
 #
 #    * Redistributions of source code must retain the above copyright
 # notice, this list of conditions and the following disclaimer.
@@ -138,7 +138,7 @@ def main(argv=None):
                 "ci", "var=", "noBase"])
         except getopt.error, msg:
             raise ShowMessageAndExit(msg)
-        return 0
+            return 0
 
         outputPath = ""
         _nsiqcppstyle_state.output_format = "vs7"
