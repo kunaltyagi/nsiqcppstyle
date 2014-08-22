@@ -44,7 +44,7 @@ def RunRule(lexer, fullName, decl, contextStack, context) :
     if ext == ".h" :
         upperBlock = contextStack.SigPeek()
         # modification to make doxygen compulsory for even private functions
-        if upperBlock != None:  # and upperBlock.type == "CLASS_BLOCK" and upperBlock.additional == "PRIVATE":
+        if upperBlock is None:  # != None: and upperBlock.type == "CLASS_BLOCK" and upperBlock.additional == "PRIVATE":
             return
 
         t = lexer.GetCurToken()
