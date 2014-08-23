@@ -10,54 +10,67 @@ This rule detect following style file comment.
     #define "AA" <== Violation. file comment should be the first element of file.
     ///
     /// blar blar
-    /// Copyright reserved. 
+    /// Copyright reserved.
     ///
-    
-    = start of file = 
+
+    = start of file =
     /**         <== Violation. No copyright string.
-     * blar blar    
+     * blar blar
      * blar blar
      */
-     
+
 == Good ==
 
-    = start of file = 
+    = start of file =
     ///
     /// blar blar
     /// Copyright reserved. <== Correct
+    /// file
+    /// author
+    /// date
+    /// version
+    /// brief
     ///
-    
-    = start of file = 
+
+    = start of file =
     /**
      * blar blar
      * Copyright reserved. <== Correct
+     * file
+     * author
+     * date
+     * version
+     * brief
      * blar blar
      */
 """
-from nsiqcppstyle_rulehelper import  *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
+
+def error(lexer):
+    nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 1, 0),
+            __name__, """Please provide file info comment in front of
+            file. It includes license/copyright information along
+            with filename, author, date of modification, version and
+            a brief description""")
 
 def RunRule(lexer, filename, dirname) :
 
     t = lexer.GetNextTokenSkipWhiteSpace()
     if t == None : return
-    if t.type == "COMMENT" :
-        if t.value.lower().find("copyright") == -1 :
-            nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 1, 0), __name__, "Please provide file info comment in front of file")
-
-    elif t.type == "CPPCOMMENT" :
+    if t.type in ("COMMENT", "CPPCOMMENT") :
         find = False
         while(t != None and t.type == "CPPCOMMENT") :
-            if t.value.lower().find("copyright") != -1 :
+            if t.value.lower().find("copyright") != -1 or t.value.lower().find("license") != -1:
                 find = True
                 break;
             t = lexer.GetNextTokenSkipWhiteSpace()
         if not find :
-            nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 1, 0), __name__, "Please provide file info comment in front of file")
+            error(lexer)
     else :
-        nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 1, 0), __name__, "Please provide file info comment in front of file")
-    
+        error(lexer)
+
 ruleManager.AddFileStartRule(RunRule)
 
 ###########################################################################################
@@ -67,7 +80,7 @@ ruleManager.AddFileStartRule(RunRule)
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddFileStartRule(RunRule)   
+        ruleManager.AddFileStartRule(RunRule)
     def test1(self):
         self.Analyze("thisfile.c","""
 // license
@@ -110,4 +123,4 @@ coryright */ """)
 #define "WEWE"
 #include </ewe/kk> """)
         assert not CheckErrorContent(__name__)
-        
+

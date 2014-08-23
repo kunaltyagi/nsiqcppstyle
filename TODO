@@ -1,0 +1,6 @@
+Rule 8 1 A : add indentification of which info is missing
+Rule 3 1 A : ensure no main.h
+
+Comments after closing of a block more than 15 lines
+
+unittest everything
