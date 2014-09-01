@@ -28,6 +28,8 @@ filenameMap = {}
 def RunRule(lexer, filename, dirname):
     if filename.startswith("stdafx."):
         return
+    if filename.startswith("main.c"):
+        return
     filelist = filenameMap.get(filename, None)
     if filelist is None:
         filenameMap[filename] = []
