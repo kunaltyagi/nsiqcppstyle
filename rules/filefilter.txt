@@ -29,7 +29,6 @@
 ~ RULE_6_1_A_do_not_omit_function_parameter_names
 ~ RULE_6_1_E_do_not_use_more_than_5_paramters_in_function
 ~ RULE_6_1_G_write_less_than_200_lines_for_function
-~ RULE_6_2_A_do_not_use_system_dependent_type
 ~ RULE_6_4_B_initialize_first_item_of_enum
 ~ RULE_6_5_B_do_not_use_lowercase_for_macro_constants
 ~ RULE_6_5_B_do_not_use_macro_for_constants
