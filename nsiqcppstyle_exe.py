@@ -377,11 +377,11 @@ class FilterManager:
             elif line.startswith("+"):
                 arg = line[1: ].strip()
                 if arg != "": filter.AddInclude(arg)
-                elif line.startswith("-"):
-                    arg = line[1: ].strip()
+            elif line.startswith("-"):
+                arg = line[1: ].strip()
                 if arg != "": filter.AddExclude(arg)
-                elif line.startswith("%"):
-                    arg = line[1: ].strip()
+            elif line.startswith("%"):
+                arg = line[1: ].strip()
                 if arg != "": filter.AddVarMap(arg, "\"" + arg + "\" of filefilter.txt")
         f.close()
         for eachMapKey in self.filterMap.keys():
