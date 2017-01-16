@@ -13,6 +13,17 @@ It only checks public, protected as well as private funcions.
      */
     void FunctionB();
 
+    class A {
+        private :
+            void FunctionC(); <== Violation. doxygen comment still required in private function.
+    }
+
+    class A {
+        public :
+            ///
+            void FunctionC(); <== Violation. doxygen comment in C++ style is not accepted.
+    }
+
 == Good ==
 
    = a.h =
@@ -27,10 +38,6 @@ It only checks public, protected as well as private funcions.
     void FunctionB() {  <== OK.
     }
 
-    class A {
-        private :
-            void FunctionC(); <== Error. Despite it being a private function.
-    }
   = a.c =
      void FunctionD(); <== Don't care. it's defined in c file.
 """
@@ -43,9 +50,6 @@ def RunRule(lexer, fullName, decl, contextStack, context) :
     ext = lexer.filename[lexer.filename.rfind("."):]
     if ext == ".h" :
         upperBlock = contextStack.SigPeek()
-        # modification to make doxygen compulsory for even private functions
-        if upperBlock is None:  # != None: and upperBlock.type == "CLASS_BLOCK" and upperBlock.additional == "PRIVATE":
-            return
 
         t = lexer.GetCurToken()
 
@@ -98,7 +102,7 @@ void FunctionA();
  */
 extern void FunctionB();
 """)
-        assert  CheckErrorContent(__name__)
+        assert CheckErrorContent(__name__)
     def test3(self):
         self.Analyze("thisfile.h",
 """
@@ -107,7 +111,7 @@ public:
     void ~A();
 }
 """)
-        assert  CheckErrorContent(__name__)
+        assert CheckErrorContent(__name__)
     def test4(self):
         self.Analyze("thisfile.h",
 """
@@ -115,10 +119,6 @@ class J {
 public :
     /** HELLO */
     A();
-private :
-    B();
-    C() {
-    }
 }
 """)
         assert not CheckErrorContent(__name__)
@@ -131,7 +131,7 @@ private :
  void FunctionB() {
 }
 """)
-        assert  CheckErrorContent(__name__)
+        assert CheckErrorContent(__name__)
 
     def test6(self):
         self.Analyze("thisfile.h",
@@ -139,5 +139,114 @@ private :
 int a;
  void FunctionB();
 """)
-        assert  CheckErrorContent(__name__)
+        assert CheckErrorContent(__name__)
 
+    def test7(self):
+        self.Analyze("thisfile.h",
+"""
+/**
+ *
+ */
+extern void FunctionB();
+""")
+        assert not CheckErrorContent(__name__)
+
+    def test8(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+protected :
+    /** HELLO */
+    A();
+private :
+    B();
+    C() {
+    }
+}
+""")
+        assert CheckErrorContent(__name__)
+
+    def test9(self):
+        self.Analyze("thisfile.h",
+"""
+///
+extern void FunctionB();
+""")
+        assert CheckErrorContent(__name__)
+
+    def test10(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+public :
+    /// HELLO
+    A();
+}
+""")
+        assert CheckErrorContent(__name__)
+
+    def test11(self):
+        self.Analyze("thisfile.h",
+"""
+extern void FunctionB();  ///< HELLO
+""")
+        assert CheckErrorContent(__name__)
+
+    def test12(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+public :
+    A();  ///< HELLO
+}
+""")
+        assert CheckErrorContent(__name__)
+
+    def test13(self):
+        self.Analyze("thisfile.c",
+"""
+void FunctionA();
+""")
+        assert not CheckErrorContent(__name__)
+
+    def test14(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+protected :
+    /** HELLO */
+    A();
+}
+""")
+        assert not CheckErrorContent(__name__)
+
+    def test15(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+private :
+    /** HELLO */
+    A();
+}
+""")
+        assert not CheckErrorContent(__name__)
+
+    def test14(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+protected :
+    A();
+}
+""")
+        assert CheckErrorContent(__name__)
+
+    def test15(self):
+        self.Analyze("thisfile.h",
+"""
+class J {
+private :
+    A();
+}
+""")
+        assert CheckErrorContent(__name__)
