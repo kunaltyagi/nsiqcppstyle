@@ -57,19 +57,17 @@ def error(lexer):
 
 def RunRule(lexer, filename, dirname) :
 
-    t = lexer.GetNextTokenSkipWhiteSpace()
-    if t == None : return
-    if t.type in ("COMMENT", "CPPCOMMENT") :
-        find = False
-        while(t != None and t.type == "CPPCOMMENT") :
-            if t.value.lower().find("copyright") != -1 or t.value.lower().find("license") != -1:
-                find = True
-                break;
-            t = lexer.GetNextTokenSkipWhiteSpace()
-        if not find :
+    token = lexer.GetNextToken()
+
+    while True:
+        if token is None or token.type not in ("COMMENT", "CPPCOMMENT"):
             error(lexer)
-    else :
-        error(lexer)
+            return
+
+        if token.value.lower().find("copyright") != -1 or token.value.lower().find("license") != -1:
+            return
+
+        token = lexer.GetNextTokenSkipWhiteSpace()
 
 ruleManager.AddFileStartRule(RunRule)
 
@@ -82,45 +80,53 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFileStartRule(RunRule)
     def test1(self):
-        self.Analyze("thisfile.c","""
-// license
+        self.Analyze("thisfile.c",
+"""// license
 // copyright
 """)
         assert not CheckErrorContent(__name__)
     def test2(self):
-        self.Analyze("thisfile.c", """
-/**
+        self.Analyze("thisfile.c",
+"""/**
 #if 0
 #endif
 license
 coryright */ """)
-        assert CheckErrorContent(__name__)
+        assert not CheckErrorContent(__name__)
     def test3(self):
-        self.Analyze("thisfile.c","""
-
+        self.Analyze("thisfile.c",
+"""
 // license
 // copyrigh1
 """)
         assert CheckErrorContent(__name__)
     def test4(self):
-        self.Analyze("thisfile.c","""
-#define "WEWE"
+        self.Analyze("thisfile.c",
+"""#define "WEWE"
 // license
 // copyrigh1
 #include </ewe/kk> """)
-        assert  CheckErrorContent(__name__)
+        assert CheckErrorContent(__name__)
     def test5(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c",
+"""
 #define "WEWE"
 // license
 // copyright
 #include </ewe/kk> """)
         assert CheckErrorContent(__name__)
     def test6(self):
-        self.Analyze("thisfile.c","""
-// license
+        self.Analyze("thisfile.c",
+"""// license
 // copyright
 #define "WEWE"
 #include </ewe/kk> """)
         assert not CheckErrorContent(__name__)
-
+    def test7(self):
+        self.Analyze("thisfile.c",
+"""/*
+ * license
+ * copyright
+ */
+""")
+        assert not CheckErrorContent(__name__)
