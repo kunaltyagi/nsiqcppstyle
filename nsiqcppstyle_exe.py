@@ -286,7 +286,7 @@ def main(argv=None):
 
         nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter, ciMode)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
-        return 0
+        return _nsiqcppstyle_state.error_count
 
     except Usage, err:
         print >> sys.stderr, err.msg
