@@ -19,7 +19,7 @@ from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
 def RunRule(lexer, filename, dirname) :
-    if Search("[_]", filename) and filename[filename.rfind("."):] in (".cpp", ".cxx") :
+    if Search("[_]", filename) and filename[filename.rfind("."):] in (".cpp", ".cxx", "cc", "mm") :
         nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0,0), __name__, 
                            "Do not use underbar for cpp file name (%s)." % filename)
 
