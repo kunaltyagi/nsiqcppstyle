@@ -152,7 +152,7 @@ def main(argv=None):
             "Java": set(["java"]),
             "Javascript/ActionScript": set(["js", "as"]),
             "JSP/PHP": set(["jsp", "php", "JSP", "PHP"]),
-            "C/C++": set(["cpp", "h", "c", "hxx", "cxx", "hpp"])
+            "C/C++": set(["cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"])
             }
 
         updateNsiqCppStyle = False
