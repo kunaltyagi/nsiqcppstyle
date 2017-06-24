@@ -253,7 +253,8 @@ reserved = {
     "_based":"IGNORE",
     "__stdcall":"IGNORE",
     "__try":"IGNORE",
-    "dllexport":"IGNORE"
+    "dllexport":"IGNORE",
+    "final":"IGNORE"
 
 }
 
@@ -1148,5 +1149,5 @@ def RunRules(ruleManager, lexer):
     except Exception, e:
         if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
             print >> sys.stderr, "Rule Error : ", e       
-            traceback.print_exc(file=sys.stderr)     
+            traceback.print_exc(file=sys.stderr)
         
