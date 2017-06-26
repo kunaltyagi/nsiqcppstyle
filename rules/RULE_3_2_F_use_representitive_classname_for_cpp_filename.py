@@ -159,3 +159,21 @@ class DLLEXPORT CCamRecorderFactory
 };
 """)
         assert not  CheckErrorContent(__name__) 
+
+    def test9(self):
+        self.Analyze("test/CamRecorderFactory.h",
+"""
+class CamRecorderFactory final
+{
+};
+""")
+        assert not CheckErrorContent(__name__)
+
+    def test10(self):
+        self.Analyze("test/CamRecorderFact.h",
+"""
+class CamRecorderFactory final
+{
+};
+""")
+        assert CheckErrorContent(__name__)
