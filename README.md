@@ -8,13 +8,44 @@ nsiqcppstyle is one of the most customizable cpp style checkers about.
 * No complex preprocess setting(Easy to run. Just run the nsiqcppstyle in the folder to be analyzed.)
 * Rule / Analysis engine separated structure.
 * Easy to add custom rules.
-* Analysis engine parses source code in heuristic way not concrete grammar. So it supports most C/C++ variations.
+* Analysis engine parses source code in heuristic way not concrete grammar. So it supports **most** C/C++ variations.
 * Supports IDE integation.
 * Easy to integrate in Visual Studio / Emacs / Eclipse CDT. Support each IDE standard error output format.
 * Support CI server.
 * Support checkstyle xml output. You can use checkstyle plugin in various CI server to show N'SIQ CppStyle result.
 * Various violation suppression
 * Provides 4 way to suppress the false alarm. filefilter / basefile / rule ignore per file / violation ignore
+
+## Known limitations
+AFAIK, C++98, C++11 and C++14 code doesn't produce false positives. If you encounter some, please create an issue.
+There are a few corner cases where false positives are generated on a pure C code.
+
+One such known case is while returning ```struct``` from a function (See Issue #8).
+```C
+struct test_struct
+{
+    int a;
+    int b;
+};
+
+struct test_struct func(void)
+{
+    struct test_struct ts = {1, 2};
+    return ts;
+}
+```
+
+A simple solution is to use ```typedef``` so that the lexer doesn't think of ```func``` like a structure but a function.
+```C
+typedef struct test_struct
+{
+    int a;
+    int b;
+} test_struct;
+
+test_struct func(void)
+...
+```
 
 # Instructions
 
@@ -76,8 +107,8 @@ It's really simple
     filefilter.txt is configuration file for the friend tool N'SIQ Collector originally. The filter setting for selecting which file is analyzed by file name pattern matching. N'SIQ CppStyle uses N'SIQCollector filefilter.txt file for reuse of the settings. In addition N'SIQ CppStyle uses '~' character to represent the applying rules in filefilter.txt.
 
 3. **Warning**: Some rules above conflict each other. Eg:
-       RULE_4_1_A_A_use_tab_for_indent 
-       RULE_4_1_A_B_use_space_for_indent. 
+       RULE_4_1_A_A_use_tab_for_indent
+       RULE_4_1_A_B_use_space_for_indent.
     So you should carefully pick the appropriate rules which fit your need.
 
 ## How to run N'SIQ CppStyle on a folder containing C/C++ files
@@ -89,14 +120,14 @@ It's really simple
 Then, N'SIQ CppStyle outputs the analyzed result.
 ```
 ======================================================================================
-Update: checking for update 
+Update: checking for update
 
 ============================ Analyzing box ===========================================
 ======================================================================================
 
  * load rule set in filefilter.txt
 
-  -  RULE_10_1_A_do_not_use_bufferoverflow_risky_function_for_unix is applied. 
+  -  RULE_10_1_A_do_not_use_bufferoverflow_risky_function_for_unix is applied.
     ~~~
   -  RULE_9_1_A_do_not_use_hardcorded_include_path is applied.
 ======================================================================================
@@ -118,26 +149,26 @@ Current File extension and Language Settings
 
  * Violation list
 
-d:\sample\a.c(1, 5):  Do not start function name(SetGlobalAuthority) with uppercase  [RULE_3_3_A_start_function_name_with_lowercase_unix] 
-d:\sample\a.c(1, 5):  Doxygen Comment should be provided in front of function (SetGlobalAuthority) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(1, 1):  Please provide file info comment in front of file  [RULE_8_1_A_provide_file_info_comment] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(21, 6):  Do not start function name(writeLog) with lowercase  [RULE_3_3_A_start_function_name_with_upperrcase_windows] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(21, 6):  Doxygen Comment should be provided in front of function (writeLog) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(36, 6):  Do not start function name(openOut) with lowercase  [RULE_3_3_A_start_function_name_with_upperrcase_windows] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(36, 6):  Doxygen Comment should be provided in front of function (openOut) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(40, 2):  Matching Braces inside of function should be located in the same column   [RULE_4_5_A_braces_inside_of_function_should_be_located_same_column] 
-d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(44, 3):  Do not use system dependent type(int). Use system independent type like (int32_t)  
+d:\sample\a.c(1, 5):  Do not start function name(SetGlobalAuthority) with uppercase  [RULE_3_3_A_start_function_name_with_lowercase_unix]
+d:\sample\a.c(1, 5):  Doxygen Comment should be provided in front of function (SetGlobalAuthority) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(1, 1):  Please provide file info comment in front of file  [RULE_8_1_A_provide_file_info_comment]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(21, 6):  Do not start function name(writeLog) with lowercase  [RULE_3_3_A_start_function_name_with_upperrcase_windows]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(21, 6):  Doxygen Comment should be provided in front of function (writeLog) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(36, 6):  Do not start function name(openOut) with lowercase  [RULE_3_3_A_start_function_name_with_upperrcase_windows]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(36, 6):  Doxygen Comment should be provided in front of function (openOut) in impl file.  [RULE_5_3_A_provide_doxygen_function_comment_on_function_in_impl]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(40, 2):  Matching Braces inside of function should be located in the same column   [RULE_4_5_A_braces_inside_of_function_should_be_located_same_column]
+d:\sample\utils\trunk\boxmonlog\boxmonlog.cpp(44, 3):  Do not use system dependent type(int). Use system independent type like (int32_t)
 
 =============================== Summary Report ==========================================
 
- 
 
- ** Total Available Rules     : 46  
- ** Total Applied Rules       : 43   
- ** Total Violated Rules      : 20   
- ** Total Errors Occurs       : 243  
- ** Total Analyzed Files      : 8    
- ** Total Violated Files Count: 8    
+
+ ** Total Available Rules     : 46
+ ** Total Applied Rules       : 43
+ ** Total Violated Rules      : 20
+ ** Total Errors Occurs       : 243
+ ** Total Analyzed Files      : 8
+ ** Total Violated Files Count: 8
  ** Build Quality             : 0.00%  <== (total analyzed files - the ratio total violated file count) / total analyzed files * 100
 
 =========================== Violated Rule Details ==========================
