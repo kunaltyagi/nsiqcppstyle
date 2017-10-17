@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 #
 # Copyright (c) 2009 NHN Inc. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import sys
 import os
 import csv #@UnusedImport
 import urllib #@UnusedImport
-import urllib2 #@UnusedImport
 try:
     import hashlib #@UnusedImport
 except ImportError:
