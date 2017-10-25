@@ -578,19 +578,17 @@ class CppLexerNavigator(object):
             elif nextToken.type in ["GT"] :
                 tokenStack.pop()
                 if len(tokenStack) == 0 :
-                    return nextToken    
-                else :
-                    return None                
+                    return nextToken
             elif nextToken.type in ["RSHIFT"] :
                 tokenStack.pop()
+                if len(tokenStack) == 0 :
+                    return nextToken
                 tokenStack.pop()
                 if len(tokenStack) == 0 :
-                    return nextToken    
-                else :
-                    return None 
-                
-                
-            
+                    return nextToken
+
+
+
     def GetNextMatchingToken(self, keepCur = False):
         """
         Get matching token
