@@ -120,4 +120,30 @@ extern bool CTEST:canHave();
 boolean operator=();
 boolean KK::operator=();
 """)
-        assert not CheckErrorContent(__name__)    
+        assert not CheckErrorContent(__name__)
+    def test9(self):
+        self.Analyze("test/thisFile.c",
+"""
+template<class ObjectTypePtr,
+         typename = typename std::enable_if<std::is_pointer<ObjectTypePtr>::value>::type>
+bool canHave(ObjectTypePtr obj) {
+}
+
+template<class ObjectTypeNotPtr,
+         typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
+bool canHave(ObjectTypeNotPtr obj) {
+}""")
+        assert CheckErrorContent(__name__)
+    def test10(self):
+        self.Analyze("test/thisFile.c",
+"""
+template<class ObjectTypePtr,
+         typename = typename std::enable_if<std::is_pointer<ObjectTypePtr>::value>::type>
+bool isIt(ObjectTypePtr obj) {
+}
+
+template<class ObjectTypeNotPtr,
+         typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
+bool isIt(ObjectTypeNotPtr obj) {
+}""")
+        assert not CheckErrorContent(__name__)
