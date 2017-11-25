@@ -1054,13 +1054,13 @@ def ContructContextInfo(lexer):
                 
                 if (t3 == None or t3.type != "NEW") and t2 != None and t2.type == "LPAREN" and (curContext == None or curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "NAMESPACE_BLOCK"]) and t4.type != "STRING":
                     # Check The ID after the next RPAREN
-                    # if there is ID or None it's not a function.
-                    # in case HELLO() HELLO2()
+                    # if there is ID, None, or LBRACKET it's not a function.
+                    # in case HELLO() HELLO2(), or FOO (BAR*)[]
                     lexer.PushTokenIndex()
                     lexer._MoveToToken(t2)
                     lexer.GetNextMatchingToken()
                     t5 = lexer.GetNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
-                    if t5 == None or t5.type == "ID" :
+                    if t5 == None or t5.type in ["ID", "LBRACKET"] :
                         lexer.PopTokenIndex()
                         continue
                     lexer.PopTokenIndex()
