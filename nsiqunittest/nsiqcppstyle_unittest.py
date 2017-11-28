@@ -81,3 +81,12 @@ int a;
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
             if tok == None : break
             print tok, tok.contextStack, tok.pp
+    def test5(self):
+        data = """
+foo (bar*)[];
+"""
+        navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
+        nsiqcppstyle_checker.ContructContextInfo(navigator)
+        navigator.Reset()
+        tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
+        assert(tok.type == 'ID' and tok.value == 'foo')
