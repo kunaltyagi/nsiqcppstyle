@@ -26,6 +26,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import nsiqcppstyle_checker
+from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import Verbosity as Verbosity
 import unittest
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
@@ -49,7 +51,7 @@ class nct(unittest.TestCase):
     def setUp(self):
         nsiqcppstyle_rulemanager.ruleManager.ResetRules()
         nsiqcppstyle_rulemanager.ruleManager.ResetRegisteredRules()
-        nsiqcppstyle_state._nsiqcppstyle_state.verbose = True
+        _consoleOutputer.SetVerbosity(Verbosity.Verbose)
         nsiqcppstyle_reporter.Error = MockError
         self.setUpRule()
         global errors

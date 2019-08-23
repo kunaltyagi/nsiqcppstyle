@@ -27,7 +27,10 @@
 
 import unittest
 import nsiqcppstyle_checker
+from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_state
+
 class urlTest(unittest.TestCase):
     def test2(self):
         data = """
@@ -73,7 +76,7 @@ void function2() {
 int a;
 """
 
-        nsiqcppstyle_state._nsiqcppstyle_state.verbose = True
+        _consoleOutputer.SetVerbosity(Verbosity.Verbose)
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)   
         nsiqcppstyle_checker.ContructContextInfo(navigator)
         navigator.Reset()

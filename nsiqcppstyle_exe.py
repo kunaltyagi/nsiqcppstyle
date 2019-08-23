@@ -33,6 +33,8 @@ import re
 import sys  # @UnusedImport
 import copy
 import nsiqcppstyle_checker
+from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
@@ -144,7 +146,6 @@ def main(argv=None):
         _nsiqcppstyle_state.output_format = "vs7"
         filterScope = "default"
         filterPath = ""
-        ciMode = False
         noBase = False
         varMap = {}
         extLangMap = {
@@ -171,7 +172,7 @@ def main(argv=None):
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
             elif o == "-v":
-                EnableVerbose()
+                _consoleOutputer.SetVerbosity(Verbosity.Verbose)
             elif o == "-s":
                 filterScope = a
             elif o == "--show-url":
@@ -184,19 +185,19 @@ def main(argv=None):
             elif o == "--var":
                 varMap = GetCustomKeyValueMap(a, "--var="+a)
             elif o == "--ci":
-                ciMode = True
+                _consoleOutputer.SetVerbosity(Verbosity.Ci);
             elif o == "--noBase":
                 noBase = True
 
-        print title
+        _consoleOutputer.Print(Verbosity.Ci, title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
             try:
-                print "======================================================================================"
+                _consoleOutputer.PrintSeparator(Verbosity.Ci)
                 updateagent.agent.Update(version)
             except Exception, e:
-                print e
+                _consoleOutputer.Print(Verbosity.Error, e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
@@ -219,8 +220,8 @@ def main(argv=None):
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
-            print "======================================================================================"
-            print "=  Analyzing %s " % targetName
+            _consoleOutputer.PrintSeparator(Verbosity.Ci)
+            _consoleOutputer.Print(Verbosity.Ci, "=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath= filterPath
@@ -237,7 +238,8 @@ def main(argv=None):
             filterManager = FilterManager(filefilterPath, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
-                print "\n%s filter scope is not available. Instead, use %s\n" % (filterScope, filterManager.GetActiveFilter().filterName)
+                _consoleOutputer.Print(Verbosity.Error, "\n%s filter scope is not available. Instead, use %s\n"
+                                       % (filterScope, filterManager.GetActiveFilter().filterName))
 
             filter = filterManager.GetActiveFilter()
             # Load Rule
@@ -246,21 +248,20 @@ def main(argv=None):
                 ShowMessageAndExit("Error!. Rules must be set in %s" % filefilterPath, False)
                 continue
 
-            ruleManager.LoadRules(filter.nsiqCppStyleRules, not ciMode)
+            ruleManager.LoadRules(filter.nsiqCppStyleRules)
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
-            if not ciMode:
-                print filter.to_string()
-            print "======================================================================================"
-
-            if VerboseMode(): print "* run nsiqcppstyle analysis on %s" % targetName
+            
+            _consoleOutputer.Print(Verbosity.Default, filter.to_string())
+            _consoleOutputer.PrintSeparator(Verbosity.Ci)
+            _consoleOutputer.Print(Verbosity.Verbose, "* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
             if os.path.isfile(targetPath):
                 fileExtension = targetPath[targetPath.rfind('.') + 1: ]
                 if fileExtension in cExtendstionSet:
-                    ProcessFile(ruleManager, targetPath, analyzedFiles, ciMode)
+                    ProcessFile(ruleManager, targetPath, analyzedFiles)
 
             # if the target is directory, analyze it with filefilter and basefilelist
             else:
@@ -279,12 +280,12 @@ def main(argv=None):
                         basePart = eachFile[len(targetPath): ]
                         if fileExtension in cExtendstionSet and basefilelist.IsNewOrChanged(eachFile) and filter.CheckFileInclusion(basePart):
                             nsiqcppstyle_reporter.StartFile(os.path.dirname(basePart), fname)
-                            ProcessFile(ruleManager, eachFile, analyzedFiles, ciMode)
+                            ProcessFile(ruleManager, eachFile, analyzedFiles)
                             nsiqcppstyle_reporter.EndFile()
             ruleManager.RunProjectRules(targetPath)
             nsiqcppstyle_reporter.EndTarget()
 
-        nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter, ciMode)
+        nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
         return _nsiqcppstyle_state.error_count
 
@@ -296,8 +297,8 @@ def main(argv=None):
 
 #################################################################################################3
 
-def ProcessFile(ruleManager, file, analyzedFiles, ciMode):
-    if not ciMode: print "Processing: ", file
+def ProcessFile(ruleManager, file, analyzedFiles):
+    _consoleOutputer.Print(Verbosity.Default, "Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
 
@@ -328,15 +329,7 @@ def GetRealTargetPaths(args):
             ShowMessageAndExit("Error!: Target directory %s is not exists" % eachTarget)
     return targetPaths
 
-#################################################################################################3
-
-def EnableVerbose():
-    _nsiqcppstyle_state.verbose = True
-
-def VerboseMode():
-    return _nsiqcppstyle_state.verbose
-
-
+#################################################################################################
 
 ##############################################################################
 # Filter Manager
