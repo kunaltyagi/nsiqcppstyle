@@ -76,7 +76,7 @@ Usage: nsiqcppstyle [Options]
   -o path       Set the output path. It's only applied when the output is csv or xml.
   -f path       Set the filefilter path. If not provided, it uses the default filterpath
                 (target/filefilter.txt)
-                If you provide the file path(not folder path) for the target,
+                If you provide the file path (not a folder path) for the target,
                 -f option should be provided.
   --var=key: value,key: value
                 provide the variables to customize the rule behavior.
@@ -88,7 +88,8 @@ Usage: nsiqcppstyle [Options]
                 that each tool recognizes.
                 csv and xml outputs the result on the file "nsiqcppstyle_result.csv"
                 "nsiqcppstyle_result.xml" respectively, if you don't provide -o option.
-  --ci          Continuous Integration mode. If this mode is on, this tool only report summary.
+  --ci          Continuous Integration mode. If this mode is on, this tool only reports summary.
+  --quiet / -q  Quiet mode. If this mode is on, this tool only reports errors.
 
 * nsiqcppstyle reports coding standard violations on C/C++ source code.
 * In default, it doesn't apply any rules on the source. If you want to apply rule,
@@ -135,9 +136,9 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1: ], "o: s: m: hvrf: ", ["help", "csv",
+            opts, args = getopt.getopt(argv[1: ], "o: s: m: hqvrf: ", ["help", "csv",
                 "output=", "list_rules", "verbose=", "show-url", "no-update",
-                "ci", "var=", "noBase"])
+                "ci", "quiet", "var=", "noBase"])
         except getopt.error, msg:
             raise ShowMessageAndExit(msg)
             return 0
@@ -186,6 +187,8 @@ def main(argv=None):
                 varMap = GetCustomKeyValueMap(a, "--var="+a)
             elif o == "--ci":
                 _consoleOutputer.SetVerbosity(Verbosity.Ci);
+            elif o in ("-q", "--quiet"):
+                _consoleOutputer.SetVerbosity(Verbosity.Error);
             elif o == "--noBase":
                 noBase = True
 
