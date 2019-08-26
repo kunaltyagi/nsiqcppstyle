@@ -60,7 +60,7 @@ class ConsoleOuputer:
         self.__logger.setLevel(verbosity)
         
     def __CreateLogger(self):
-        self.__logger = logging.getLogger('simple_example')
+        self.__logger = logging.getLogger('console')
         self.__logger.setLevel(Verbosity.Default)
         
         # create console handler and set level to Verbose
