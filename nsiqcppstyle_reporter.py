@@ -27,7 +27,7 @@
 
 import nsiqcppstyle_state
 import nsiqcppstyle_checker
-from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_rulemanager
 import sys
@@ -64,27 +64,27 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter) :
     buildQuality = 0
     if fileCount != 0 :
         buildQuality = (fileCount - violatedFileCount) * 100.0 / fileCount 
-    _consoleOutputer.Print(Verbosity.Ci, "\n")
-    _consoleOutputer.Print(Verbosity.Ci, "=================================== Summary Report ===================================")
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Analyzed Files      : %d" % len(analyzedFiles))
-    _consoleOutputer.Print(Verbosity.Ci, " ** Total Violated Files Count: %d" % violatedFileCount)
-    _consoleOutputer.Print(Verbosity.Ci, " ** Build Quality             : %.2f%%" % buildQuality)
-    if _consoleOutputer.IsVerbosityDisplayed(Verbosity.Default) :
-        _consoleOutputer.Print(Verbosity.Default, "\n================================ Violated Rule Details ===============================")
+    console.CI("\n")
+    console.CI("=================================== Summary Report ===================================")
+    console.CI(" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
+    console.CI(" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
+    console.CI(" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
+    console.CI(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
+    console.CI(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
+    console.CI(" ** Total Violated Files Count: %d" % violatedFileCount)
+    console.CI(" ** Build Quality             : %.2f%%" % buildQuality)
+    if console.IsVerbosityDisplayed(Verbosity.Default) :
+        console.Info("\n================================ Violated Rule Details ===============================")
         for checker in nsiqcppstyle_state.errorPerChecker.keys() :
-            _consoleOutputer.Print(Verbosity.Default, " - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
-        _consoleOutputer.Print(Verbosity.Default, "\n================================ Violated File Details ===============================")
+            console.Info(" - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
+        console.Info("\n================================ Violated File Details ===============================")
         for eachFile in nsiqcppstyle_state.errorPerFile.keys() :
             count = 0
             for  eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys() :
                 count += nsiqcppstyle_state.errorPerFile[eachFile][eachRule]
-            _consoleOutputer.Print(Verbosity.Default, " - ", eachFile, " violated in total : ", count)
+            console.Info(" - ", eachFile, " violated in total : ", count)
             for  eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys() :
-                _consoleOutputer.Print(Verbosity.Default, "   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
+                console.Info("   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
 
 def CloseReport(format) :
     if format == "xml" :

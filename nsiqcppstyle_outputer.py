@@ -25,32 +25,60 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------
 
-import sys
+import logging
 
 class Verbosity:
-    Verbose = 1
-    Default = 2
-    Ci      = 3
-    Error   = 4
+    Verbose = logging.DEBUG
+    Default = logging.INFO
+    Ci      = logging.WARNING
+    Error   = logging.ERROR
 
 class ConsoleOuputer:
     def __init__(self):
         # Default verbosity is set to Default
         self.__verbosity = Verbosity.Default
+        self.__CreateLogger()
+        self.Separator = "======================================================================================"
 
     def IsVerbosityDisplayed(self, verbosity):
         return verbosity >= self.__verbosity
 
-    def Print(self, verbosity, *msgArgs):
-        if self.IsVerbosityDisplayed(verbosity):
-            # Format output te same way a direct call to print would
-            print ' '.join(str(a) for a in msgArgs)
+    def Verbose(self, *msgArgs):
+        self.__logger.debug(self.__Format(*msgArgs))
 
-    def PrintSeparator(self, verbosity):
-        self.Print(verbosity, "======================================================================================")
+    def Info(self, *msgArgs):
+        self.__logger.info(self.__Format(*msgArgs))
+
+    def CI(self, *msgArgs):
+        self.__logger.warning(self.__Format(*msgArgs))
+
+    def Error(self, *msgArgs):
+        self.__logger.error(self.__Format(*msgArgs))
 
     def SetVerbosity(self, verbosity):
         self.__verbosity = verbosity
+        self.__logger.setLevel(verbosity)
+        
+    def __CreateLogger(self):
+        self.__logger = logging.getLogger('simple_example')
+        self.__logger.setLevel(Verbosity.Default)
+        
+        # create console handler and set level to Verbose
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setLevel(Verbosity.Verbose)
+
+        # create formatter
+        formatter = logging.Formatter('%(message)s')
+
+        # add formatter to consoleHandler
+        consoleHandler.setFormatter(formatter)
+
+        # add consoleHandler to __logger
+        self.__logger.addHandler(consoleHandler)
+        
+    def __Format(self, *msgArgs):
+        # Format output te same way a direct call to print would
+        return ' '.join(str(a) for a in msgArgs)
 
 _consoleOutputer = ConsoleOuputer()
 

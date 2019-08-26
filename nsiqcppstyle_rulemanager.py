@@ -28,7 +28,7 @@
 import os #@UnusedImport
 import sys #@UnusedImport
 import sre_compile
-from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_outputer import Verbosity as Verbosity
 from nsiqcppstyle_util import * #@UnusedWildImport
 
@@ -71,20 +71,20 @@ class RuleManager :
             self.rollBackImporter.uninstall()
         
         self.rollBackImporter = RollbackImporter()
-        _consoleOutputer.PrintSeparator(Verbosity.Ci)
+        console.CI(console.Separator)
         
         for ruleName in checkingRuleNames :
             count = self.availRuleNames.count(ruleName)
             if count == 0 :
-                _consoleOutputer.Print(Verbosity.Error, "%s does not exist or incompatible." % ruleName)
+                console.Error("%s does not exist or incompatible." % ruleName)
                 continue
             else :
-                _consoleOutputer.Print(Verbosity.Default, "  - ", ruleName, "is applied.")
+                console.Info("  - ", ruleName, "is applied.")
             ruleModule = __import__("rules."+ruleName)
             self.loadedRule.append(ruleModule)
         if len(self.loadedRule) == 0 :
-            _consoleOutputer.Print(Verbosity.Ci, "  No Rule is specified. Please configure rules in filefilter.txt.")
-        _consoleOutputer.PrintSeparator(Verbosity.Ci)
+            console.CI("  No Rule is specified. Please configure rules in filefilter.txt.")
+        console.CI(console.Separator)
                 
     def ResetRules(self):
         self.loadedRule = []

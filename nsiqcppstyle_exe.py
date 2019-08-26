@@ -33,7 +33,7 @@ import re
 import sys  # @UnusedImport
 import copy
 import nsiqcppstyle_checker
-from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
+from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
@@ -173,7 +173,7 @@ def main(argv=None):
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
             elif o == "-v":
-                _consoleOutputer.SetVerbosity(Verbosity.Verbose)
+                console.SetVerbosity(Verbosity.Verbose)
             elif o == "-s":
                 filterScope = a
             elif o == "--show-url":
@@ -186,21 +186,21 @@ def main(argv=None):
             elif o == "--var":
                 varMap = GetCustomKeyValueMap(a, "--var="+a)
             elif o == "--ci":
-                _consoleOutputer.SetVerbosity(Verbosity.Ci);
+                console.SetVerbosity(Verbosity.Ci);
             elif o in ("-q", "--quiet"):
-                _consoleOutputer.SetVerbosity(Verbosity.Error);
+                console.SetVerbosity(Verbosity.Error);
             elif o == "--noBase":
                 noBase = True
 
-        _consoleOutputer.Print(Verbosity.Ci, title)
+        console.CI(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
             try:
-                _consoleOutputer.PrintSeparator(Verbosity.Ci)
+                console.CI(console.Separator)
                 updateagent.agent.Update(version)
             except Exception, e:
-                _consoleOutputer.Print(Verbosity.Error, e)
+                console.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
@@ -223,8 +223,8 @@ def main(argv=None):
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
-            _consoleOutputer.PrintSeparator(Verbosity.Ci)
-            _consoleOutputer.Print(Verbosity.Ci, "=  Analyzing %s " % targetName)
+            console.CI(console.Separator)
+            console.CI("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath= filterPath
@@ -241,8 +241,8 @@ def main(argv=None):
             filterManager = FilterManager(filefilterPath, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
-                _consoleOutputer.Print(Verbosity.Error, "\n%s filter scope is not available. Instead, use %s\n"
-                                       % (filterScope, filterManager.GetActiveFilter().filterName))
+                console.Error("\n%s filter scope is not available. Instead, use %s\n"
+                              % (filterScope, filterManager.GetActiveFilter().filterName))
 
             filter = filterManager.GetActiveFilter()
             # Load Rule
@@ -256,9 +256,9 @@ def main(argv=None):
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
             
-            _consoleOutputer.Print(Verbosity.Default, filter.to_string())
-            _consoleOutputer.PrintSeparator(Verbosity.Ci)
-            _consoleOutputer.Print(Verbosity.Verbose, "* run nsiqcppstyle analysis on %s" % targetName)
+            console.Info(filter.to_string())
+            console.CI(console.Separator)
+            console.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
             if os.path.isfile(targetPath):
@@ -301,7 +301,7 @@ def main(argv=None):
 #################################################################################################3
 
 def ProcessFile(ruleManager, file, analyzedFiles):
-    _consoleOutputer.Print(Verbosity.Default, "Processing: ", file)
+    console.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
 
