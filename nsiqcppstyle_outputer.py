@@ -29,14 +29,14 @@ import logging
 
 class Verbosity:
     Verbose = logging.DEBUG
-    Default = logging.INFO
+    Info = logging.INFO
     Ci      = logging.WARNING
     Error   = logging.ERROR
 
 class ConsoleOuputer:
     def __init__(self):
-        # Default verbosity is set to Default
-        self.__verbosity = Verbosity.Default
+        # Default verbosity is set to Info
+        self.__verbosity = Verbosity.Info
         self.__CreateLogger()
         self.Separator = "======================================================================================"
 
@@ -61,19 +61,19 @@ class ConsoleOuputer:
         
     def __CreateLogger(self):
         self.__logger = logging.getLogger('console')
-        self.__logger.setLevel(Verbosity.Default)
+        self.__logger.setLevel(Verbosity.Info)
         
-        # create console handler and set level to Verbose
+        # Create console handler and set level to Verbose
         consoleHandler = logging.StreamHandler()
         consoleHandler.setLevel(Verbosity.Verbose)
 
-        # create formatter
+        # Create formatter
         formatter = logging.Formatter('%(message)s')
 
-        # add formatter to consoleHandler
+        # Add formatter to consoleHandler
         consoleHandler.setFormatter(formatter)
 
-        # add consoleHandler to __logger
+        # Add consoleHandler to __logger
         self.__logger.addHandler(consoleHandler)
         
     def __Format(self, *msgArgs):

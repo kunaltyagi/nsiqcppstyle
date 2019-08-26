@@ -73,7 +73,7 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter) :
     console.CI(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
     console.CI(" ** Total Violated Files Count: %d" % violatedFileCount)
     console.CI(" ** Build Quality             : %.2f%%" % buildQuality)
-    if console.IsVerbosityDisplayed(Verbosity.Default) :
+    if console.IsVerbosityDisplayed(Verbosity.Info) :
         console.Info("\n================================ Violated Rule Details ===============================")
         for checker in nsiqcppstyle_state.errorPerChecker.keys() :
             console.Info(" - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
