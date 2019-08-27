@@ -241,7 +241,7 @@ def main(argv=None):
 
             if filterScope != filterManager.GetActiveFilter().filterName:
                 console.Out.Error("\n%s filter scope is not available. Instead, use %s\n"
-                              % (filterScope, filterManager.GetActiveFilter().filterName))
+                                  % (filterScope, filterManager.GetActiveFilter().filterName))
 
             filter = filterManager.GetActiveFilter()
             # Load Rule
