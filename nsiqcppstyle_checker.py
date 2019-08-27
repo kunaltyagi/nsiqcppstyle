@@ -29,7 +29,6 @@
 import os
 import traceback
 from nsiqcppstyle_outputer import _consoleOutputer as console
-from nsiqcppstyle_outputer import Verbosity as Verbosity
 from nsiqcppstyle_rulehelper import * #@UnusedWildImport
 # Reserved words
 
@@ -1104,7 +1103,7 @@ def ContructContextInfo(lexer):
             t.contextStack = contextStack            
             prevLine = t.lineno 
         except Exception, e:
-            if console.IsVerbosityDisplayed(Verbosity.Verbose) :
+            if console.IsLevelDisplayed(console.Level.Verbose) :
                 print >> sys.stderr, "Context Construnction Error : ", t, t.contextStack, e     
                 traceback.print_exc(file=sys.stderr) 
                 
@@ -1112,7 +1111,7 @@ def RunRules(ruleManager, lexer):
     try :
         ruleManager.RunFileStartRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))    
     except Exception, e:
-        if console.IsVerbosityDisplayed(Verbosity.Verbose) :
+        if console.IsLevelDisplayed(console.Level.Verbose) :
             print >> sys.stderr, "Rule Error : ", e  
             traceback.print_exc(file=sys.stderr) 
     currentLine = 0
@@ -1140,13 +1139,13 @@ def RunRules(ruleManager, lexer):
                         ruleManager.RunTypeScopeRule(lexer, t.contextStack)
                 ruleManager.RunRule(lexer, t.contextStack)
         except Exception, e:
-            if console.IsVerbosityDisplayed(Verbosity.Verbose) :
+            if console.IsLevelDisplayed(console.Level.Verbose) :
                 print >> sys.stderr, "Rule Error : ", t, t.contextStack, e    
                 traceback.print_exc(file=sys.stderr)            
     try :
         ruleManager.RunFileEndRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))
     except Exception, e:
-        if console.IsVerbosityDisplayed(Verbosity.Verbose) :
+        if console.IsLevelDisplayed(console.Level.Verbose) :
             print >> sys.stderr, "Rule Error : ", e       
             traceback.print_exc(file=sys.stderr)
         

@@ -29,7 +29,6 @@ import os #@UnusedImport
 import sys #@UnusedImport
 import sre_compile
 from nsiqcppstyle_outputer import _consoleOutputer as console
-from nsiqcppstyle_outputer import Verbosity as Verbosity
 from nsiqcppstyle_util import * #@UnusedWildImport
 
 class RuleManager :
@@ -71,7 +70,7 @@ class RuleManager :
             self.rollBackImporter.uninstall()
         
         self.rollBackImporter = RollbackImporter()
-        console.CI(console.Separator)
+        console.Ci(console.Separator)
         
         for ruleName in checkingRuleNames :
             count = self.availRuleNames.count(ruleName)
@@ -83,8 +82,8 @@ class RuleManager :
             ruleModule = __import__("rules."+ruleName)
             self.loadedRule.append(ruleModule)
         if len(self.loadedRule) == 0 :
-            console.CI("  No Rule is specified. Please configure rules in filefilter.txt.")
-        console.CI(console.Separator)
+            console.Ci("  No Rule is specified. Please configure rules in filefilter.txt.")
+        console.Ci(console.Separator)
                 
     def ResetRules(self):
         self.loadedRule = []

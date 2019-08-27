@@ -34,7 +34,6 @@ import sys  # @UnusedImport
 import copy
 import nsiqcppstyle_checker
 from nsiqcppstyle_outputer import _consoleOutputer as console
-from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
@@ -173,7 +172,7 @@ def main(argv=None):
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
             elif o == "-v":
-                console.SetVerbosity(Verbosity.Verbose)
+                console.SetLevel(console.Level.Verbose)
             elif o == "-s":
                 filterScope = a
             elif o == "--show-url":
@@ -186,18 +185,18 @@ def main(argv=None):
             elif o == "--var":
                 varMap = GetCustomKeyValueMap(a, "--var="+a)
             elif o == "--ci":
-                console.SetVerbosity(Verbosity.Ci);
+                console.SetLevel(console.Level.Ci);
             elif o in ("-q", "--quiet"):
-                console.SetVerbosity(Verbosity.Error);
+                console.SetLevel(console.Level.Error);
             elif o == "--noBase":
                 noBase = True
 
-        console.CI(title)
+        console.Ci(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
+            console.Ci(console.Separator)
             try:
-                console.CI(console.Separator)
                 updateagent.agent.Update(version)
             except Exception, e:
                 console.Error(e)
@@ -223,8 +222,8 @@ def main(argv=None):
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
-            console.CI(console.Separator)
-            console.CI("=  Analyzing %s " % targetName)
+            console.Ci(console.Separator)
+            console.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath= filterPath
@@ -257,7 +256,7 @@ def main(argv=None):
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
             
             console.Info(filter.to_string())
-            console.CI(console.Separator)
+            console.Ci(console.Separator)
             console.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition

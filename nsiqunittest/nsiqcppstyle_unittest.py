@@ -27,8 +27,7 @@
 
 import unittest
 import nsiqcppstyle_checker
-from nsiqcppstyle_outputer import _consoleOutputer as _consoleOutputer
-from nsiqcppstyle_outputer import Verbosity as Verbosity
+from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 
 class urlTest(unittest.TestCase):
@@ -76,7 +75,7 @@ void function2() {
 int a;
 """
 
-        _consoleOutputer.SetVerbosity(Verbosity.Verbose)
+        console.SetLevel(console.Level.Verbose)
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)   
         nsiqcppstyle_checker.ContructContextInfo(navigator)
         navigator.Reset()

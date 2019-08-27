@@ -27,21 +27,21 @@
 
 import logging
 
-class Verbosity:
-    Verbose = logging.DEBUG
-    Info = logging.INFO
-    Ci      = logging.WARNING
-    Error   = logging.ERROR
-
 class ConsoleOuputer:
+    class Level:
+        Verbose = logging.DEBUG
+        Info    = logging.INFO
+        Ci      = logging.WARNING
+        Error   = logging.ERROR
+
     def __init__(self):
-        # Default verbosity is set to Info
-        self.__verbosity = Verbosity.Info
+        # Default level is set to Info
+        self.__level = self.Level.Info
         self.__CreateLogger()
         self.Separator = "======================================================================================"
-
-    def IsVerbosityDisplayed(self, verbosity):
-        return verbosity >= self.__verbosity
+        
+    def IsLevelDisplayed(self, level):
+        return level >= self.__level
 
     def Verbose(self, *msgArgs):
         self.__logger.debug(self.__Format(*msgArgs))
@@ -49,23 +49,23 @@ class ConsoleOuputer:
     def Info(self, *msgArgs):
         self.__logger.info(self.__Format(*msgArgs))
 
-    def CI(self, *msgArgs):
+    def Ci(self, *msgArgs):
         self.__logger.warning(self.__Format(*msgArgs))
 
     def Error(self, *msgArgs):
         self.__logger.error(self.__Format(*msgArgs))
 
-    def SetVerbosity(self, verbosity):
-        self.__verbosity = verbosity
-        self.__logger.setLevel(verbosity)
+    def SetLevel(self, level):
+        self.__level = level
+        self.__logger.setLevel(level)
         
     def __CreateLogger(self):
         self.__logger = logging.getLogger('console')
-        self.__logger.setLevel(Verbosity.Info)
+        self.__logger.setLevel(self.Level.Info)
         
         # Create console handler and set level to Verbose
         consoleHandler = logging.StreamHandler()
-        consoleHandler.setLevel(Verbosity.Verbose)
+        consoleHandler.setLevel(self.Level.Verbose)
 
         # Create formatter
         formatter = logging.Formatter('%(message)s')

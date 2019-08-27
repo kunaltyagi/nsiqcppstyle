@@ -28,7 +28,6 @@
 import nsiqcppstyle_state
 import nsiqcppstyle_checker
 from nsiqcppstyle_outputer import _consoleOutputer as console
-from nsiqcppstyle_outputer import Verbosity as Verbosity
 import nsiqcppstyle_rulemanager
 import sys
 import csv
@@ -64,16 +63,16 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter) :
     buildQuality = 0
     if fileCount != 0 :
         buildQuality = (fileCount - violatedFileCount) * 100.0 / fileCount 
-    console.CI("\n")
-    console.CI("=================================== Summary Report ===================================")
-    console.CI(" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
-    console.CI(" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
-    console.CI(" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
-    console.CI(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
-    console.CI(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
-    console.CI(" ** Total Violated Files Count: %d" % violatedFileCount)
-    console.CI(" ** Build Quality             : %.2f%%" % buildQuality)
-    if console.IsVerbosityDisplayed(Verbosity.Info) :
+    console.Ci("\n")
+    console.Ci("=================================== Summary Report ===================================")
+    console.Ci(" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
+    console.Ci(" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
+    console.Ci(" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
+    console.Ci(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
+    console.Ci(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
+    console.Ci(" ** Total Violated Files Count: %d" % violatedFileCount)
+    console.Ci(" ** Build Quality             : %.2f%%" % buildQuality)
+    if console.IsLevelDisplayed(console.Level.Info) :
         console.Info("\n================================ Violated Rule Details ===============================")
         for checker in nsiqcppstyle_state.errorPerChecker.keys() :
             console.Info(" - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
