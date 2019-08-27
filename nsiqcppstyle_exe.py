@@ -50,7 +50,7 @@ title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
 
 def ShowMessageAndExit(msg, usageOutput=True):
-    print >> sys.stderr, msg
+    console.Err.Error(msg)
     if usageOutput:
         Usage()
     sys.exit(-1)
@@ -191,15 +191,15 @@ def main(argv=None):
             elif o == "--noBase":
                 noBase = True
 
-        console.Ci(title)
+        console.Out.Ci(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
-            console.Ci(console.Separator)
+            console.Out.Ci(console.Separator)
             try:
                 updateagent.agent.Update(version)
             except Exception, e:
-                console.Error(e)
+                console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
@@ -222,8 +222,8 @@ def main(argv=None):
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
-            console.Ci(console.Separator)
-            console.Ci("=  Analyzing %s " % targetName)
+            console.Out.Ci(console.Separator)
+            console.Out.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath= filterPath
@@ -240,7 +240,7 @@ def main(argv=None):
             filterManager = FilterManager(filefilterPath, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
-                console.Error("\n%s filter scope is not available. Instead, use %s\n"
+                console.Out.Error("\n%s filter scope is not available. Instead, use %s\n"
                               % (filterScope, filterManager.GetActiveFilter().filterName))
 
             filter = filterManager.GetActiveFilter()
@@ -255,9 +255,9 @@ def main(argv=None):
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
             
-            console.Info(filter.to_string())
-            console.Ci(console.Separator)
-            console.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
+            console.Out.Info(filter.to_string())
+            console.Out.Ci(console.Separator)
+            console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
             if os.path.isfile(targetPath):
@@ -292,15 +292,15 @@ def main(argv=None):
         return _nsiqcppstyle_state.error_count
 
     except Usage, err:
-        print >> sys.stderr, err.msg
-        print >> sys.stderr, "for help use --help"
+        console.Err.Error(err.msg)
+        console.Err.Error("for help use --help")
         sys.exit(-1)
 
 
 #################################################################################################3
 
 def ProcessFile(ruleManager, file, analyzedFiles):
-    console.Info("Processing: ", file)
+    console.Out.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
 
