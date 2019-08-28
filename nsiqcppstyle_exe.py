@@ -33,6 +33,7 @@ import re
 import sys  # @UnusedImport
 import copy
 import nsiqcppstyle_checker
+from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
@@ -49,7 +50,7 @@ title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
 
 def ShowMessageAndExit(msg, usageOutput=True):
-    print >> sys.stderr, msg
+    console.Err.Error(msg)
     if usageOutput:
         Usage()
     sys.exit(-1)
@@ -74,7 +75,7 @@ Usage: nsiqcppstyle [Options]
   -o path       Set the output path. It's only applied when the output is csv or xml.
   -f path       Set the filefilter path. If not provided, it uses the default filterpath
                 (target/filefilter.txt)
-                If you provide the file path(not folder path) for the target,
+                If you provide the file path (not a folder path) for the target,
                 -f option should be provided.
   --var=key: value,key: value
                 provide the variables to customize the rule behavior.
@@ -86,7 +87,8 @@ Usage: nsiqcppstyle [Options]
                 that each tool recognizes.
                 csv and xml outputs the result on the file "nsiqcppstyle_result.csv"
                 "nsiqcppstyle_result.xml" respectively, if you don't provide -o option.
-  --ci          Continuous Integration mode. If this mode is on, this tool only report summary.
+  --ci          Continuous Integration mode. If this mode is on, this tool only reports summary.
+  --quiet / -q  Quiet mode. If this mode is on, this tool only reports errors.
 
 * nsiqcppstyle reports coding standard violations on C/C++ source code.
 * In default, it doesn't apply any rules on the source. If you want to apply rule,
@@ -133,9 +135,9 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1: ], "o: s: m: hvrf: ", ["help", "csv",
+            opts, args = getopt.getopt(argv[1: ], "o: s: m: hqvrf: ", ["help", "csv",
                 "output=", "list_rules", "verbose=", "show-url", "no-update",
-                "ci", "var=", "noBase"])
+                "ci", "quiet", "var=", "noBase"])
         except getopt.error, msg:
             raise ShowMessageAndExit(msg)
             return 0
@@ -144,7 +146,6 @@ def main(argv=None):
         _nsiqcppstyle_state.output_format = "vs7"
         filterScope = "default"
         filterPath = ""
-        ciMode = False
         noBase = False
         varMap = {}
         extLangMap = {
@@ -171,7 +172,7 @@ def main(argv=None):
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
             elif o == "-v":
-                EnableVerbose()
+                console.SetLevel(console.Level.Verbose)
             elif o == "-s":
                 filterScope = a
             elif o == "--show-url":
@@ -184,19 +185,21 @@ def main(argv=None):
             elif o == "--var":
                 varMap = GetCustomKeyValueMap(a, "--var="+a)
             elif o == "--ci":
-                ciMode = True
+                console.SetLevel(console.Level.Ci);
+            elif o in ("-q", "--quiet"):
+                console.SetLevel(console.Level.Error);
             elif o == "--noBase":
                 noBase = True
 
-        print title
+        console.Out.Ci(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
+            console.Out.Ci(console.Separator)
             try:
-                print "======================================================================================"
                 updateagent.agent.Update(version)
             except Exception, e:
-                print e
+                console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
@@ -219,8 +222,8 @@ def main(argv=None):
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
-            print "======================================================================================"
-            print "=  Analyzing %s " % targetName
+            console.Out.Ci(console.Separator)
+            console.Out.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath= filterPath
@@ -237,7 +240,8 @@ def main(argv=None):
             filterManager = FilterManager(filefilterPath, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
-                print "\n%s filter scope is not available. Instead, use %s\n" % (filterScope, filterManager.GetActiveFilter().filterName)
+                console.Out.Error("\n%s filter scope is not available. Instead, use %s\n"
+                                  % (filterScope, filterManager.GetActiveFilter().filterName))
 
             filter = filterManager.GetActiveFilter()
             # Load Rule
@@ -246,21 +250,20 @@ def main(argv=None):
                 ShowMessageAndExit("Error!. Rules must be set in %s" % filefilterPath, False)
                 continue
 
-            ruleManager.LoadRules(filter.nsiqCppStyleRules, not ciMode)
+            ruleManager.LoadRules(filter.nsiqCppStyleRules)
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
-            if not ciMode:
-                print filter.to_string()
-            print "======================================================================================"
-
-            if VerboseMode(): print "* run nsiqcppstyle analysis on %s" % targetName
+            
+            console.Out.Info(filter.to_string())
+            console.Out.Ci(console.Separator)
+            console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
             if os.path.isfile(targetPath):
                 fileExtension = targetPath[targetPath.rfind('.') + 1: ]
                 if fileExtension in cExtendstionSet:
-                    ProcessFile(ruleManager, targetPath, analyzedFiles, ciMode)
+                    ProcessFile(ruleManager, targetPath, analyzedFiles)
 
             # if the target is directory, analyze it with filefilter and basefilelist
             else:
@@ -279,25 +282,25 @@ def main(argv=None):
                         basePart = eachFile[len(targetPath): ]
                         if fileExtension in cExtendstionSet and basefilelist.IsNewOrChanged(eachFile) and filter.CheckFileInclusion(basePart):
                             nsiqcppstyle_reporter.StartFile(os.path.dirname(basePart), fname)
-                            ProcessFile(ruleManager, eachFile, analyzedFiles, ciMode)
+                            ProcessFile(ruleManager, eachFile, analyzedFiles)
                             nsiqcppstyle_reporter.EndFile()
             ruleManager.RunProjectRules(targetPath)
             nsiqcppstyle_reporter.EndTarget()
 
-        nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter, ciMode)
+        nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
         return _nsiqcppstyle_state.error_count
 
     except Usage, err:
-        print >> sys.stderr, err.msg
-        print >> sys.stderr, "for help use --help"
+        console.Err.Error(err.msg)
+        console.Err.Error("for help use --help")
         sys.exit(-1)
 
 
 #################################################################################################3
 
-def ProcessFile(ruleManager, file, analyzedFiles, ciMode):
-    if not ciMode: print "Processing: ", file
+def ProcessFile(ruleManager, file, analyzedFiles):
+    console.Out.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
 
@@ -328,15 +331,7 @@ def GetRealTargetPaths(args):
             ShowMessageAndExit("Error!: Target directory %s is not exists" % eachTarget)
     return targetPaths
 
-#################################################################################################3
-
-def EnableVerbose():
-    _nsiqcppstyle_state.verbose = True
-
-def VerboseMode():
-    return _nsiqcppstyle_state.verbose
-
-
+#################################################################################################
 
 ##############################################################################
 # Filter Manager

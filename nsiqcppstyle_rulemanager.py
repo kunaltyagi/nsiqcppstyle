@@ -28,6 +28,7 @@
 import os #@UnusedImport
 import sys #@UnusedImport
 import sre_compile
+from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import * #@UnusedWildImport
 
 class RuleManager :
@@ -59,7 +60,7 @@ class RuleManager :
 #       self.LoadAllRules()
         
             
-    def LoadRules(self, checkingRuleNames, printRule = True):
+    def LoadRules(self, checkingRuleNames):
         """
         Load Rules. It resets rule before loading rules 
         """
@@ -69,21 +70,20 @@ class RuleManager :
             self.rollBackImporter.uninstall()
         
         self.rollBackImporter = RollbackImporter()
-        print "======================================================================================"
+        console.Out.Ci(console.Separator)
         
         for ruleName in checkingRuleNames :
             count = self.availRuleNames.count(ruleName)
             if count == 0 :
-                print "%s does not exist or incompatible." % ruleName
+                console.Out.Error("%s does not exist or incompatible." % ruleName)
                 continue
             else :
-                if printRule :
-                    print "  - ", ruleName, "is applied."
+                console.Out.Info("  - ", ruleName, "is applied.")
             ruleModule = __import__("rules."+ruleName)
             self.loadedRule.append(ruleModule)
         if len(self.loadedRule) == 0 :
-            print "  No Rule is specified. Please configure rules in filefilter.txt."  
-        print "======================================================================================"
+            console.Out.Ci("  No Rule is specified. Please configure rules in filefilter.txt.")
+        console.Out.Ci(console.Separator)
                 
     def ResetRules(self):
         self.loadedRule = []

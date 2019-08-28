@@ -27,6 +27,7 @@
 
 import nsiqcppstyle_state
 import nsiqcppstyle_checker
+from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_rulemanager
 import sys
 import csv
@@ -53,7 +54,7 @@ def PrepareReport(outputPath, format) :
         writer = file(outputPath, "wb")
         writer.write("<?xml version='1.0'?>\n<checkstyle version='4.4'>\n")
 
-def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter, ciMode) :
+def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter) :
     """
     Report Summary Info into the screen.
     """
@@ -62,27 +63,28 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter, ciMode) :
     buildQuality = 0
     if fileCount != 0 :
         buildQuality = (fileCount - violatedFileCount) * 100.0 / fileCount 
-    print "\n"
-    print ("=================================== Summary Report ===================================");
-    print (" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
-    print (" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
-    print (" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
-    print (" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
-    print (" ** Total Analyzed Files      : %d" % len(analyzedFiles))
-    print (" ** Total Violated Files Count: %d" % violatedFileCount)
-    print (" ** Build Quality             : %.2f%%" % buildQuality)
-    if not ciMode :
-        print ("\n================================ Violated Rule Details ===============================")
+    console.Out.Ci("\n")
+    console.Out.Ci("=================================== Summary Report ===================================")
+    console.Out.Ci(" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
+    console.Out.Ci(" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
+    console.Out.Ci(" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
+    console.Out.Ci(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
+    console.Out.Ci(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
+    console.Out.Ci(" ** Total Violated Files Count: %d" % violatedFileCount)
+    console.Out.Ci(" ** Build Quality             : %.2f%%" % buildQuality)
+    if console.IsLevelDisplayed(console.Level.Info) :
+        console.Out.Info("\n================================ Violated Rule Details ===============================")
         for checker in nsiqcppstyle_state.errorPerChecker.keys() :
-            print " - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker]
-        print ("\n================================ Violated File Details ===============================")
+            console.Out.Info(" - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
+        console.Out.Info("\n================================ Violated File Details ===============================")
         for eachFile in nsiqcppstyle_state.errorPerFile.keys() :
             count = 0
             for  eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys() :
                 count += nsiqcppstyle_state.errorPerFile[eachFile][eachRule]
-            print " - ", eachFile, " violated in total : ", count
+            console.Out.Info(" - ", eachFile, " violated in total : ", count)
             for  eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys() :
-                print "   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule]
+                console.Out.Info("   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
+
 def CloseReport(format) :
     if format == "xml" :
         global writer

@@ -37,7 +37,6 @@ class _NsiqCppStyleState(object):
         # "emacs" - format that emacs can parse (default)
         # "vs7" - format that Microsoft Visual Studio 7 can parse
         self.output_format = 'vs7'
-        self.verbose = False
         self.showUrl = False
         self.reportError = False
         self.suppressRules = {}
@@ -46,12 +45,6 @@ class _NsiqCppStyleState(object):
     def SetOutputFormat(self, output_format):
         """Sets the output format for errors."""
         self.output_format = output_format
-
-    def SetVerboseLevel(self, level):
-        """Sets the module's verbosity, and returns the previous setting."""
-        last_verbose_level = self.verbose_level
-        self.verbose_level = level
-        return last_verbose_level
 
     def SetCheckers(self, checkers):
         self.checkers = checkers

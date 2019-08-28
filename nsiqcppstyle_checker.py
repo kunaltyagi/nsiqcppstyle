@@ -28,6 +28,7 @@
 
 import os
 import traceback
+from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_rulehelper import * #@UnusedWildImport
 # Reserved words
 
@@ -307,8 +308,7 @@ def t_CPPCOMMENT(t):
     return t
 
 def t_error(t):
-    if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
-        print "Illegal character '%s'" % t.value[0], t.lexer.lineno;
+    console.Out.Verbose("Illegal character '%s'" % t.value[0], t.lexer.lineno);
     t.lexer.skip(1)
 
  
@@ -1103,17 +1103,15 @@ def ContructContextInfo(lexer):
             t.contextStack = contextStack            
             prevLine = t.lineno 
         except Exception, e:
-            if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
-                print >> sys.stderr, "Context Construnction Error : ", t, t.contextStack, e     
-                traceback.print_exc(file=sys.stderr) 
+            console.Err.Verbose("Context Construction Error : ", t, t.contextStack, e) 
+            console.Err.Verbose(traceback.format_exc())
                 
 def RunRules(ruleManager, lexer):
     try :
         ruleManager.RunFileStartRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))    
     except Exception, e:
-        if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
-            print >> sys.stderr, "Rule Error : ", e  
-            traceback.print_exc(file=sys.stderr) 
+        console.Err.Verbose("Rule Error : ", e)
+        console.Err.Verbose(traceback.format_exc())
     currentLine = 0
     t = None
     while(True) :
@@ -1139,13 +1137,11 @@ def RunRules(ruleManager, lexer):
                         ruleManager.RunTypeScopeRule(lexer, t.contextStack)
                 ruleManager.RunRule(lexer, t.contextStack)
         except Exception, e:
-            if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
-                print >> sys.stderr, "Rule Error : ", t, t.contextStack, e    
-                traceback.print_exc(file=sys.stderr)            
+            console.Err.Verbose("Rule Error : ", t, t.contextStack, e)
+            console.Err.Verbose(traceback.format_exc())
     try :
         ruleManager.RunFileEndRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))
     except Exception, e:
-        if nsiqcppstyle_state._nsiqcppstyle_state.verbose :
-            print >> sys.stderr, "Rule Error : ", e       
-            traceback.print_exc(file=sys.stderr)
+        console.Err.Verbose("Rule Error : ", e)
+        console.Err.Verbose(traceback.format_exc())
         
