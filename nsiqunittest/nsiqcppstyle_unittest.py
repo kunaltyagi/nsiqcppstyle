@@ -58,6 +58,63 @@ class unitTest(unittest.TestCase):
     def testIgnoreNoexceptFunctionSpecifier(self):
         self.__testFunctionSpecifier("noexcept")
 
+    def testGetPrevMatchingLT(self):
+        lexer = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", "std::set<int> m;")
+        # This step resolves comments and some token types like FUNCTION
+        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        lexer.Reset();
+
+        ltToken = lexer.GetNextTokenInType("LT")
+        assert(ltToken != None and ltToken.type == "LT")
+        gtToken = lexer.GetNextTokenInType("GT")
+        assert(gtToken != None and gtToken.type == "GT")
+
+        matchingLtToken = lexer.GetPrevMatchingLT()
+        assert(matchingLtToken != None and matchingLtToken.type == "LT")
+        assert(matchingLtToken.column == ltToken.column)
+
+    def testGetPrevMatchingLTWithInnerOnes(self):
+        lexer = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", "std::map<std::set<int>, float> m;")
+        # This step resolves comments and some token types like FUNCTION
+        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        lexer.Reset();
+
+        # Get the first < token
+        ltToken = lexer.GetNextTokenInType("LT")
+        assert(ltToken != None and ltToken.type == "LT" and ltToken.column == 9)
+
+        # Get the first > token
+        gtToken = lexer.GetNextTokenInType("GT")
+        assert(gtToken != None and gtToken.type == "GT")
+        # Get the second > token
+        prevGtTokenColumn = gtToken.column
+        gtToken = lexer.GetNextTokenInType("GT")
+        assert(gtToken != None and gtToken.type == "GT" and gtToken.column != prevGtTokenColumn)
+
+        # Expect the matching < token to be the first < token
+        matchingLtToken = lexer.GetPrevMatchingLT()
+        assert(matchingLtToken != None and matchingLtToken.type == "LT")
+        assert(matchingLtToken.column == ltToken.column)
+
+    def testGetPrevMatchingLTWithInner(self):
+        lexer = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", "std::set<std::map<int, float>> m;")
+        # This step resolves comments and some token types like FUNCTION
+        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        lexer.Reset();
+
+        # Get the first < token
+        ltToken = lexer.GetNextTokenInType("LT")
+        assert(ltToken != None and ltToken.type == "LT" and ltToken.column == 9)
+
+        # Get the >> token
+        gtToken = lexer.GetNextTokenInType("RSHIFT")
+        assert(gtToken != None and gtToken.type == "RSHIFT")
+
+        # Expect the matching < token to be the first < token
+        matchingLtToken = lexer.GetPrevMatchingLT()
+        assert(matchingLtToken != None and matchingLtToken.type == "LT")
+        assert(matchingLtToken.column == ltToken.column)
+
     def test2(self):
         data = """
 #ifdef __NAME__
