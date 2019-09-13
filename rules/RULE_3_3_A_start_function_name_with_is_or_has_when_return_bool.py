@@ -42,15 +42,6 @@ def RunRule(lexer, fullName, decl, contextStack, context) :
 
 ruleManager.AddFunctionNameRule(RunRule)
 
-
-
-
-
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -65,38 +56,43 @@ class testRule(nct):
 """
 bool canHave() {
 }""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c",
 """
 bool CTEST:canHave() {
 }""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c",
 """
 extern bool CTEST:canHave() {
 }""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c",
 """
 extern int CTEST:canHave() {
 }""")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c",
 """
 extern int CTEST:isIt() {
 }""")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c",
 """
 class K {
 extern bool CTEST:canHave();
 }""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test7(self):
         self.Analyze("test/thisFile.c", """
@@ -112,7 +108,7 @@ extern bool CTEST:canHave();
               */
              void AddGate(GATE gate){m_GateCont.push_back(gate); }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test8(self):
         self.Analyze("test/thisFile.c",
@@ -120,7 +116,7 @@ extern bool CTEST:canHave();
 boolean operator=();
 boolean KK::operator=();
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test9(self):
         self.Analyze("test/thisFile.c",
@@ -137,7 +133,7 @@ template<class ObjectTypeNotPtr,
          typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
 bool canHave(ObjectTypeNotPtr obj) {
 }""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test10(self):
         self.Analyze("test/thisFile.c",
@@ -154,4 +150,4 @@ template<class ObjectTypeNotPtr,
          typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
 bool isIt(ObjectTypeNotPtr obj) {
 }""")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

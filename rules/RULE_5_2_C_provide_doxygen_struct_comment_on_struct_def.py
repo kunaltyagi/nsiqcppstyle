@@ -55,14 +55,16 @@ ruleManager.AddTypeNameRule(RunRule)
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddTypeNameRule(RunRule)   
+        ruleManager.AddTypeNameRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c",
 """
 struct A {
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """
@@ -71,7 +73,8 @@ struct A {
 struct K {
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c",
 """
@@ -82,7 +85,8 @@ struct K {
     }
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """
@@ -98,7 +102,8 @@ struct J {
 }
 class T;
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c",
 """
@@ -107,11 +112,12 @@ class T;
 struct K {
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test6(self):
         self.Analyze("thisfile.c",
 """
 typedef struct  {
 } K
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)

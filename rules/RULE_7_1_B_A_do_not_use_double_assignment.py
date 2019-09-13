@@ -40,32 +40,37 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddLineRule(RunRule)   
+
     def test1(self):
         self.Analyze("thisfile.c","""
 void Hello() {
    int k = a = 2;
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 int k = c = 2;
 void Hello() {
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 int k = 2; int j = 2;
 void Hello() {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c","""
 a = "dsd=wew=e";
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c","""
         
@@ -91,4 +96,4 @@ a = "dsd=wew=e";
                               TzZfRXdVRXNxRUNjY1V4ZmpaamRobEtvYUtQS19CNjhUay02LV9mMm5wQ2RGZDJrNDhXdHVROWxnaHFMbS1mdzNzT\
                               HdfMktsNjVGWC1uY3pVM0F6NVlUMFJ6UT09";
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

@@ -44,18 +44,20 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionScopeRule(RunRule) 
-        ruleManager.AddPreprocessRule(RunRule)  
+        ruleManager.AddPreprocessRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""
 void Hello() {
    goto TT:
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 goto TT:
 void Hello() {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

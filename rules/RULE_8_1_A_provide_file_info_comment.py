@@ -79,12 +79,14 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFileStartRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c",
 """// license
 // copyright
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """/**
@@ -92,21 +94,24 @@ class testRule(nct):
 #endif
 license
 coryright */ """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c",
 """
 // license
 // copyrigh1
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """#define "WEWE"
 // license
 // copyrigh1
 #include </ewe/kk> """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c",
 """
@@ -114,14 +119,16 @@ coryright */ """)
 // license
 // copyright
 #include </ewe/kk> """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test6(self):
         self.Analyze("thisfile.c",
 """// license
 // copyright
 #define "WEWE"
 #include </ewe/kk> """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test7(self):
         self.Analyze("thisfile.c",
 """/*
@@ -129,4 +136,4 @@ coryright */ """)
  * copyright
  */
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

@@ -70,13 +70,15 @@ ruleManager.AddFunctionNameRule(RunRule)
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddFunctionNameRule(RunRule)   
+        ruleManager.AddFunctionNameRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c",
 """
 int functionA(int *a, K<a, b>, int b, int c, int c);
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """
@@ -85,7 +87,8 @@ int functionA(int, int, int, Scope<T,J> a) {
 
 int B;
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c",
 """
@@ -94,7 +97,8 @@ int functionA(int *a, int, int, tt&b, aa*s, k a);
 int B;
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """
@@ -103,7 +107,7 @@ int functionA(int *a, int c, int d, tt&b, aa*s, k a);
 int B;
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test5(self):
         self.Analyze("thisfile.c",
@@ -113,7 +117,8 @@ int functionA(void);
 int B;
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("thisfile.c",
 """
@@ -122,7 +127,7 @@ int functionA(void*);
 int B;
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test7(self):
         self.Analyze("thisfile.c",
@@ -149,14 +154,15 @@ void func(void)
 }
 
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test8(self):
         self.Analyze("thisfile.c",
 """
 #define ILOG_WARN(A) \\
         iota::BoxLog::Instance().WriteFormat(box::Warn, __FILE__, __LINE__, __VA_ARGS__)
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test9(self) :
 
@@ -172,7 +178,7 @@ ExeOptionDetail& ExeOptionDetail::operator=(const nano::Variant::Map& mapOptions
 };
 
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test10(self):
         self.Analyze("thisfile.c",
@@ -185,8 +191,8 @@ CHTMLDomUtility::SetStyleProperty(pObject, _T("display"), _T("none"));    // ==>
 } 
 }; 
 """)
-        assert not CheckErrorContent(__name__)
-    
+        self.ExpectSuccess(__name__)
+
     def test11(self):
         self.Analyze("thisfile.c",
 """
@@ -196,5 +202,4 @@ CPoint BtnTeamPos[]    = { CPoint(BTN_SINGLE_POS_X, BTN_SINGLE_POS_Y),
                             CPoint(BTN_TEAM_C_POS_X, BTN_TEAM_C_POS_Y) 
                         };
 """)
-        assert not CheckErrorContent(__name__)
-
+        self.ExpectSuccess(__name__)

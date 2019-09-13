@@ -39,10 +39,6 @@ def RunRule(lexer, fullName, decl, contextStack, context) :
 
 ruleManager.AddFunctionNameRule(RunRule)
 
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -51,6 +47,7 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -59,7 +56,8 @@ void function(int k, int j
 {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -68,7 +66,8 @@ void function(int k, int j,
 {
 }
 """)
-        assert  CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -78,7 +77,8 @@ void function(int k, int j,
 {
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -86,7 +86,8 @@ void function(int k, int j, int pp)
 {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -95,7 +96,8 @@ void function(int k, int j,
               int pp);
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -104,7 +106,8 @@ void function(int k, int j,
             int pp);
 }
 """)
-        assert  CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test7(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -117,7 +120,8 @@ void function(int k, int j,
 }
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test8(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -130,7 +134,8 @@ void function(int k, int j,
 }
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test9(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -139,9 +144,8 @@ Void aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa( int a,
 {
 }
 """)
-        assert not CheckErrorContent(__name__)
- 
- 
+        self.ExpectSuccess(__name__)
+
     def test10(self):
         self.Analyze("test/thisFile.c", 
 """ 
@@ -155,4 +159,4 @@ OrgDNSHandler::RESULT_CODE OrgDNSHandler::process( const NRootDNSConfig* pNRootD
 void functionA(int a, int b
                int c);
 """)
-        assert not CheckErrorContent(__name__)                         
+        self.ExpectSuccess(__name__)

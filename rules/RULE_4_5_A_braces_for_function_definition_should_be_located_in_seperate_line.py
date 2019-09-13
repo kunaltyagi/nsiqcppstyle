@@ -53,20 +53,23 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""
 void function() {
 
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 void function() const {
 
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 class K {
@@ -76,7 +79,8 @@ class K {
     }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c","""
 void function()
@@ -90,7 +94,8 @@ void function()
   }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c","""
 class K {
@@ -98,3 +103,4 @@ class K {
     {   }
 }
 """)
+        self.ExpectSuccess(__name__)

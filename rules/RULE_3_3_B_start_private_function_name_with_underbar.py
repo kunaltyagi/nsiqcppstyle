@@ -45,11 +45,6 @@ def RunTypeScopeRule(lexer, contextStack) :
 ruleManager.AddFunctionNameRule(RunRule)
 ruleManager.AddTypeScopeRule(RunTypeScopeRule)
 
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -61,12 +56,14 @@ class testRule(nct):
         ruleManager.AddTypeScopeRule(RunTypeScopeRule)
         global currentVisibility
         currentVisibility = False
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
 bool CanHave() {
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -75,7 +72,8 @@ private:
 bool CTEST:CanHave() {
 }
 }""")
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -84,7 +82,8 @@ private:
 bool CTEST:_CanHave() {
 }
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -93,7 +92,8 @@ public:
 bool CTEST:_CanHave() {
 }
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -101,7 +101,7 @@ class K {
 private:
 bool CTEST:_CanHave() ;
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
 
     def test6(self):
         self.Analyze("test/thisFile.c", 
@@ -111,7 +111,7 @@ private:
 public :
 bool CTEST:CanHave();
 """)
-        assert not CheckErrorContent(__name__)       
+        self.ExpectSuccess(__name__)
         
     def test7(self):
         self.Analyze("test/thisFile.c", 
@@ -121,9 +121,8 @@ public :
 private:
 bool CTEST:CanHave();
 """)
-        assert CheckErrorContent(__name__)       
-        
-               
+        self.ExpectError(__name__)
+
     def test8(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -133,8 +132,8 @@ private:
  K();
  ~K();
 """)
-        assert not CheckErrorContent(__name__)     
-        
+        self.ExpectSuccess(__name__)
+
     def test9(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -144,8 +143,8 @@ int KK:KK(Hello wow){
 int KK:~KK() {
 }
 """)
-        assert not CheckErrorContent(__name__) 
-        
+        self.ExpectSuccess(__name__)
+
     def test10(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -154,8 +153,8 @@ class KK {
         int K1();
 }
 """)
-        assert CheckErrorContent(__name__)
-        
+        self.ExpectError(__name__)
+
     def test11(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -164,7 +163,8 @@ class TT {
         void operator=(sdsd) {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test12(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -174,16 +174,18 @@ private:
  K();
  ~K();
 """)                 
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test13(self):
         self.Analyze("test/thisFile.c", 
 """
 DEF_DD(wewe)
 """)                 
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test14(self):
         self.Analyze("test/thisFile.c", 
 """
 DEF11_DD(wewe)
 """)                 
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)

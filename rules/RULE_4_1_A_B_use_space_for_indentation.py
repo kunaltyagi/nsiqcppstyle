@@ -30,9 +30,6 @@ def RunRule(lexer, line, lineno) :
 
 ruleManager.AddLineRule(RunRule)
 
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -41,17 +38,20 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddLineRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 "\tbool CanHave() {\n\t}")
-        assert  CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
 class K {
     Hello
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -59,5 +59,4 @@ class K {
             
 Hello
 }""")
-        assert not CheckErrorContent(__name__)    
-                
+        self.ExpectSuccess(__name__)    

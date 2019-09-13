@@ -38,17 +38,19 @@ ruleManager.AddFunctionNameRule(RunRule)
 # Unit Test
 ###########################################################################################
 
-
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddFunctionNameRule(RunRule)   
+        ruleManager.AddFunctionNameRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","int k() {%s};" % ("hello\n\n"*201))
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c", "int k() {%s};" % ("hello\n\n"*120))
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c", "int k() {%s};" % ("hello\n\n"*200))
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

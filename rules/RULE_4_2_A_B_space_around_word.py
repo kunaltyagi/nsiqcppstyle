@@ -52,6 +52,7 @@ def RunRule(lexer, contextStack) :
 
 ruleManager.AddFunctionScopeRule(RunRule)
 ruleManager.AddPreprocessRule(RunRule)
+
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -61,6 +62,7 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionScopeRule(RunRule)
         ruleManager.AddPreprocessRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -70,7 +72,8 @@ void function(int k, int j, int pp)
   }
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -81,7 +84,8 @@ void function(int k, int j, int pp)
   }
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -93,7 +97,8 @@ void function(int k, int j, int pp)
   }
 }
 """)
-        assert CheckErrorContent(__name__)  
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -112,32 +117,35 @@ void function(int k, int j, int pp)
   }
 }
 """)
-        assert not CheckErrorContent(__name__) 
-           
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
 #define AA do {\\
 } while(0)
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c", 
 """
 #define AA if\\
 {} while(0)
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test7(self):
         self.Analyze("test/thisFile.c", 
 """
 #define AA if(\\
 {} while(0)
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test8(self):
         self.Analyze("test/thisFile.c", 
 """
 #  include <boost/preprocessor/repetition/for.hpp> 
 """)
-        assert not CheckErrorContent(__name__)                                                        
+        self.ExpectSuccess(__name__)

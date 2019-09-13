@@ -30,13 +30,6 @@ def RunRule(lexer, filename, dirname) :
 
 ruleManager.AddFileStartRule(RunRule)
 
-
-
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -48,30 +41,36 @@ class testRule(nct):
 
     def test1(self):
         self.Analyze("test/thisfile.cpp", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/this_file.c", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("test/thisfile.cxx", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("test/thisfile.cc", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisfile.mm", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test6(self):
         self.Analyze("test/this_file.cxx", "")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test7(self):
         self.Analyze("test/this_file.cpp", "")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test8(self):
         self.Analyze("test/this_file.cc", "")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test9(self):
         self.Analyze("test/this_file.mm", "")
-        assert CheckErrorContent(__name__)
-
+        self.ExpectError(__name__)
