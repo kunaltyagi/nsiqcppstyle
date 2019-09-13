@@ -30,8 +30,34 @@ import nsiqcppstyle_checker
 from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 
+class unitTest(unittest.TestCase):
+    def __testFunctionSpecifier(self, specifier):
+        lexer = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", "void FunctionName() " + specifier + ";")
+        # This step resolves comments and some token types like FUNCTION
+        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        lexer.Reset();
 
-class urlTest(unittest.TestCase):
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'VOID')
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'FUNCTION')
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'LPAREN')
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'RPAREN')
+        # Specifier keyword
+        specifierToken = lexer.GetNextTokenSkipWhiteSpaceAndComment()
+        assert(specifierToken.type == 'IGNORE')
+        assert(specifierToken.value == specifier)
+
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'SEMI')
+        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment() == None)
+
+    def testIgnoreFinalFunctionSpecifier(self):
+        self.__testFunctionSpecifier("final")
+
+    def testIgnoreOverrideFunctionSpecifier(self):
+        self.__testFunctionSpecifier("override")
+
+    def testIgnoreNoexceptFunctionSpecifier(self):
+        self.__testFunctionSpecifier("noexcept")
+
     def test2(self):
         data = """
 #ifdef __NAME__
@@ -68,7 +94,7 @@ void function2() {
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
             if tok is None:
                 break
-            print tok, tok.contextStack
+            # print tok, tok.contextStack
 
     def test4(self):
         data = """
@@ -87,7 +113,7 @@ int a;
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
             if tok is None:
                 break
-            print tok, tok.contextStack, tok.pp
+            # print tok, tok.contextStack, tok.pp
 
     def test5(self):
         data = """

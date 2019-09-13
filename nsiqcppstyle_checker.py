@@ -257,8 +257,9 @@ reserved = {
     "__stdcall": "IGNORE",
     "__try": "IGNORE",
     "dllexport": "IGNORE",
-    "final": "IGNORE"
-
+    "final": "IGNORE",
+    "override":"IGNORE",
+    "noexcept":"IGNORE"
 }
 
 
