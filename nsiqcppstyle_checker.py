@@ -579,7 +579,7 @@ class CppLexerNavigator(object):
         gtStack = []
         if self.GetCurToken().type != "LT":
             raise RuntimeError(
-                'Matching token should be examined when cur token is } ) ]')
+                'Matching next GT token should be examined when cur token is <')
         gtStack.append(self.GetCurToken())
         t = self._GetNextMatchingGTToken(gtStack)
         if keepCur:
@@ -686,6 +686,37 @@ class CppLexerNavigator(object):
                     continue
             if token.type not in context:
                 return token
+
+    def GetPrevMatchingLT(self, keepCur=False):
+        if keepCur :
+            self.PushTokenIndex()
+        gtStack = []
+        if not self.GetCurToken().type in ["GT", "RSHIFT"] :
+            raise RuntimeError(
+                'Matching previous LT token should be examined when cur token is > or >>')
+        # If >> token is found, append it twice
+        if self.GetCurToken().type == "RSHIFT" :
+            gtStack.append(self.GetCurToken())
+        gtStack.append(self.GetCurToken())
+        t = self._GetPrevMatchingLTToken(gtStack)
+        if keepCur :
+            self.PopTokenIndex()
+        return t
+
+    def _GetPrevMatchingLTToken(self, tokenStack):
+        while True :
+            prevToken = self._GetPrevToken()
+            if prevToken is None :
+                return None
+            elif prevToken.type in ["GT"] :
+                tokenStack.append(prevToken)
+            elif prevToken.type in ["RSHIFT"] :
+                tokenStack.append(prevToken)
+                tokenStack.append(prevToken)
+            elif prevToken.type in ["LT"] :
+                tokenStack.pop()
+                if len(tokenStack) == 0 :
+                    return prevToken
 
     def GetPrevMatchingToken(self, keepCur=False):
         if keepCur:
