@@ -38,7 +38,8 @@ def RunRule(lexer, filename, dirname):
     else:
         filenameMap[filename].append(os.path.join(dirname, filename))
         nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0, 0), __name__,
-                                    'Do not use same filename(%s) more than once. This filename is used in %s' % (filename, string.join(filenameMap[filename], ", ")))
+                                    'Do not use same filename(%s) more than once. This filename is used in %s' % (
+                                        filename, ", ".join(filenameMap[filename])))
 
 
 ruleManager.AddFileStartRule(RunRule)
