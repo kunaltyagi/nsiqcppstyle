@@ -65,7 +65,8 @@ void func1() {
        }}}}}}}
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """
@@ -76,7 +77,7 @@ void func1() {
        }}}}
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test3(self):
         self.Analyze("thisfile.c",
@@ -100,7 +101,8 @@ printf("...");
 }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """
@@ -123,4 +125,4 @@ printf("...");
 }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)

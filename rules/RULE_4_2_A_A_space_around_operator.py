@@ -120,6 +120,7 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddRule(RunRule)
         ruleManager.AddPreprocessRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c",
 """
@@ -134,90 +135,102 @@ A != 3;
 t = a++;
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c",
 """
 (DD +ww);
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c",
 """
 HELLO = ewe <<3;
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c",
 """
 HELLo = TET ||B;
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", "#define KK(dsd) TET ||B;")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c", "k = &b;")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test7(self):
         self.Analyze("test/thisFile.c", "k=b;")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test8(self):
         self.Analyze("test/thisFile.c", "k|= b;")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test9(self):
         self.Analyze("test/thisFile.c", "k++c;")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test10(self):
         self.Analyze("test/thisFile.c", "#include <h/ds>")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test11(self):
         self.Analyze("test/thisFile.c", "hash ^= hash << 4;")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test12(self):
         self.Analyze("test/thisFile.c", """
 #define KK() ewee;\\
 hash ^= hash << 4;
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test13(self):
         self.Analyze("test/thisFile.c", """
 #define KK() ewee;\\
 hash ^= hash<<4;
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test14(self):
         self.Analyze("test/thisFile.c", """
 #include <magic++.h>
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test15(self):
         self.Analyze("test/thisFile.c", """
 m_mTabCommand.SetAt(nId++, p##TabName##TabCommand);
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test16(self):
         self.Analyze("test/thisFile.c", """
 m_mTabCommand.SetAt(++nId, p##TabName##TabCommand);
 m_mTabCommand.SetAt(nId++dd);
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test17(self):
         self.Analyze("test/thisFile.c", """
 string k = "k=b %s";
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test18(self):
         self.Analyze("test/thisFile.c", """
 sprintf(l_szConfigPath, ""
 "print%log");
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test19(self):
         self.Analyze("test/thisFile.c", r"""
@@ -229,4 +242,4 @@ wewe
 "ewewe"
 
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

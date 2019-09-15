@@ -60,9 +60,6 @@ def RunRule(lexer, contextStack) :
 
 ruleManager.AddFunctionScopeRule(RunRule)
 
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -71,7 +68,8 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddFunctionScopeRule(RunRule)   
+        ruleManager.AddFunctionScopeRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""
 void function() {
@@ -79,7 +77,8 @@ for (;;) {
 }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 void function() {
@@ -87,7 +86,8 @@ a = {
 }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 void function() {
@@ -101,7 +101,8 @@ void function() {
     k = {}
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c","""
 void function() {
@@ -112,14 +113,15 @@ void function() {
     }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c","""
 void function() {
     a = { dsdsd}
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test6(self):
         self.Analyze("thisfile.c","""
@@ -128,4 +130,4 @@ do {\
 aa = e;
 } while(0)
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

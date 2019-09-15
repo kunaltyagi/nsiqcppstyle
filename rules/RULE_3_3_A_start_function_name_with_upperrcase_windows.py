@@ -46,8 +46,6 @@ def RunRule(lexer, fullName, decl, contextStack, context) :
             nsiqcppstyle_reporter.Error(t, __name__, "Do not start function name(%s) with lowercase" % fullName)         
 ruleManager.AddFunctionNameRule(RunRule)
 
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -57,45 +55,49 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)
 
-
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
 bool CanHave() {
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
 bool CTEST:CanHave() {
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
 extern bool CTEST:canHave() {
 }""")
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
 extern int CTEST:_CanHave() {
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
 calss AA {
 extern int ~IsIt();
 }""")
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c", 
 """
 class K {
 extern bool CTEST:canHave();
 }""")
-        assert  CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
 
     def test7(self):
         self.Analyze("a.c", 
@@ -103,7 +105,7 @@ extern bool CTEST:canHave();
 void ** *(d) (((int &, 
   char **(*)(char *, char **));        // d is a pointer to a function that takes
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test8(self):
         self.Analyze("a.c", 
@@ -114,15 +116,16 @@ class A {
     }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test9(self):
         self.Analyze("a.c", 
 """
 void operator=() {
 }
 """)
-        assert not CheckErrorContent(__name__)
-        
+        self.ExpectSuccess(__name__)
+
     def test10(self):
         self.Analyze("a.c", 
 """
@@ -132,7 +135,8 @@ bool ConvertToTM(struct)
     memcpy(szTemp);
 }
 """)
-        assert not CheckErrorContent(__name__)      
+        self.ExpectSuccess(__name__)
+
     def test11(self):
         self.Analyze("a.c", 
 """
@@ -142,14 +146,15 @@ bool& TT::operator=(struct)
     memcpy(szTemp);
 }
 """)
-        assert not CheckErrorContent(__name__)       
+        self.ExpectSuccess(__name__)
+
     def test12(self):
         self.Analyze("a.c", 
 """
 typedef c d();
 """)
-        assert CheckErrorContent(__name__)     
-        
+        self.ExpectError(__name__)
+
     def test13(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -160,8 +165,8 @@ std::string("Autumn"),
 std::string("Winter") 
 }; 
 """)
-        assert not CheckErrorContent(__name__) 
-        
+        self.ExpectSuccess(__name__)
+
     def test14(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -170,7 +175,7 @@ interface ICamRecorder
 {
 }    
 """)
-        assert not CheckErrorContent(__name__) 
+        self.ExpectSuccess(__name__)
 
     def test15(self):
         self.Analyze("test/thisFile.c", 
@@ -180,5 +185,4 @@ void _tmain() {
 void _tWinMain() {
 }
 """)
-        assert not CheckErrorContent(__name__) 
-                     
+        self.ExpectSuccess(__name__)

@@ -88,12 +88,14 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)
         ruleManager.AddTypeScopeRule(RunTypeScopeRule)
+
     def test1(self):
         self.Analyze("thisfile.h",
 """
 void FunctionA();
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.h",
 """
@@ -102,7 +104,8 @@ void FunctionA();
  */
 extern void FunctionB();
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.h",
 """
@@ -111,7 +114,8 @@ public:
     void ~A();
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.h",
 """
@@ -121,7 +125,8 @@ public :
     A();
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.h",
 """
@@ -131,7 +136,7 @@ public :
  void FunctionB() {
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test6(self):
         self.Analyze("thisfile.h",
@@ -139,7 +144,7 @@ public :
 int a;
  void FunctionB();
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test7(self):
         self.Analyze("thisfile.h",
@@ -149,7 +154,7 @@ int a;
  */
 extern void FunctionB();
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test8(self):
         self.Analyze("thisfile.h",
@@ -164,7 +169,7 @@ private :
     }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test9(self):
         self.Analyze("thisfile.h",
@@ -172,7 +177,7 @@ private :
 ///
 extern void FunctionB();
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test10(self):
         self.Analyze("thisfile.h",
@@ -183,14 +188,14 @@ public :
     A();
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test11(self):
         self.Analyze("thisfile.h",
 """
 extern void FunctionB();  ///< HELLO
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test12(self):
         self.Analyze("thisfile.h",
@@ -200,14 +205,14 @@ public :
     A();  ///< HELLO
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test13(self):
         self.Analyze("thisfile.c",
 """
 void FunctionA();
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test14(self):
         self.Analyze("thisfile.h",
@@ -218,7 +223,7 @@ protected :
     A();
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test15(self):
         self.Analyze("thisfile.h",
@@ -229,7 +234,7 @@ private :
     A();
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test14(self):
         self.Analyze("thisfile.h",
@@ -239,7 +244,7 @@ protected :
     A();
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test15(self):
         self.Analyze("thisfile.h",
@@ -249,4 +254,4 @@ private :
     A();
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)

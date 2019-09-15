@@ -32,6 +32,7 @@ def RunRule(lexer, contextStack) :
 
 ruleManager.AddFunctionScopeRule(RunRule)
 ruleManager.AddPreprocessRule(RunRule)
+
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -41,25 +42,27 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionScopeRule(RunRule)   
         ruleManager.AddPreprocessRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""
 void Hello() {
    int k = true ? 1 : 2;
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 int k = true ? 1 : 2;
 void Hello() {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 #define k (t ? 1 : 2);
 void Hello() {
 }
 """)
-        assert  CheckErrorContent(__name__)
-    
+        self.ExpectError(__name__)

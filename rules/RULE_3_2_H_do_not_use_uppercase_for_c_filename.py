@@ -23,13 +23,6 @@ def RunRule(lexer, filename, dirname) :
               "Do not use uppercase for c file name (%s)." % filename)
 ruleManager.AddFileStartRule(RunRule)
 
-
-
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -41,11 +34,12 @@ class testRule(nct):
     
     def test1(self):
         self.Analyze("test/thisFile.c", "")
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/ThisFile.cpp", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test3(self):
         self.Analyze("test/this_file.c", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

@@ -25,8 +25,6 @@ def RunRule(lexer, line, lineno) :
 
 ruleManager.AddLineRule(RunRule)
 
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -35,6 +33,7 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddLineRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c",
 """
@@ -43,7 +42,8 @@ void function(int k, int j, int pp)
 %s
 }
 """ % ("d"*121))
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c",
 """
@@ -53,4 +53,4 @@ void function(int k, int j, int pp)
 %s
 }
 """ % ("d"*119, " "*130))
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

@@ -41,7 +41,6 @@ def RunRule(lexer, filename, dirname):
 
 ruleManager.AddFileStartRule(RunRule)
 
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -61,7 +60,7 @@ class testRule(nct):
         """
         self.Analyze("test/thisfile.c", "")
         self.Analyze("test2/thisfile.c", "")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test2(self):
         """
@@ -69,7 +68,7 @@ class testRule(nct):
         """
         self.Analyze("test/thisfile.c", "")
         self.Analyze("test/thisfile.h", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test3(self):
         """
@@ -81,4 +80,4 @@ class testRule(nct):
         self.Analyze("test/main.c", "")
         self.Analyze("test2/main.c", "")
         self.Analyze("test/thisfile.h", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

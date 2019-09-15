@@ -36,13 +36,15 @@ ruleManager.AddRule(RunRule)
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddRule(RunRule)   
+        ruleManager.AddRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c",
 """
 int k;
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """
@@ -50,13 +52,15 @@ void T() {
     long long k = 1;
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c",
 """
 int32_t k = 2
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """
@@ -65,4 +69,4 @@ void k() {
     }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

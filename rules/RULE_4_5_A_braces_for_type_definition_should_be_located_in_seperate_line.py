@@ -42,11 +42,6 @@ def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext) :
                      
 ruleManager.AddTypeNameRule(RunRule)
 
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -55,21 +50,24 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddTypeNameRule(RunRule)   
+        ruleManager.AddTypeNameRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""
 public class A {
 
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c","""
 class C : public AA {
     
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 class K 
@@ -81,7 +79,8 @@ class K
     }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c","""
 class K 
@@ -92,7 +91,8 @@ class K
     }
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c","""
 class C : public AA 
@@ -101,7 +101,7 @@ class C : public AA
     }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
 
     def test6(self):
         self.Analyze("thisfile.c","""
@@ -112,7 +112,8 @@ class C : public AA
       }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test7(self):
         self.Analyze("thisfile.c","""
 class C : public AA 
@@ -121,20 +122,19 @@ class C : public AA
     {   }
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test8(self):
         self.Analyze("thisfile.c","""
 namespace C {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test9(self):
         self.Analyze("thisfile.c","""
 if (hello) {
 // {kr} m_btn5 {/kr}           
 }
 """)
-        assert not CheckErrorContent(__name__)
-                          
-             
-             
+        self.ExpectSuccess(__name__)

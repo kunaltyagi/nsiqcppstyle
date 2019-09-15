@@ -22,11 +22,6 @@ def RunRule(lexer, filename, dirname) :
 
 ruleManager.AddFileStartRule(RunRule)
 
-
-
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -35,13 +30,13 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFileStartRule(RunRule)
-    
+
     def test1(self):
         self.Analyze("test/this-file.c", "")
         self.Analyze("test2/!thisfile22.c", "")
-        assert CheckErrorContent(__name__)
-    
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("test/thisfile.c", "")
         self.Analyze("test/thisfile.h", "")
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

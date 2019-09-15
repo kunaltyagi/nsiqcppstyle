@@ -103,13 +103,15 @@ class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)   
         ruleManager.AddTypeScopeRule(RunTypeScopeRule)
+
     def test1(self):
         self.Analyze("thisfile.c",
 """
 void FunctionA() {
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c",
 """
@@ -119,7 +121,8 @@ void FunctionA() {
 extern void FunctionB() {
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c",
 """
@@ -129,7 +132,8 @@ public:
     }
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c",
 """
@@ -145,7 +149,8 @@ private :
     
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c",
 """
@@ -155,8 +160,8 @@ private :
 static void FunctionB() {
 }
 """)
-        assert not CheckErrorContent(__name__)
-        
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("thisfile.h",
 """
@@ -164,7 +169,8 @@ int a;
 void FunctionB(){
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test7(self):
         self.Analyze("thisfile.c",
 """
@@ -172,7 +178,8 @@ int a;
 void FunctionB(){
 }
 """)
-        assert  CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test8(self):
         self.Analyze("thisfile.c",
 """
@@ -181,5 +188,4 @@ class J {
     }
 }
 """)
-        assert  CheckErrorContent(__name__)
-           
+        self.ExpectError(__name__)

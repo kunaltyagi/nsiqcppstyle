@@ -95,7 +95,6 @@ def RunRule(lexer, contextStack) :
                
 ruleManager.AddFunctionScopeRule(RunRule)
 
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -105,7 +104,7 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionScopeRule(RunRule)
-        
+
     def test1(self):
         self.Analyze("thisfile.c", 
 """
@@ -114,7 +113,8 @@ void func1()
     k = strcat()
 }
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c", 
 """
@@ -123,21 +123,24 @@ void func1() {
 #define strcat() k
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c", 
 """
 void strcat() {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c", 
 """
 void strcat () {
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("thisfile.c", 
 """
@@ -146,4 +149,4 @@ void func1()
     k = help.strcat ()
 }
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

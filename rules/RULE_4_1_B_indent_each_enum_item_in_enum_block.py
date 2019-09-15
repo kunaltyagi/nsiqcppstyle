@@ -45,13 +45,15 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddTypeNameRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
 enum A {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -59,7 +61,8 @@ enum C {
     AA, BB
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -68,7 +71,8 @@ AA = 4,
     BB
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -77,7 +81,8 @@ enum C {
 ,BB
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -87,7 +92,8 @@ enum C {
     ,BB
 }
 """)
-        assert not  CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -97,7 +103,8 @@ typedef enum  {
     ,BB
 } DD
 """)
-        assert not  CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test7(self):
         self.Analyze("test/thisFile.c", 
 """      
@@ -114,7 +121,7 @@ typedef enum
   ADMIN
 } UTIL_SERVICE_INDEX_E;
 """) 
-        assert not  CheckErrorContent(__name__) 
+        self.ExpectSuccess(__name__)
 
     def test8(self):
         self.Analyze("test/thisFile.c", 
@@ -131,4 +138,4 @@ enum COLOR
         COLOR_RESULT_RATING = 0x00fcff, 
         COLOR_RESULT_POINT = 0x33ff00 
 }; """)
-        assert not CheckErrorContent(__name__)           
+        self.ExpectSuccess(__name__)

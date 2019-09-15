@@ -27,7 +27,6 @@ def RunRule(lexer, contextStack) :
 
 ruleManager.AddPreprocessRule(RunRule)
 
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -35,21 +34,25 @@ ruleManager.AddPreprocessRule(RunRule)
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
-        ruleManager.AddPreprocessRule(RunRule)   
+        ruleManager.AddPreprocessRule(RunRule)
+
     def test1(self):
         self.Analyze("thisfile.c","""# include "c:\k.h"
 void func1() 
 {}""")
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test2(self):
         self.Analyze("thisfile.c", """
 #include "/ewe/dsd" """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("thisfile.c","""
 #include "ewe\kk" """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("thisfile.c","""
 #include </ewe/kk> """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)

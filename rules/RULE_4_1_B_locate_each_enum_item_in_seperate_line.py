@@ -35,9 +35,6 @@ def RunRule(lexer, typeName, typeFullName, decl, contextStack, typeContext) :
                     nsiqcppstyle_reporter.Error(nt2, __name__, "Each enum item(%s) should be located in the different line" % nt2.value)
 ruleManager.AddTypeNameRule(RunRule)
 
-
-
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -46,13 +43,15 @@ from nsiqunittest.nsiqcppstyle_unittestbase import *
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddTypeNameRule(RunRule)
+
     def test1(self):
         self.Analyze("test/thisFile.c", 
 """
 enum A {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -60,7 +59,8 @@ enum C {
     AA, BB
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -69,7 +69,8 @@ enum C {
     BB
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -78,7 +79,8 @@ enum C {
     ,BB
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/thisFile.c", 
 """
@@ -88,7 +90,7 @@ enum C
     ,BB
 } TT;
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
 
     def test6(self):
         self.Analyze("test/thisFile.c", 
@@ -105,4 +107,4 @@ enum COLOR
         COLOR_RESULT_RATING = 0x00fcff, 
         COLOR_RESULT_POINT = 0x33ff00 
 }; """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)

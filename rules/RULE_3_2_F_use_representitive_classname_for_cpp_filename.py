@@ -81,7 +81,6 @@ ruleManager.AddTypeNameRule(RunTypeNameRule)
 ruleManager.AddFunctionNameRule(RunFunctionNameRule)
 ruleManager.AddFileEndRule(RunFileEndRule)
 
-
 ###########################################################################################
 # Unit Test
 ###########################################################################################
@@ -93,35 +92,39 @@ class testRule(nct):
         ruleManager.AddTypeNameRule(RunTypeNameRule)
         ruleManager.AddFunctionNameRule(RunFunctionNameRule)
         ruleManager.AddFileEndRule(RunFileEndRule)
-    
+
     def test1(self):
         self.Analyze("test/aa.c", 
 """
 void AA::DSD() {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test2(self):
         self.Analyze("test/ab.c", 
 """
 void AA::DSD() {
 }
 """)
-        assert CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test3(self):
         self.Analyze("test/aa.c", 
 """
 void CAA::DSD() {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test4(self):
         self.Analyze("test/aa.c", 
 """
 void DSD() {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test5(self):
         self.Analyze("test/aa.cpp", 
 """
@@ -131,7 +134,8 @@ struct AA {
 class BB {
 }
 """)
-        assert not CheckErrorContent(__name__)    
+        self.ExpectSuccess(__name__)
+
     def test6(self):
         self.Analyze("test/aa.cpp", 
 """
@@ -141,7 +145,8 @@ struct AA1 {
 class BB {
 }
 """)
-        assert  CheckErrorContent(__name__)    
+        self.ExpectError(__name__)
+
     def test7(self):
         self.Analyze("test/CamRecorderFactory.cpp", 
 """
@@ -149,8 +154,8 @@ class __declspec(dllexport) CCamRecorderFactory
 {
 };
 """)
-        assert not  CheckErrorContent(__name__) 
-        
+        self.ExpectSuccess(__name__)
+
     def test8(self):
         self.Analyze("test/CamRecorderFactory.cpp", 
 """
@@ -158,7 +163,7 @@ class DLLEXPORT CCamRecorderFactory
 {
 };
 """)
-        assert not  CheckErrorContent(__name__) 
+        self.ExpectSuccess(__name__)
 
     def test9(self):
         self.Analyze("test/CamRecorderFactory.h",
@@ -167,7 +172,7 @@ class CamRecorderFactory final
 {
 };
 """)
-        assert not CheckErrorContent(__name__)
+        self.ExpectSuccess(__name__)
 
     def test10(self):
         self.Analyze("test/CamRecorderFact.h",
@@ -176,4 +181,4 @@ class CamRecorderFactory final
 {
 };
 """)
-        assert CheckErrorContent(__name__)
+        self.ExpectError(__name__)
