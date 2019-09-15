@@ -34,10 +34,12 @@ import nsiqcppstyle_state
 
 errors = []
 
+
 def MockError(token, category, message):
     global errors
     errors.append((token, category, message))
-    #print token, category, message
+    # print token, category, message
+
 
 class nct(unittest.TestCase):
     def setUp(self):
@@ -50,7 +52,8 @@ class nct(unittest.TestCase):
         errors = []
 
     def Analyze(self, filename, data):
-        nsiqcppstyle_checker.ProcessFile(nsiqcppstyle_rulemanager.ruleManager, filename, data)
+        nsiqcppstyle_checker.ProcessFile(
+            nsiqcppstyle_rulemanager.ruleManager, filename, data)
 
     def ExpectError(self, msg):
         result = self._CheckErrorContent(msg)
@@ -65,7 +68,7 @@ class nct(unittest.TestCase):
 
     def _CheckErrorContent(self, msg):
         global errors
-        for err in errors :
-            if err[1] == msg :
+        for err in errors:
+            if err[1] == msg:
                 return True
         return False

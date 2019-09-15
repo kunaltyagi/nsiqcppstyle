@@ -11,19 +11,23 @@ Do not start the file name with underbars.
     BdSc.h
 
 """
-from nsiqcppstyle_reporter import  * #@UnusedWildImport
-from nsiqcppstyle_rulemanager import * #@UnusedWildImport
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_reporter import *  # @UnusedWildImport
+from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
 
-def RunRule(lexer, filename, dirname) :
-    if filename.startswith("_") :
-        nsiqcppstyle_reporter.Error(nsiqcppstyle_reporter.DummyToken(lexer.filename, "", 0, 0), __name__, "File name(%s) should not start with underbar." % filename)
+
+def RunRule(lexer, filename, dirname):
+    if filename.startswith("_"):
+        nsiqcppstyle_reporter.Error(nsiqcppstyle_reporter.DummyToken(
+            lexer.filename, "", 0, 0), __name__, "File name(%s) should not start with underbar." % filename)
+
+
 ruleManager.AddFileStartRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 class testRule(nct):
     def setUpRule(self):

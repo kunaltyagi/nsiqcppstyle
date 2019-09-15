@@ -28,26 +28,31 @@
 import os
 import sys
 
+
 def WeAreFrozen():
     return hasattr(sys, "frozen")
 
+
 def ModulePath():
     if WeAreFrozen():
-        return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding()))
+        return os.path.dirname(
+            unicode(sys.executable, sys.getfilesystemencoding()))
     return os.path.dirname(unicode(__file__, sys.getfilesystemencoding()))
 
-def GetRuntimePath() :
+
+def GetRuntimePath():
     "Return the path of this tool"
-    if (sys.platform == "win32") :
-        runtimePath = ModulePath();
-    else :
+    if (sys.platform == "win32"):
+        runtimePath = ModulePath()
+    else:
         modename = globals()['__name__']
         module = sys.modules[modename]
         runtimePath = os.path.dirname(module.__file__)
     return runtimePath
 
-def GetSystemKey() :
-    if (sys.platform == "win32") :
+
+def GetSystemKey():
+    if (sys.platform == "win32"):
         return "window"
-    else :
+    else:
         return "linux"

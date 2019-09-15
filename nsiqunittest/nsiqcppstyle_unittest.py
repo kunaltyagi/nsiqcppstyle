@@ -30,6 +30,7 @@ import nsiqcppstyle_checker
 from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 
+
 class urlTest(unittest.TestCase):
     def test2(self):
         data = """
@@ -46,9 +47,10 @@ auto
 """
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
 
-        while(True) :
+        while(True):
             tok = navigator.GetNextToken()
-            if tok == None : break
+            if tok is None:
+                break
 
     def test3(self):
         data = """
@@ -59,13 +61,15 @@ void function2() {
 #endif
 }
 """
-        navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)   
+        navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
         nsiqcppstyle_checker.ContructContextInfo(navigator)
         navigator.Reset()
-        while(True) :
+        while(True):
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
-            if tok == None : break
+            if tok is None:
+                break
             print tok, tok.contextStack
+
     def test4(self):
         data = """
 #define dsd(dsd) \\
@@ -76,13 +80,15 @@ int a;
 """
 
         console.SetLevel(console.Level.Verbose)
-        navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)   
+        navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
         nsiqcppstyle_checker.ContructContextInfo(navigator)
         navigator.Reset()
-        while(True) :
+        while(True):
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
-            if tok == None : break
+            if tok is None:
+                break
             print tok, tok.contextStack, tok.pp
+
     def test5(self):
         data = """
 foo (bar*)[];

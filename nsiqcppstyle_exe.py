@@ -45,7 +45,7 @@ except NameError:
     from sets import Set as set
 
 version = "0.2.2.13"
-####################################################################################################
+##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
 
@@ -135,10 +135,10 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1: ], "o: s: m: hqvrf: ", ["help", "csv",
-                "output=", "list_rules", "verbose=", "show-url", "no-update",
-                "ci", "quiet", "var=", "noBase"])
-        except getopt.error, msg:
+            opts, args = getopt.getopt(argv[1:], "o: s: m: hqvrf: ", ["help", "csv",
+                                                                      "output=", "list_rules", "verbose=", "show-url", "no-update",
+                                                                      "ci", "quiet", "var=", "noBase"])
+        except getopt.error as msg:
             raise ShowMessageAndExit(msg)
             return 0
 
@@ -154,7 +154,7 @@ def main(argv=None):
             "Javascript/ActionScript": set(["js", "as"]),
             "JSP/PHP": set(["jsp", "php", "JSP", "PHP"]),
             "C/C++": set(["cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"])
-            }
+        }
 
         updateNsiqCppStyle = False
         for o, a in opts:
@@ -180,14 +180,15 @@ def main(argv=None):
             elif o == '--output':
                 if not a in ('emacs', 'vs7', 'csv', 'xml', 'eclipse'):
                     print title
-                    ShowMessageAndExit('The only allowed output formats are emacs, vs7 and csv.')
+                    ShowMessageAndExit(
+                        'The only allowed output formats are emacs, vs7 and csv.')
                 _nsiqcppstyle_state.output_format = a
             elif o == "--var":
-                varMap = GetCustomKeyValueMap(a, "--var="+a)
+                varMap = GetCustomKeyValueMap(a, "--var=" + a)
             elif o == "--ci":
-                console.SetLevel(console.Level.Ci);
+                console.SetLevel(console.Level.Ci)
             elif o in ("-q", "--quiet"):
-                console.SetLevel(console.Level.Error);
+                console.SetLevel(console.Level.Error)
             elif o == "--noBase":
                 noBase = True
 
@@ -198,7 +199,7 @@ def main(argv=None):
             console.Out.Ci(console.Separator)
             try:
                 updateagent.agent.Update(version)
-            except Exception, e:
+            except Exception as e:
                 console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
@@ -206,19 +207,21 @@ def main(argv=None):
         if len(targetPaths) == 1:
             multipleTarget = False
 
-        #If multiple target
+        # If multiple target
         if multipleTarget:
             if len(outputPath) == 0:
-                ShowMessageAndExit("OutputPath(-o) should be provided to analyze multiple targets")
+                ShowMessageAndExit(
+                    "OutputPath(-o) should be provided to analyze multiple targets")
         else:
             outputPath = GetOutputPath(targetPaths[0], outputPath)
         ruleManager = nsiqcppstyle_rulemanager.ruleManager
 
         cExtendstionSet = extLangMap.get("C/C++")
 
-        nsiqcppstyle_reporter.PrepareReport(outputPath, _nsiqcppstyle_state.output_format)
+        nsiqcppstyle_reporter.PrepareReport(
+            outputPath, _nsiqcppstyle_state.output_format)
         analyzedFiles = []
-        for targetPath in targetPaths :
+        for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = os.path.basename(targetPath)
@@ -226,9 +229,10 @@ def main(argv=None):
             console.Out.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
-                filefilterPath= filterPath
+                filefilterPath = filterPath
             elif os.path.isfile(targetPath):
-                filefilterPath = os.path.join(os.path.dirname(targetPath), "filefilter.txt")
+                filefilterPath = os.path.join(
+                    os.path.dirname(targetPath), "filefilter.txt")
             else:
                 filefilterPath = os.path.join(targetPath, "filefilter.txt")
             if (noBase):
@@ -237,7 +241,8 @@ def main(argv=None):
                 basefilelist = BaseFileList(targetPath)
 
             # Get Active Filter
-            filterManager = FilterManager(filefilterPath, extLangMapCopy, varMap, filterScope)
+            filterManager = FilterManager(
+                filefilterPath, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
                 console.Out.Error("\n%s filter scope is not available. Instead, use %s\n"
@@ -247,25 +252,29 @@ def main(argv=None):
             # Load Rule
 
             if len(filter.nsiqCppStyleRules) == 0:
-                ShowMessageAndExit("Error!. Rules must be set in %s" % filefilterPath, False)
+                ShowMessageAndExit(
+                    "Error!. Rules must be set in %s" % filefilterPath, False)
                 continue
 
             ruleManager.LoadRules(filter.nsiqCppStyleRules)
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
-            nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames, filter.nsiqCppStyleRules)
-            
+            nsiqcppstyle_reporter.ReportRules(
+                ruleManager.availRuleNames, filter.nsiqCppStyleRules)
+
             console.Out.Info(filter.to_string())
             console.Out.Ci(console.Separator)
-            console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
+            console.Out.Verbose(
+                "* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
             if os.path.isfile(targetPath):
-                fileExtension = targetPath[targetPath.rfind('.') + 1: ]
+                fileExtension = targetPath[targetPath.rfind('.') + 1:]
                 if fileExtension in cExtendstionSet:
                     ProcessFile(ruleManager, targetPath, analyzedFiles)
 
-            # if the target is directory, analyze it with filefilter and basefilelist
+            # if the target is directory, analyze it with filefilter and
+            # basefilelist
             else:
                 for root, dirs, files in os.walk(targetPath):
                     if '.cvs' in dirs:
@@ -277,37 +286,45 @@ def main(argv=None):
                     if '.hg' in dirs:
                         dirs.remove('.hg')
                     for fname in files:
-                        fileExtension = fname[fname.rfind('.') + 1: ]
+                        fileExtension = fname[fname.rfind('.') + 1:]
                         eachFile = os.path.join(root, fname)
-                        basePart = eachFile[len(targetPath): ]
-                        if fileExtension in cExtendstionSet and basefilelist.IsNewOrChanged(eachFile) and filter.CheckFileInclusion(basePart):
-                            nsiqcppstyle_reporter.StartFile(os.path.dirname(basePart), fname)
+                        basePart = eachFile[len(targetPath):]
+                        if fileExtension in cExtendstionSet and basefilelist.IsNewOrChanged(
+                                eachFile) and filter.CheckFileInclusion(basePart):
+                            nsiqcppstyle_reporter.StartFile(
+                                os.path.dirname(basePart), fname)
                             ProcessFile(ruleManager, eachFile, analyzedFiles)
                             nsiqcppstyle_reporter.EndFile()
             ruleManager.RunProjectRules(targetPath)
             nsiqcppstyle_reporter.EndTarget()
 
-        nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles, _nsiqcppstyle_state, filter)
+        nsiqcppstyle_reporter.ReportSummaryToScreen(
+            analyzedFiles, _nsiqcppstyle_state, filter)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
         return _nsiqcppstyle_state.error_count
 
-    except Usage, err:
+    except Usage as err:
         console.Err.Error(err.msg)
         console.Err.Error("for help use --help")
         sys.exit(-1)
 
 
-#################################################################################################3
+# 3
 
 def ProcessFile(ruleManager, file, analyzedFiles):
     console.Out.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
 
+
 def Update():
-    updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update", version)
+    updateagent.agent.Update(
+        "http: //nsiqcppstyle.nsiq.nhncorp.com/update", version)
+
 
 csvResult = []
+
+
 def GetOutputPath(outputBasePath, outputPath):
     "Returns the LOC and complexity result path"
     if outputPath == "":
@@ -328,15 +345,17 @@ def GetRealTargetPaths(args):
         targetPaths.append(realPath)
 #       CheckPathPermission(realPath, "Target directory")
         if not os.path.exists(realPath):
-            ShowMessageAndExit("Error!: Target directory %s is not exists" % eachTarget)
+            ShowMessageAndExit(
+                "Error!: Target directory %s is not exists" % eachTarget)
     return targetPaths
 
-#################################################################################################
+##########################################################################
 
 ##############################################################################
 # Filter Manager
 # - Load Filter
 ##############################################################################
+
 
 class FilterManager:
     defaultFilterName = "default"
@@ -345,12 +364,13 @@ class FilterManager:
         self.fileFilterPath = fileFilterPath
         self.baseExtLangMap = extLangMap
         self.baseVarMap = varMap
-        self.filterMap = {FilterManager.defaultFilterName: self.CreateNewFilter(FilterManager.defaultFilterName)}
+        self.filterMap = {FilterManager.defaultFilterName: self.CreateNewFilter(
+            FilterManager.defaultFilterName)}
         filter = self.GetFilter(self.defaultFilterName)
         self.activeFilterName = self.defaultFilterName
 
         f = self.GetFilterFile(fileFilterPath)
-        if f == None:
+        if f is None:
             filter.AddExclude("/.svn/")
             filter.AddExclude("/.cvs/")
             return
@@ -360,37 +380,42 @@ class FilterManager:
             if line.startswith("#") or len(line) == 0:
                 continue
             if line.startswith("*"):
-                if (len(line[1: ].strip()) != 0):
-                    filterName = line[1: ].strip()
+                if (len(line[1:].strip()) != 0):
+                    filterName = line[1:].strip()
                     filter = self.GetFilter(filterName)
             elif line.startswith("="):
-                if (len(line[1: ].strip()) != 0):
-                    filter.AddLangMap(line[1: ].strip(), "\"" + line + "\" of filefilter.txt")
+                if (len(line[1:].strip()) != 0):
+                    filter.AddLangMap(
+                        line[1:].strip(), "\"" + line + "\" of filefilter.txt")
             elif line.startswith("~"):
-                if (len(line[1: ].strip()) != 0):
-                    filter.AddCppChecker(line[1: ].strip())
+                if (len(line[1:].strip()) != 0):
+                    filter.AddCppChecker(line[1:].strip())
             elif line.startswith("+"):
-                arg = line[1: ].strip()
-                if arg != "": filter.AddInclude(arg)
+                arg = line[1:].strip()
+                if arg != "":
+                    filter.AddInclude(arg)
             elif line.startswith("-"):
-                arg = line[1: ].strip()
-                if arg != "": filter.AddExclude(arg)
+                arg = line[1:].strip()
+                if arg != "":
+                    filter.AddExclude(arg)
             elif line.startswith("%"):
-                arg = line[1: ].strip()
-                if arg != "": filter.AddVarMap(arg, "\"" + arg + "\" of filefilter.txt")
+                arg = line[1:].strip()
+                if arg != "":
+                    filter.AddVarMap(arg, "\"" + arg + "\" of filefilter.txt")
         f.close()
         for eachMapKey in self.filterMap.keys():
             self.filterMap[eachMapKey].AddExclude("/.cvs/")
             self.filterMap[eachMapKey].AddExclude("/.svn/")
 
-        if (self.filterMap.has_key(activeFilterName)):
+        if (activeFilterName in self.filterMap):
             self.activeFilterName = activeFilterName
 
     def CreateNewFilter(self, filterName):
-        return Filter(filterName, copy.deepcopy(self.baseExtLangMap), copy.deepcopy(self.baseVarMap))
+        return Filter(filterName, copy.deepcopy(
+            self.baseExtLangMap), copy.deepcopy(self.baseVarMap))
 
     def GetFilter(self, filterName):
-        if self.filterMap.has_key(filterName):
+        if filterName in self.filterMap:
             return self.filterMap[filterName]
         else:
             self.filterMap[filterName] = self.CreateNewFilter(filterName)
@@ -410,12 +435,15 @@ class FilterManager:
 # - Represent each Filter
 # - Check if the file is included or not
 ##############################################################################
+
+
 class Filter:
     """
      Filter
      - Represent each Filter
      - Check if the file is included or not
     """
+
     def __init__(self, filterName, baseExtLangMap, baseVarMap):
         self.extLangMap = baseExtLangMap
         self.varMap = baseVarMap
@@ -434,19 +462,22 @@ Current File extension and Language Settings
         count = 1
         for eachfilter in self.filefilter:
             filterment = ""
-            if eachfilter[0]: filterment = "is included"
-            else: filterment = "is excluded"
+            if eachfilter[0]:
+                filterment = "is included"
+            else:
+                filterment = "is excluded"
             s = s + ("  %s. %s %s\n" % (count, eachfilter[1], filterment))
             count = count + 1
         return template % (self.filterName, s, self.GetLangString())
 
     def NormalizePath(self, eachFilter):
         replacedpath = eachFilter.replace("/", os.path.sep)
-        replacedpath = replacedpath.replace("\\\\", os.path.sep);
-        return replacedpath.replace("\\", os.path.sep);
+        replacedpath = replacedpath.replace("\\\\", os.path.sep)
+        return replacedpath.replace("\\", os.path.sep)
 
     def CheckExist(self, includeOrExclude, eachFilter, startwith):
-        return (self.filefilter.count([includeOrExclude, eachFilter, startwith]) == 1)
+        return (self.filefilter.count(
+            [includeOrExclude, eachFilter, startwith]) == 1)
 
     def AddInclude(self, eachFilter):
         self.AddFilter(True, eachFilter)
@@ -481,10 +512,11 @@ Current File extension and Language Settings
                 for eachExt in extSet:
                     count = count + 1
                     s = s + eachExt
-                    if count < setLen: s = s + ","
-                    else: s = s + "\n"
-        return s;
-
+                    if count < setLen:
+                        s = s + ","
+                    else:
+                        s = s + "\n"
+        return s
 
     def CheckFileInclusion(self, fileStr):
         eachfile = self.NormalizePath(fileStr)
@@ -499,24 +531,26 @@ Current File extension and Language Settings
         return inclusion
 
     def GetLangMap(self):
-        return self.extLangMap;
+        return self.extLangMap
 
     def AddLangMap(self, langMapString, where):
         langExtList = langMapString.split(",")
         for eachExt in langExtList:
             extLangPair = eachExt.split(": ")
             if len(extLangPair) != 2:
-                ShowMessageAndExit("Error!: The extension and language pair (%s) is incorrect in %s, please use LANGUAGENAME: EXTENSION style" % (langMapString, where))
+                ShowMessageAndExit("Error!: The extension and language pair (%s) is incorrect in %s, please use LANGUAGENAME: EXTENSION style" % (
+                    langMapString, where))
             lang, ext = extLangPair
             self.extLangMap.get(lang).add(ext)
 
     def AddVarMap(self, keyValuePairString, where):
         varMap = GetCustomKeyValueMap(keyValuePairString, where)
         for eachVar in varMap.keys():
-            if self.varMap.has_key(eachVar):
+            if eachVar in self.varMap:
                 continue
             else:
                 self.varMap[eachVar] = varMap[eachVar]
+
 
 def GetCustomKeyValueMap(keyValuePair, where):
     varMap = {}
@@ -524,7 +558,8 @@ def GetCustomKeyValueMap(keyValuePair, where):
     for eachCustomKeyValue in customKeyValues:
         customKeyValuePair = eachCustomKeyValue.split(": ")
         if len(customKeyValuePair) != 2:
-            ShowMessageAndExit("Error!: The var key and value pair (%s) is incorrect in %s, please use KEY: VALUE style" % (keyValuePair, where))
+            ShowMessageAndExit(
+                "Error!: The var key and value pair (%s) is incorrect in %s, please use KEY: VALUE style" % (keyValuePair, where))
         key, value = customKeyValuePair
         varMap[key] = value
     return varMap
@@ -532,11 +567,14 @@ def GetCustomKeyValueMap(keyValuePair, where):
 ##############################################################################
 # BaseFileList
 ##############################################################################
+
+
 class BaseFileList(object):
     """
      - Represent  basefilelist.txt state
      - It check if the current file and size pair is in the basefilelist.
     """
+
     def __init__(self, targetDir):
         self.baseFileList = {}
         if os.path.isdir(targetDir):
@@ -545,15 +583,18 @@ class BaseFileList(object):
                 f = file(fsrc)
                 for line in f.readlines():
                     self.baseFileList[line.strip()] = True
+
     def IsNewOrChanged(self, filename):
         item = os.path.basename(filename) + str(os.path.getsize(filename))
         return not self.baseFileList.get(item, False)
+
 
 class NullBaseFileList(object):
     """
      - Represent  basefilelist.txt state
      - It check if the current file and size pair is in the basefilelist.
     """
+
     def __init__(self):
         pass
 
@@ -563,24 +604,23 @@ class NullBaseFileList(object):
 
 def ShowRuleList():
     nsiqcppstyle_rulemanager.ruleManager.availRuleNames.sort()
-    for rule in  nsiqcppstyle_rulemanager.ruleManager.availRuleNames:
+    for rule in nsiqcppstyle_rulemanager.ruleManager.availRuleNames:
         print "~", rule
     sys.exit(1)
 
 
-
 def CheckPathPermission(path, folderrole):
     if not os.access(path, os.R_OK) and os.path.exists(path):
-        ShowMessageAndExit("Error!: %s  You should have read permission in %s." % (folderrole, path))
+        ShowMessageAndExit(
+            "Error!: %s  You should have read permission in %s." % (folderrole, path))
     return True
 
-####################################################################################################
+##########################################################################
+
 
 _nsiqcppstyle_state = nsiqcppstyle_state._nsiqcppstyle_state
-
 
 
 if __name__ == "__main__":
     sys.path.append(GetRuntimePath())
     sys.exit(main())
-

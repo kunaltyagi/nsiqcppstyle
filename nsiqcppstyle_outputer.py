@@ -25,14 +25,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------
 
-import logging, sys
+import logging
+import sys
+
 
 class ConsoleOuputer:
     class Level:
         Verbose = logging.DEBUG
-        Info    = logging.INFO
-        Ci      = logging.WARNING
-        Error   = logging.ERROR
+        Info = logging.INFO
+        Ci = logging.WARNING
+        Error = logging.ERROR
 
     def __init__(self):
         # Default level is set to Info
@@ -90,5 +92,5 @@ class ConsoleOuputer:
             # Format output the same way a direct call to print would
             return ' '.join(str(a) for a in msgArgs)
 
-_consoleOutputer = ConsoleOuputer()
 
+_consoleOutputer = ConsoleOuputer()

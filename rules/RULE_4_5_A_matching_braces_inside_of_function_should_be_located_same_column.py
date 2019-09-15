@@ -1,16 +1,16 @@
 """
 Matching braces inside of function definitions should be the same column.
 
-== Violation == 
+== Violation ==
 
     void A() { <== Don't Care
-        for (;;) 
+        for (;;)
         { <== ERROR
           }
     }
-    class K() 
+    class K()
     { <== Don't Care
-        if (true) 
+        if (true)
         { <== Error
       }
     }
@@ -18,39 +18,41 @@ Matching braces inside of function definitions should be the same column.
 == Good ==
 
     void A() { <== Don't Care
-        for (;;) 
+        for (;;)
         { <== Correct
         }
-    }    
+    }
 
 """
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
-def RunRule(lexer, contextStack) :
+
+def RunRule(lexer, contextStack):
     t = lexer.GetCurToken()
     if t.type == "RBRACE" and not t.pp:
         matching = lexer.GetPrevMatchingToken(True)
-        if matching != None and t.lineno != matching.lineno : 
-            if GetRealColumn(t) != GetRealColumn(matching) :
-                nsiqcppstyle_reporter.Error(t, __name__, 
-                      "Matching Braces inside of function should be located in the same column " )
+        if matching is not None and t.lineno != matching.lineno:
+            if GetRealColumn(t) != GetRealColumn(matching):
+                nsiqcppstyle_reporter.Error(t, __name__,
+                                            "Matching Braces inside of function should be located in the same column ")
+
 
 ruleManager.AddFunctionScopeRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionScopeRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
     for (;;) {
     }
@@ -59,7 +61,7 @@ void function() {
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
     a = {
     }
@@ -68,11 +70,11 @@ void function() {
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
     a = {
         }
-    while(True) 
+    while(True)
     {
     }
     k = {}
@@ -81,7 +83,7 @@ void function() {
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
     for (;;) {
              }
@@ -90,7 +92,7 @@ void function() {
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
 %sfor (;;) {
              }
@@ -99,14 +101,14 @@ void function() {
         self.ExpectSuccess(__name__)
 
     def test6(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 void function() {
 void function2() {
-for (;;) 
+for (;;)
 {
   {
   }
 }
 }
-""" )
+""")
         self.ExpectSuccess(__name__)

@@ -20,75 +20,79 @@ Please turn off this rule. If you think it's too overwhelming.
     }
 """
 
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
-def RunRule(lexer, fullName, decl, contextStack, context) :
+
+def RunRule(lexer, fullName, decl, contextStack, context):
     t = lexer.GetCurToken()
     functionName = t.value.lower()
     k = 0
     t2 = None
-    while(True) :
+    while(True):
         t2 = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
-        if t2 == None or k > 4 or t2.type == "SEMI":
-            break;
-        if t2.value.lower() == "bool" :
-            if not Search("^(has|is)", functionName) and functionName != "operator" :
+        if t2 is None or k > 4 or t2.type == "SEMI":
+            break
+        if t2.value.lower() == "bool":
+            if not Search("^(has|is)",
+                          functionName) and functionName != "operator":
                 nsiqcppstyle_reporter.Error(t, __name__,
-                       "The function name(%s) should start with has or is when returinning bool" % fullName)
-            break;
+                                            "The function name(%s) should start with has or is when returinning bool" % fullName)
+            break
         k += 1
+
 
 ruleManager.AddFunctionNameRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunRule)
 
     def test1(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 bool canHave() {
 }""")
         self.ExpectError(__name__)
 
     def test2(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 bool CTEST:canHave() {
 }""")
         self.ExpectError(__name__)
 
     def test3(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 extern bool CTEST:canHave() {
 }""")
         self.ExpectError(__name__)
 
     def test4(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 extern int CTEST:canHave() {
 }""")
         self.ExpectSuccess(__name__)
 
     def test5(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 extern int CTEST:isIt() {
 }""")
         self.ExpectSuccess(__name__)
 
     def test6(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 class K {
 extern bool CTEST:canHave();
 }""")
@@ -112,7 +116,7 @@ extern bool CTEST:canHave();
 
     def test8(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 boolean operator=();
 boolean KK::operator=();
 """)
@@ -120,7 +124,7 @@ boolean KK::operator=();
 
     def test9(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 /**
   * This tests for correct parsing of fn name and nested templates
   **/
@@ -137,7 +141,7 @@ bool canHave(ObjectTypeNotPtr obj) {
 
     def test10(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 /**
   * This tests for correct parsing of fn name and nested templates
   **/

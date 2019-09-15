@@ -30,6 +30,7 @@ import nsiqcppstyle_state
 
 _regexp_compile_cache = {}
 
+
 def Match(pattern, s):
     """Matches the string with the pattern, caching the compiled regexp."""
     # The regexp compilation caching is inlined in both Match and Search for
@@ -46,47 +47,55 @@ def Search(pattern, s):
         _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
     return _regexp_compile_cache[pattern].search(s)
 
+
 def FindAll(pattern, s):
     """Searches the string for the pattern, caching the compiled regexp."""
     if not pattern in _regexp_compile_cache:
         _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
     return _regexp_compile_cache[pattern].findall(s)
- 
+
+
 def GetRealColumn(token):
     """ Get the token's real column """
     tabsize = int(nsiqcppstyle_state._nsiqcppstyle_state.GetVar("tabsize", 4))
 
-    line = token.line[:token.column]    
+    line = token.line[:token.column]
     tabCount = line.count("\t")
-    return len(line) + tabCount * (tabsize - 1)          
+    return len(line) + tabCount * (tabsize - 1)
+
 
 def GetIndentation(token):
-    """ Get indentation of the line in which the tokens exists""" 
+    """ Get indentation of the line in which the tokens exists"""
     tabsize = int(nsiqcppstyle_state._nsiqcppstyle_state.GetVar("tabsize", 4))
 
     line = token.line
-    indent  = 0
+    indent = 0
     for char in line:
-        if char == ' ' : indent += 1
-        elif char == '\t' : indent += tabsize
-        else : break;
-    return  indent
+        if char == ' ':
+            indent += 1
+        elif char == '\t':
+            indent += tabsize
+        else:
+            break
+    return indent
+
 
 def IsConstuctor(value, fullName, context):
     """ Check if the passed value is the contructor or destructor """
     fullName = fullName.replace("~", "")
     names = fullName.split("::")
-    if len(names) != 1 and names[-1] == value :
+    if len(names) != 1 and names[-1] == value:
         return True
 
-    if context != None and context.type in ["CLASS_BLOCK", "STRUCT_BLOCK"] :
+    if context is not None and context.type in ["CLASS_BLOCK", "STRUCT_BLOCK"]:
         names = context.name.split("::")
-        if names[-1] == value :
+        if names[-1] == value:
             return True
     return False
 
+
 def IsOperator(value):
     """ Check if the passed value is 'operator' """
-    if value != None and value == "operator" :
+    if value is not None and value == "operator":
         return True
     return False
