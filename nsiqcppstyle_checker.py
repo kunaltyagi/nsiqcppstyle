@@ -773,8 +773,8 @@ class CppLexerNavigator(object):
             self.PopTokenIndex()
         return token
 
-    def GetPrevTokenInTypeList(
-            self, typelist, keepCur=True, skipPreprocess=True):
+    def GetPrevTokenInTypeList(self, typelist, keepCur=True,
+                               skipPreprocess=True):
         if keepCur:
             self.PushTokenIndex()
         token = None
@@ -814,8 +814,8 @@ class CppLexerNavigator(object):
             self.PopTokenIndex()
         return token
 
-    def GetNextTokenInTypeList(
-            self, typelist, keepCur=False, skipPreprocess=True):
+    def GetNextTokenInTypeList(self, typelist, keepCur=False,
+                               skipPreprocess=True):
         if keepCur:
             self.PushTokenIndex()
         token = None
@@ -855,8 +855,8 @@ class Context:
         self.additional = ""
 
     def __str__(self):
-        return "%s, %s, %s, %s" % (
-            self.type, self.name, self.startToken, self.endToken)
+        return ", ".join([self.type, self.name,
+                          self.startToken, self.endToken])
 
     def IsContextStart(self, token):
         return token == self.startToken
@@ -1002,8 +1002,8 @@ def ContructContextInfo(lexer):
                 templateContext = None
 
             if t.type in ['LBRACE', 'LPAREN', 'LBRACKET']:
-                if contextPrediction is not None and contextPrediction.IsContextStart(
-                        t):
+                if contextPrediction is not None and \
+                        contextPrediction.IsContextStart(t):
                     contextStack = contextStack.Copy()
                     contextStack.Push(contextPrediction)
                     contextStackStack.Push(contextStack)
@@ -1012,8 +1012,8 @@ def ContructContextInfo(lexer):
                     mt = lexer.GetNextMatchingToken(True)
                     if mt is not None:
                         contextStack = contextStack.Copy()
-                        contextStack.Push(
-                            Context(t.type[1:] + "BLOCK", "", False, t.lexpos, mt.lexpos))
+                        contextStack.Push(Context(t.type[1:] + "BLOCK", "",
+                                                  False, t.lexpos, mt.lexpos))
                         contextStackStack.Push(contextStack)
 
 #       print depth, "Push", contextStack
@@ -1036,8 +1036,8 @@ def ContructContextInfo(lexer):
                 hasBody = lexer.HasBody()
                 fullName = ""
                 curContext = contextStack.Peek()
-                if (prevToken is None or prevToken.value != "<") and (
-                        curContext is None or curContext.type != "PARENBLOCK") and hasBody:
+                if (prevToken is None or prevToken.value != "<") and \
+                        (curContext is None or curContext.type != "PARENBLOCK") and hasBody:
                     lexer.PushTokenIndex()
                     # find start and end brace block
                     contextStart = lexer.GetNextTokenInType("LBRACE")
@@ -1060,8 +1060,8 @@ def ContructContextInfo(lexer):
                             else:
                                 fullName += token.value
                                 break
-                        contextPrediction = Context(
-                            t.type + "_BLOCK", fullName, True, contextStart, contextEnd)
+                        contextPrediction = Context(t.type + "_BLOCK", fullName,
+                                                    True, contextStart, contextEnd)
                     lexer.PopTokenIndex()
                 t.type = "TYPE"
                 t.fullName = fullName
@@ -1097,8 +1097,13 @@ def ContructContextInfo(lexer):
                 t3 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                 curContext = contextStack.SigPeek()
 
-                if (t3 is None or t3.type != "NEW") and t2 is not None and t2.type == "LPAREN" and (
-                        curContext is None or curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "NAMESPACE_BLOCK"]) and t4.type != "STRING":
+                if (t3 is None or t3.type != "NEW") and \
+                        t2 is not None and \
+                        t2.type == "LPAREN" and \
+                        t4.type != "STRING" and \
+                        (curContext is None or
+                         curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK",
+                                             "NAMESPACE_BLOCK"]):
                     # Check The ID after the next RPAREN
                     # if there is ID, None, or LBRACKET it's not a function.
                     # in case HELLO() HELLO2(), or FOO (BAR*)[]
@@ -1140,10 +1145,10 @@ def ContructContextInfo(lexer):
                         contextStart = lexer.GetNextTokenInType("LBRACE")
                         contextEnd = lexer.GetNextMatchingToken(contextStart)
                         if contextEnd is not None:
-                            contextPrediction = Context(
-                                "FUNCTION_BLOCK", fullName, True, contextStart, contextEnd)
+                            contextPrediction = Context("FUNCTION_BLOCK", fullName,
+                                                        True, contextStart, contextEnd)
 
-                    #RunFunctionRule(lexer, functionName, decl, contextStack, contextPrediction)
+                    # RunFunctionRule(lexer, functionName, decl, contextStack, contextPrediction)
                     t.type = "FUNCTION"
                     t.fullName = fullName
                     t.context = contextPrediction
@@ -1161,8 +1166,8 @@ def ContructContextInfo(lexer):
 
 def RunRules(ruleManager, lexer):
     try:
-        ruleManager.RunFileStartRule(lexer, os.path.basename(
-            lexer.filename), os.path.dirname(lexer.filename))
+        ruleManager.RunFileStartRule(lexer, os.path.basename(lexer.filename),
+                                     os.path.dirname(lexer.filename))
     except Exception as e:
         console.Err.Verbose("Rule Error : ", e)
         console.Err.Verbose(traceback.format_exc())
@@ -1182,11 +1187,11 @@ def RunRules(ruleManager, lexer):
                 ruleManager.RunPreprocessRule(lexer, t.contextStack)
             else:
                 if t.type == 'TYPE':
-                    ruleManager.RunTypeNameRule(lexer, t.value.upper(
-                    ), t.fullName, t.decl, t.contextStack, t.context)
+                    ruleManager.RunTypeNameRule(lexer, t.value.upper(), t.fullName,
+                                                t.decl, t.contextStack, t.context)
                 elif t.type == 'FUNCTION':
-                    ruleManager.RunFunctionNameRule(
-                        lexer, t.fullName, t.decl, t.contextStack, t.context)
+                    ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
+                                                    t.contextStack, t.context)
                 elif t.contextStack is not None and t.contextStack.SigPeek() is not None:
                     sigContext = t.contextStack.SigPeek()
                     if sigContext.type == "FUNCTION_BLOCK":
@@ -1198,8 +1203,8 @@ def RunRules(ruleManager, lexer):
             console.Err.Verbose("Rule Error : ", t, t.contextStack, e)
             console.Err.Verbose(traceback.format_exc())
     try:
-        ruleManager.RunFileEndRule(lexer, os.path.basename(
-            lexer.filename), os.path.dirname(lexer.filename))
+        ruleManager.RunFileEndRule(lexer, os.path.basename(lexer.filename),
+                                   os.path.dirname(lexer.filename))
     except Exception as e:
         console.Err.Verbose("Rule Error : ", e)
         console.Err.Verbose(traceback.format_exc())

@@ -55,11 +55,12 @@ def Update(currentVersion):
 
             #win32str = agentFile["name"].replace("/", "\\")
             eachFileName = agentFile["name"]
-            if (eachFileName.endswith(".dll") or eachFileName.endswith(
-                    ".zip") or eachFileName.endswith(".exe")):
+            if (eachFileName.endswith(".dll") or
+                    eachFileName.endswith(".zip") or
+                    eachFileName.endswith(".exe")):
                 continue
-            filestr = os.path.join(
-                nsiqcppstyle_util.GetRuntimePath(), agentFile["name"])
+            filestr = os.path.join(nsiqcppstyle_util.GetRuntimePath(),
+                                   agentFile["name"])
 
             if os.path.exists(filestr):
                 checksum = md5_constructor()
@@ -78,8 +79,9 @@ def Update(currentVersion):
 
         for agentFile in updateInfo['files']:
             eachFileName = agentFile["name"]
-            if (eachFileName.endswith(".dll") or eachFileName.endswith(
-                    ".zip") or eachFileName.endswith(".exe")):
+            if (eachFileName.endswith(".dll") or
+                    eachFileName.endswith(".zip") or
+                    eachFileName.endswith(".exe")):
                 continue
             if agentFile.get('new', None) is not None:
                 print 'Updating ' + agentFile['name']
@@ -100,8 +102,8 @@ def Update(currentVersion):
 
 def DownloadFile(url, agentFile, systemKey, recursed=False):
     print 'Downloading ' + agentFile['name']
-    downloadedFile = urllib.urlretrieve(
-        url + '/update/' + systemKey + "/" + agentFile['name'])
+    downloadedFile = urllib.urlretrieve(url + '/update/' + systemKey +
+                                        "/" + agentFile['name'])
 
     checksum = md5_constructor()
 

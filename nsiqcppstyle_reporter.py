@@ -95,8 +95,8 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter):
                 count += nsiqcppstyle_state.errorPerFile[eachFile][eachRule]
             console.Out.Info(" - ", eachFile, " violated in total : ", count)
             for eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys():
-                console.Out.Info(
-                    "   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
+                console.Out.Info("   * ", eachRule, " : ",
+                                 nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
 
 
 def CloseReport(format):
@@ -106,7 +106,7 @@ def CloseReport(format):
         writer.close()
 ##########################################################################
 
-#ruleMap = {}
+# ruleMap = {}
 
 
 def IsRuleUsed(ruleName, ruleNames):
@@ -118,9 +118,9 @@ def IsRuleUsed(ruleName, ruleNames):
 
 def ReportRules(availRuleName, ruleNames):
     pass
-    #global ruleMap
-    #ruleMap = {}
-    #index = 0
+    # global ruleMap
+    # ruleMap = {}
+    # index = 0
     # ===========================================================================
     # for eachAvailRuleName in availRuleName :
     #    ruleMap[eachAvailRuleName] = index
@@ -208,18 +208,18 @@ def ErrorInternal(t, ruleName, message):
 
     if t is None:
         return
-    if nsiqcppstyle_checker.Search(
-            r"//\s*NS", t.line) is None and not _nsiqcppstyle_state.CheckRuleSuppression(ruleName):
+    if nsiqcppstyle_checker.Search(r"//\s*NS", t.line) is None and \
+            not _nsiqcppstyle_state.CheckRuleSuppression(ruleName):
         _nsiqcppstyle_state.IncrementErrorCount(ruleName, t.filename)
         url = ""
         if _nsiqcppstyle_state.showUrl:
             url = "http://nsiqcppstyle.appspot.com/rule_doc/" + ruleName
         if _nsiqcppstyle_state.output_format == 'emacs':
-            sys.stdout.write('%s:%s:  %s  [%s] %s\n' % (
-                t.filename, t.lineno, message, ruleName, url))
+            sys.stdout.write('%s:%s:  %s  [%s] %s\n' % (t.filename, t.lineno,
+                                                        message, ruleName, url))
         elif _nsiqcppstyle_state.output_format == 'vs7':
-            sys.stdout.write('%s(%s, %s):  %s  [%s] %s\n' % (
-                t.filename, t.lineno, t.column, message, ruleName, url))
+            sys.stdout.write('%s(%s, %s):  %s  [%s] %s\n' % (t.filename, t.lineno,
+                                                             t.column, message, ruleName, url))
         elif _nsiqcppstyle_state.output_format == 'eclipse':
             sys.stdout.write('  File "%s", line %d %s (%s)\n' %
                              (t.filename, t.lineno, message, ruleName))
