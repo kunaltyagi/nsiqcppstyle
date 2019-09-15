@@ -5,51 +5,55 @@ Braces for namespace should be located in the seperate line.
 
     namespace AA { <== ERROR
     }
-    
+
 
 
 == Good ==
 
-    namespace  
-    { 
+    namespace
+    {
     }
-    
+
 """
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 
-from nsiqcppstyle_rulehelper import  *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
 
-def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext) :  
-    if not decl and currentType == "NAMESPACE" and typeContext != None:
+def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext):
+    if not decl and currentType == "NAMESPACE" and typeContext is not None:
         t = lexer.GetNextTokenInType("LBRACE", False, True)
-        if t != None :
+        if t is not None:
             t2 = typeContext.endToken
-            if t2 != None and t.lineno != t2.lineno : 
+            if t2 is not None and t.lineno != t2.lineno:
                 prevToken = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
-                #print contextStack.Peek()
-                if prevToken != None and prevToken.lineno == t.lineno :
-                    nsiqcppstyle_reporter.Error(t, __name__, "The brace for type definition should be located in start of line")
-                if  t2.lineno != t.lineno and GetRealColumn(t2) != GetRealColumn(t) :
-                    nsiqcppstyle_reporter.Error(t2, __name__, "The brace for type definition should be located in same column")
-                     
+                # print contextStack.Peek()
+                if prevToken is not None and prevToken.lineno == t.lineno:
+                    nsiqcppstyle_reporter.Error(
+                        t, __name__, "The brace for type definition should be located in start of line")
+                if t2.lineno != t.lineno and GetRealColumn(
+                        t2) != GetRealColumn(t):
+                    nsiqcppstyle_reporter.Error(
+                        t2, __name__, "The brace for type definition should be located in same column")
+
+
 ruleManager.AddTypeNameRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddTypeNameRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 public class A {
 
 }
@@ -57,20 +61,20 @@ public class A {
         self.ExpectSuccess(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 class C : public AA {
-    
+
 }
 """)
         self.ExpectSuccess(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c","""
-class K 
+        self.Analyze("thisfile.c", """
+class K
 {
-    void function() const {  
+    void function() const {
     }
-    class T 
+    class T
     {
     }
 }
@@ -78,10 +82,10 @@ class K
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c","""
-namespace K 
+        self.Analyze("thisfile.c", """
+namespace K
 {
-    void function() const {  
+    void function() const {
     }
     class T {
     }
@@ -90,7 +94,7 @@ namespace K
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("thisfile.c","""
+        self.Analyze("thisfile.c", """
 namespace K {
     int k;
 }

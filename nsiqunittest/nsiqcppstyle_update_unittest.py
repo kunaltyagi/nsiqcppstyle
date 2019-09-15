@@ -28,6 +28,7 @@
 import unittest
 from updateagent.agent import Version
 
+
 class updateTest(unittest.TestCase):
     def test2(self):
         version1 = Version("0.1.1")
@@ -38,6 +39,8 @@ class updateTest(unittest.TestCase):
         assert(version1 > version2)
         version2 = Version("0.2.11.1")
         assert(version1 < version2)
+
     def test3(self):
         eachFileName = "library.dll"
-        assert(eachFileName.endswith(".dll") or eachFileName.endswith(".zip") or eachFileName.endswith(".exe"))
+        assert(eachFileName.endswith(".dll") or eachFileName.endswith(
+            ".zip") or eachFileName.endswith(".exe"))

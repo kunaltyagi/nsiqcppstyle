@@ -6,11 +6,11 @@ It checks if there is doxygen sytle comment in front of each class definition.
 
     class A { <== Violation. No doxygen comment.
     };
-    
-    /*        <== Violation. It's not a doxygen comment 
+
+    /*        <== Violation. It's not a doxygen comment
      *
      */
-    class B { 
+    class B {
     };
 
 == Good ==
@@ -20,41 +20,46 @@ It checks if there is doxygen sytle comment in front of each class definition.
      */
     class A { <== OK
     };
-    
+
     class B; <== Don't care. It's forward decl.
 """
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
 
-def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext) :  
-    if not decl and currentType == "CLASS"  and typeContext != None:
+def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext):
+    if not decl and currentType == "CLASS" and typeContext is not None:
         t = lexer.GetCurToken()
         lexer.PushTokenIndex()
         t2 = lexer.GetPrevTokenInType("COMMENT")
         lexer.PopTokenIndex()
         lexer.PushTokenIndex()
-        t3 = lexer.GetPrevTokenInTypeList(["LBRACE", "SEMI", "PREPROCESSOR"], False, True)
+        t3 = lexer.GetPrevTokenInTypeList(
+            ["LBRACE", "SEMI", "PREPROCESSOR"], False, True)
         lexer.PopTokenIndex()
-        if t2 != None and t2.additional == "DOXYGEN" : 
-            if t3 == None or t2.lexpos > t3.lexpos :
-                return 
-        nsiqcppstyle_reporter.Error(t, __name__, "Doxygen Comment should be provided in front of class def(%s)." % fullName)
+        if t2 is not None and t2.additional == "DOXYGEN":
+            if t3 is None or t2.lexpos > t3.lexpos:
+                return
+        nsiqcppstyle_reporter.Error(
+            t, __name__, "Doxygen Comment should be provided in front of class def(%s)." % fullName)
+
+
 ruleManager.AddTypeNameRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddTypeNameRule(RunRule)
 
     def test1(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 class A {
 }
 """)
@@ -62,7 +67,7 @@ class A {
 
     def test2(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 /*
  */
 class K {
@@ -72,7 +77,7 @@ class K {
 
     def test3(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 /**
  */
 class K {
@@ -84,7 +89,7 @@ class K {
 
     def test4(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 /**
  *
  */
@@ -101,7 +106,7 @@ class T;
 
     def test5(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 /*
  */
 struct K {
@@ -111,7 +116,7 @@ struct K {
 
     def test6(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 /**
  */
 template<class A, class B>

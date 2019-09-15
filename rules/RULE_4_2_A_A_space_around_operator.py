@@ -28,94 +28,99 @@ In the some operators(",", ";"), the spaces should be provided after the operato
     tt[c++]          <== OK. This rule doesn't care about the unary operator is used in the [ ( [
 """
 
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
 operator = (
-            "PLUS",
-            "DIVIDE",
-            "MODULO",
-            "OR",
-            "LSHIFT",
-            "LOR",
-            "LAND",
-            "LE",
-            "GE",
-            "EQ",
-            'EQUALS',
-            'TIMESEQUAL',
-            'DIVEQUAL',
-            'MODEQUAL',
-            'PLUSEQUAL',
-            'MINUSEQUAL',
-            'LSHIFTEQUAL',
-            'RSHIFTEQUAL',
-            'ANDEQUAL',
-            'XOREQUAL',
-            'OREQUAL'
+    "PLUS",
+    "DIVIDE",
+    "MODULO",
+    "OR",
+    "LSHIFT",
+    "LOR",
+    "LAND",
+    "LE",
+    "GE",
+    "EQ",
+    'EQUALS',
+    'TIMESEQUAL',
+    'DIVEQUAL',
+    'MODEQUAL',
+    'PLUSEQUAL',
+    'MINUSEQUAL',
+    'LSHIFTEQUAL',
+    'RSHIFTEQUAL',
+    'ANDEQUAL',
+    'XOREQUAL',
+    'OREQUAL'
 
 )
 
 nextoperator = (
-            "SEMI",
-            "COMMA",
+    "SEMI",
+    "COMMA",
 )
 
 unaryoperator = (
-        'PLUSPLUS', 'MINUSMINUS'
+    'PLUSPLUS', 'MINUSMINUS'
 )
-def RunRule(lexer, contextStack) :
+
+
+def RunRule(lexer, contextStack):
     t = lexer.GetCurToken()
 
-    if t.type in operator :
+    if t.type in operator:
         t2 = lexer.PeekNextToken()
         t3 = lexer.PeekPrevToken()
-        t4 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess();
-        if t2 != None and t3 != None  and (t4 == None or t4.type != "FUNCTION"):
+        t4 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
+        if t2 is not None and t3 is not None and (
+                t4 is None or t4.type != "FUNCTION"):
 
             if t.pp == True and t.type == "DIVIDE":
                 return
-            if t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"] or t3.type not in ["SPACE", "LINEFEED"] :
+            if t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"] or t3.type not in [
+                    "SPACE", "LINEFEED"]:
                 t3 = lexer.GetPrevTokenSkipWhiteSpaceAndComment()
-                if t3 != None and t3.type != "OPERATOR" and not Match("^\w*#include", t.line):
+                if t3 is not None and t3.type != "OPERATOR" and not Match(
+                        r"^\w*#include", t.line):
                     nsiqcppstyle_reporter.Error(t, __name__,
-                          "Provide spaces b/w operator '%s'" % t.value)
-    elif t.type in nextoperator :
+                                                "Provide spaces b/w operator '%s'" % t.value)
+    elif t.type in nextoperator:
         t2 = lexer.PeekNextToken()
-        if t2 != None and t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"] and not Match("^\w*#include", t.line):
+        if t2 is not None and t2.type not in [
+                "SPACE", "LINEFEED", "PREPROCESSORNEXT"] and not Match(r"^\w*#include", t.line):
             nsiqcppstyle_reporter.Error(t, __name__,
-                          "Provide spaces after operator '%s'" % t.value)
-    elif t.type in unaryoperator :
+                                        "Provide spaces after operator '%s'" % t.value)
+    elif t.type in unaryoperator:
         t2 = lexer.PeekPrevToken()
         t3 = lexer.PeekNextToken()
-        t4 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess();
-        if (Match("^\w*#include", t.line)) :
+        t4 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
+        if (Match(r"^\w*#include", t.line)):
             return
-        if (t3 != None and t3.type == "ID"):
-            if t2.type not in ["COMMA", "OPERATOR", "SPACE", "LINEFEED", "LBRACE", "LPAREN", "LBRACKET"] and t3.type not in ["SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]:
+        if (t3 is not None and t3.type == "ID"):
+            if t2.type not in ["COMMA", "OPERATOR", "SPACE", "LINEFEED", "LBRACE", "LPAREN", "LBRACKET"] and t3.type not in [
+                    "SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]:
                 nsiqcppstyle_reporter.Error(t, __name__,
-                          "Provide spaces before operator '%s'" % t.value)
+                                            "Provide spaces before operator '%s'" % t.value)
 
-        if (t2 != None and t2.type == "ID"):
-            if t3.type not in ["COMMA", "OPERATOR", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"] and t3.type not in ["SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]:
+        if (t2 is not None and t2.type == "ID"):
+            if t3.type not in ["COMMA", "OPERATOR", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"] and t3.type not in [
+                    "SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]:
                 nsiqcppstyle_reporter.Error(t, __name__,
-                          "Provide spaces after operator '%s'" % t.value)
+                                            "Provide spaces after operator '%s'" % t.value)
+
 
 ruleManager.AddRule(RunRule)
 ruleManager.AddPreprocessRule(RunRule)
 
 
-
-
-
-
-
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddRule(RunRule)
@@ -123,7 +128,7 @@ class testRule(nct):
 
     def test1(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 int *a;
 void operator=(EWE) {
 HELLO = ewe << 3;
@@ -139,21 +144,21 @@ t = a++;
 
     def test2(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 (DD +ww);
 """)
         self.ExpectError(__name__)
 
     def test3(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 HELLO = ewe <<3;
 """)
         self.ExpectError(__name__)
 
     def test4(self):
         self.Analyze("test/thisFile.c",
-"""
+                     """
 HELLo = TET ||B;
 """)
         self.ExpectError(__name__)

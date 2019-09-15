@@ -29,30 +29,34 @@
 #
 import sys
 import os
-import csv #@UnusedImport
-import urllib #@UnusedImport
+import csv  # @UnusedImport
+import urllib  # @UnusedImport
 try:
-    import hashlib #@UnusedImport
+    import hashlib  # @UnusedImport
 except ImportError:
-    import md5 #@UnusedImport
-import unittest #@UnusedImport
-import platform #@UnusedImport
-import sre_compile #@UnusedImport
-import shutil #@UnusedImport
+    import md5  # @UnusedImport
+import unittest  # @UnusedImport
+import platform  # @UnusedImport
+import sre_compile  # @UnusedImport
+import shutil  # @UnusedImport
+
 
 def WeAreFrozen():
     return hasattr(sys, "frozen")
 
+
 def ModulePath():
     if WeAreFrozen():
-        return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding()))
+        return os.path.dirname(
+            unicode(sys.executable, sys.getfilesystemencoding()))
     return os.path.dirname(unicode(__file__, sys.getfilesystemencoding()))
 
-def GetRuntimePath() :
+
+def GetRuntimePath():
     "Return the path of this tool"
-    if (sys.platform == "win32") :
-        runtimePath = ModulePath();
-    else :
+    if (sys.platform == "win32"):
+        runtimePath = ModulePath()
+    else:
         modename = globals()['__name__']
         module = sys.modules[modename]
         runtimePath = os.path.dirname(module.__file__)
@@ -63,4 +67,3 @@ if __name__ == "__main__":
     sys.path.append(GetRuntimePath())
     module = __import__("nsiqcppstyle_exe")
     sys.exit(module.main())
-

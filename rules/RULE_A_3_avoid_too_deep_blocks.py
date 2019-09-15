@@ -20,38 +20,44 @@ If the block depth in the function is more than 4, it reports a violation.
 
 
 """
-from nsiqcppstyle_rulehelper import  *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
 
 depth = 0
 reported = False
-def RunRule(lexer, contextStack) :
+
+
+def RunRule(lexer, contextStack):
     global depth
     global reported
     t = lexer.GetCurToken()
-    if t.type == "LBRACE" :
+    if t.type == "LBRACE":
         depth += 1
-        if depth > 5 and not reported :
-            nsiqcppstyle_reporter.Error(t, __name__, "Do not make too deep block(%d) ({). It makes not readable code" % depth)
+        if depth > 5 and not reported:
+            nsiqcppstyle_reporter.Error(
+                t, __name__, "Do not make too deep block(%d) ({). It makes not readable code" % depth)
             reported = True
-    elif t.type == "RBRACE" :
+    elif t.type == "RBRACE":
         depth -= 1
 
-def RunFunctionScopeRule(lexer, fullName, decl, contextStack, context) :
+
+def RunFunctionScopeRule(lexer, fullName, decl, contextStack, context):
     global depth
     global reported
     reported = False
     depth = 0
 
+
 ruleManager.AddFunctionNameRule(RunFunctionScopeRule)
 ruleManager.AddFunctionScopeRule(RunRule)
 
-###########################################################################################
+##########################################################################
 # Unit Test
-###########################################################################################
+##########################################################################
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+
 class testRule(nct):
     def setUpRule(self):
         ruleManager.AddFunctionNameRule(RunFunctionScopeRule)
@@ -59,7 +65,7 @@ class testRule(nct):
 
     def test1(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 void func1() {
 {{{{{{{
        }}}}}}}
@@ -69,7 +75,7 @@ void func1() {
 
     def test2(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 
 void func1() {
 {{{
@@ -81,7 +87,7 @@ void func1() {
 
     def test3(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 void func(void)
 {
 if (...)
@@ -105,7 +111,7 @@ printf("...");
 
     def test4(self):
         self.Analyze("thisfile.c",
-"""
+                     """
 void func(void)
 {
 if (...)

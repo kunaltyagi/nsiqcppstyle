@@ -25,8 +25,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 class _NsiqCppStyleState(object):
     """Maintains module-wide state.."""
+
     def __init__(self):
         self.error_count = 0    # global count of reported errors
         # filters to apply when emitting error messages
@@ -48,7 +50,7 @@ class _NsiqCppStyleState(object):
 
     def SetCheckers(self, checkers):
         self.checkers = checkers
-   
+
     def ResetErrorCount(self):
         """Sets the module's error statistic back to zero."""
         self.error_count = 0
@@ -58,21 +60,23 @@ class _NsiqCppStyleState(object):
     def IncrementErrorCount(self, category, file):
         """Bumps the module's error statistic."""
         self.error_count += 1
-        self.errorPerChecker[category] = self.errorPerChecker.get(category, 0) + 1
+        self.errorPerChecker[category] = self.errorPerChecker.get(
+            category, 0) + 1
         errorsPerFile = self.errorPerFile.get(file, {})
         errorsPerFile[category] = errorsPerFile.get(category, 0) + 1
         self.errorPerFile[file] = errorsPerFile
 
     def SuppressRule(self, ruleName):
         self.suppressRules[ruleName] = True
-  
+
     def ResetRuleSuppression(self):
         self.suppressRules = {}
-  
+
     def CheckRuleSuppression(self, ruleName):
         return self.suppressRules.get(ruleName, False)
-      
+
     def GetVar(self, key, defaultValue):
         return self.varMap.get(key, defaultValue)
+
 
 _nsiqcppstyle_state = _NsiqCppStyleState()
