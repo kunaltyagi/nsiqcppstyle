@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PYTHONPATH=./:./rules python2 -m unittest discover -s rules -p "*.py"
+PYTHONPATH=./:./rules python -m unittest discover -s rules -p "*.py"
