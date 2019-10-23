@@ -42,6 +42,13 @@ def RunRule(lexer, contextStack):
             t2 = lexer.PeekNextTokenSkipWhiteSpaceAndComment()
             if t2 is not None and t2.type == "LPAREN":
                 t3 = lexer.PeekPrevTokenSkipWhiteSpaceAndComment()
+                # if :: comes first then we are not using dangerous C
+                # functions, so we can get out
+                if t3.type == "DOUBLECOLON":
+                    # check out the namespace that gives us this ::
+                    prev_namespace_token = lexer.GetPrevTokenInType("ID", keepCur=True)
+                    if prev_namespace_token.value != "std":
+                        return
                 if t3 is None or t3.type != "PERIOD":
                     nsiqcppstyle_reporter.Error(t, __name__,
                                                 "Do not use burfferoverflow risky function(%s)" % t.value)
