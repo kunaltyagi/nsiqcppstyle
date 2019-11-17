@@ -290,9 +290,9 @@ def main(argv=None):
                         fileExtension = fname[fname.rfind('.') + 1:]
                         eachFile = os.path.join(root, fname)
                         basePart = eachFile[len(targetPath):]
-                        if fileExtension in cExtendstionSet and
+                        if (fileExtension in cExtendstionSet and
                                 basefilelist.IsNewOrChanged(eachFile) and
-                                filter.CheckFileInclusion(basePart):
+                                filter.CheckFileInclusion(basePart)):
                             nsiqcppstyle_reporter.StartFile(os.path.dirname(basePart),
                                                             fname)
                             ProcessFile(ruleManager, eachFile, analyzedFiles)
