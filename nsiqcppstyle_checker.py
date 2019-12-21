@@ -344,8 +344,14 @@ class CppLexerNavigator(object):
         lexer = nsiqcppstyle_lexer.lex()
         self.data = data
         if data is None:
-            f = open(filename)
-            self.data = f.read()
+            list_encodings = ('utf-8', 'cp1250', 'latin1')
+            for encoding in list_encodings:
+                try:
+                    f = open(filename, encoding=encoding)
+                    self.data = f.read()
+                    print("Detected file encoding: {}".format(encoding))
+                except ValueError:
+                    pass
         self.lines = self.data.splitlines()
         lexer.input(self.data)
         index = 0

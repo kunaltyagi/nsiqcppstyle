@@ -1,3 +1,3 @@
 #!/bin/sh 
 pythonpath=`dirname $0`
-python ${pythonpath}/nsiqcppstyle.py "$@"
+python3 ${pythonpath}/nsiqcppstyle.py "$@"

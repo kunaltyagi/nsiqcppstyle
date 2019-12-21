@@ -15,24 +15,24 @@ url = "http://nsiqcppstyle.appspot.com"
 
 
 def Update(currentVersion):
-    import httplib
-    import urllib2
+    import http.client
+    import urllib.request, urllib.error, urllib.parse
     systemKey = nsiqcppstyle_util.GetSystemKey()
     # Get the latest version info
     try:
-        print 'Update: checking for update'
-        print url + "/update/" + systemKey
-        request = urllib2.urlopen(url + "/update/" + systemKey)
+        print('Update: checking for update')
+        print(url + "/update/" + systemKey)
+        request = urllib.urlopen(url + "/update/" + systemKey)
         response = request.read()
-    except urllib2.HTTPError as e:
+    except urllib.HTTPError as e:
         raise Exception(
             'Unable to get latest version info - HTTPError = ' + str(e))
 
-    except urllib2.URLError as e:
+    except urllib.URLError as e:
         raise Exception(
             'Unable to get latest version info - URLError = ' + str(e))
 
-    except httplib.HTTPException as e:
+    except http.HTTPException as e:
         raise Exception('Unable to get latest version info - HTTPException')
 
     except Exception as e:
@@ -44,11 +44,11 @@ def Update(currentVersion):
     try:
         updateInfo = updateagent.minjson.safeRead(response)
     except Exception as e:
-        print e
+        print(e)
         raise Exception('Unable to get latest version info. Try again later.')
 
     if Version(updateInfo['version']) > Version(currentVersion):
-        print 'A new version is available.'
+        print('A new version is available.')
 
         # Loop through the new files and call the download function
         for agentFile in updateInfo['files']:
@@ -64,14 +64,14 @@ def Update(currentVersion):
 
             if os.path.exists(filestr):
                 checksum = md5_constructor()
-                f = file(filestr, 'rb').read()
+                f = open(filestr, 'rb').read()
                 checksum.update(f)
                 if agentFile["md5"] == checksum.hexdigest():
                     continue
 
             agentFile['tempFile'] = DownloadFile(url, agentFile, systemKey)
             if agentFile['tempFile'] is None:
-                print "Update Failed while downloading : " + agentFile['name']
+                print("Update Failed while downloading : " + agentFile['name'])
                 return
             agentFile['new'] = True
         import shutil
@@ -84,7 +84,7 @@ def Update(currentVersion):
                     eachFileName.endswith(".exe")):
                 continue
             if agentFile.get('new', None) is not None:
-                print 'Updating ' + agentFile['name']
+                print('Updating ' + agentFile['name'])
                 newModule = os.path.join(runtimePath, agentFile['name'])
 
                 try:
@@ -101,13 +101,13 @@ def Update(currentVersion):
 
 
 def DownloadFile(url, agentFile, systemKey, recursed=False):
-    print 'Downloading ' + agentFile['name']
+    print('Downloading ' + agentFile['name'])
     downloadedFile = urllib.urlretrieve(url + '/update/' + systemKey +
                                         "/" + agentFile['name'])
 
     checksum = md5_constructor()
 
-    f = file(downloadedFile[0], 'rb')
+    f = open(downloadedFile[0], 'rb')
     part = f.read()
     checksum.update(part)
     f.close()
@@ -119,7 +119,7 @@ def DownloadFile(url, agentFile, systemKey, recursed=False):
         if recursed == False:
             DownloadFile(url, agentFile, systemKey, True)
         else:
-            print agentFile['name'] + ' did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.'
+            print(agentFile['name'] + ' did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.')
             return None
 
 
@@ -155,4 +155,4 @@ class Version:
         if isinstance(other, StringType):
             other = Version(other)
 
-        return cmp(self.version, other.version)
+        return (self.version > other.version) - (self.version < other.version)

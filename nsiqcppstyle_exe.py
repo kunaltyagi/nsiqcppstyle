@@ -37,7 +37,7 @@ from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
-import updateagent.agent
+#import updateagent.agent
 from nsiqcppstyle_util import *  # @UnusedWildImport
 try:
     set()
@@ -57,7 +57,7 @@ def ShowMessageAndExit(msg, usageOutput=True):
 
 
 def Usage():
-    print \
+    print (
         """
 ======================================================================================
 Usage: nsiqcppstyle [Options]
@@ -125,7 +125,7 @@ Usage: nsiqcppstyle [Options]
   And It checks only new and modified file. Please refer the nsiqcollector
   to generate basefilelist.txt.
 
-"""
+""" )
     sys.exit(0)
 
 
@@ -159,7 +159,7 @@ def main(argv=None):
         updateNsiqCppStyle = False
         for o, a in opts:
             if o in ("-h", "--help"):
-                print title
+                print (title)
                 Usage()
             elif o in ("-r", "--list-rules"):
                 ShowRuleList()
@@ -179,7 +179,7 @@ def main(argv=None):
                 _nsiqcppstyle_state.showUrl = True
             elif o == '--output':
                 if not a in ('emacs', 'vs7', 'csv', 'xml', 'eclipse'):
-                    print title
+                    print(title)
                     ShowMessageAndExit(
                         'The only allowed output formats are emacs, vs7 and csv.')
                 _nsiqcppstyle_state.output_format = a
@@ -197,10 +197,10 @@ def main(argv=None):
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
             console.Out.Ci(console.Separator)
-            try:
-                updateagent.agent.Update(version)
-            except Exception as e:
-                console.Out.Error(e)
+            #try:
+            #    updateagent.agent.Update(version)
+            #except Exception as e:
+            #    console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
@@ -305,7 +305,7 @@ def main(argv=None):
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
         return _nsiqcppstyle_state.error_count
 
-    except Usage as err:
+    except Exception as err:
         console.Err.Error(err.msg)
         console.Err.Error("for help use --help")
         sys.exit(-1)
@@ -320,8 +320,9 @@ def ProcessFile(ruleManager, file, analyzedFiles):
 
 
 def Update():
-    updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update",
-                             version)
+    pass
+    #updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update",
+    #                         version)
 
 
 csvResult = []
@@ -428,7 +429,7 @@ class FilterManager:
     def GetFilterFile(self, filterfile):
         if not os.path.exists(filterfile):
             return None
-        f = file(filterfile, 'r')
+        f = open(filterfile, 'r')
         return f
 
 ##############################################################################
@@ -578,7 +579,7 @@ class BaseFileList(object):
         if os.path.isdir(targetDir):
             fsrc = os.path.join(targetDir, "basefilelist.txt")
             if os.path.exists(fsrc):
-                f = file(fsrc)
+                f = open(fsrc)
                 for line in f.readlines():
                     self.baseFileList[line.strip()] = True
 
@@ -603,7 +604,7 @@ class NullBaseFileList(object):
 def ShowRuleList():
     nsiqcppstyle_rulemanager.ruleManager.availRuleNames.sort()
     for rule in nsiqcppstyle_rulemanager.ruleManager.availRuleNames:
-        print "~", rule
+        print("~", rule)
     sys.exit(1)
 
 
