@@ -1,6 +1,6 @@
 import re
 import string
-from types import StringType
+#from types import StringType
 import nsiqcppstyle_util
 import os
 import urllib
@@ -152,7 +152,7 @@ class Version:
         return "LooseVersion ('%s')" % str(self)
 
     def __cmp__(self, other):
-        if isinstance(other, StringType):
-            other = Version(other)
+        #if isinstance(other, StringType):
+        #    other = Version(other)
 
         return (self.version > other.version) - (self.version < other.version)

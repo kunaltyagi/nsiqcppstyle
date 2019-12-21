@@ -37,7 +37,7 @@ from nsiqcppstyle_outputer import _consoleOutputer as console
 import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
-#import updateagent.agent
+import updateagent.agent
 from nsiqcppstyle_util import *  # @UnusedWildImport
 try:
     set()
@@ -197,10 +197,10 @@ def main(argv=None):
         sys.path.append(runtimePath)
         if updateNsiqCppStyle:
             console.Out.Ci(console.Separator)
-            #try:
-            #    updateagent.agent.Update(version)
-            #except Exception as e:
-            #    console.Out.Error(e)
+            try:
+                updateagent.agent.Update(version)
+            except Exception as e:
+                console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
         multipleTarget = True
