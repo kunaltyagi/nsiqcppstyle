@@ -31,6 +31,7 @@ import sys
 import os
 import csv  # @UnusedImport
 import urllib  # @UnusedImport
+
 try:
     import hashlib  # @UnusedImport
 except ImportError:
@@ -48,8 +49,8 @@ def WeAreFrozen():
 def ModulePath():
     if WeAreFrozen():
         return os.path.dirname(
-            unicode(sys.executable, sys.getfilesystemencoding()))
-    return os.path.dirname(unicode(__file__, sys.getfilesystemencoding()))
+            sys.executable.decode(sys.getfilesystemencoding()))
+    return os.path.dirname(__file__.decode(sys.getfilesystemencoding()))
 
 
 def GetRuntimePath():
