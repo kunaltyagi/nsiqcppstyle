@@ -320,11 +320,11 @@ def ProcessFile(ruleManager, file, analyzedFiles):
 
 
 def Update():
+    console.Out.Error("Development in progress. Please check manually")
+    """
     updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update",
                              version)
-
-
-csvResult = []
+    """
 
 
 def GetOutputPath(outputBasePath, outputPath):
@@ -347,7 +347,8 @@ def GetRealTargetPaths(args):
         targetPaths.append(realPath)
 #       CheckPathPermission(realPath, "Target directory")
         if not os.path.exists(realPath):
-            ShowMessageAndExit("Error!: Target directory %s is not exists" % eachTarget)
+            ShowMessageAndExit(
+                "Error!: Target directory %s is not exists" % eachTarget)
     return targetPaths
 
 ##########################################################################
@@ -477,7 +478,8 @@ Current File extension and Language Settings
         return replacedpath.replace("\\", os.path.sep)
 
     def CheckExist(self, includeOrExclude, eachFilter, startwith):
-        return (self.filefilter.count([includeOrExclude, eachFilter, startwith]) == 1)
+        return (self.filefilter.count(
+            [includeOrExclude, eachFilter, startwith]) == 1)
 
     def AddInclude(self, eachFilter):
         self.AddFilter(True, eachFilter)
@@ -538,7 +540,9 @@ Current File extension and Language Settings
         for eachExt in langExtList:
             extLangPair = eachExt.split(": ")
             if len(extLangPair) != 2:
-                ShowMessageAndExit("Error!: The extension and language pair (%s) is incorrect in %s, please use LANGUAGENAME: EXTENSION style" % (langMapString, where))
+                ShowMessageAndExit(
+                    "Error!: The extension and language pair (%s) is incorrect in %s, please use LANGUAGENAME: EXTENSION style" %
+                    (langMapString, where))
             lang, ext = extLangPair
             self.extLangMap.get(lang).add(ext)
 
@@ -557,7 +561,9 @@ def GetCustomKeyValueMap(keyValuePair, where):
     for eachCustomKeyValue in customKeyValues:
         customKeyValuePair = eachCustomKeyValue.split(": ")
         if len(customKeyValuePair) != 2:
-            ShowMessageAndExit("Error!: The var key and value pair (%s) is incorrect in %s, please use KEY: VALUE style" % (keyValuePair, where))
+            ShowMessageAndExit(
+                "Error!: The var key and value pair (%s) is incorrect in %s, please use KEY: VALUE style" %
+                (keyValuePair, where))
         key, value = customKeyValuePair
         varMap[key] = value
     return varMap
@@ -609,7 +615,9 @@ def ShowRuleList():
 
 def CheckPathPermission(path, folderrole):
     if not os.access(path, os.R_OK) and os.path.exists(path):
-        ShowMessageAndExit("Error!: %s  You should have read permission in %s." % (folderrole, path))
+        ShowMessageAndExit(
+            "Error!: %s  You should have read permission in %s." %
+            (folderrole, path))
     return True
 
 ##########################################################################
