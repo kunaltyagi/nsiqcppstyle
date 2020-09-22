@@ -18,6 +18,9 @@ from nsiqcppstyle_rulemanager import *
 
 
 def RunRule(lexer, line, lineno):
+    t = lexer.GetCurToken()
+    t2 = lexer.PeekNextToken()
+    print(t.type + ' ' + t2.type + line)
     if not Match(r"^\s*$", line):
         if len(line) > 120:
             nsiqcppstyle_reporter.Error(DummyToken(

@@ -349,7 +349,6 @@ class CppLexerNavigator(object):
                 try:
                     f = open(filename, encoding=encoding)
                     self.data = f.read()
-                    print("Detected file encoding: {}".format(encoding))
                 except ValueError:
                     pass
         self.lines = self.data.splitlines()

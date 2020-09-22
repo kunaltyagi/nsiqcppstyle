@@ -14,12 +14,15 @@ Do not start the file name with underbars.
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
+import gettext
+
+_ = gettext.gettext
 
 
 def RunRule(lexer, filename, dirname):
     if filename.startswith("_"):
         nsiqcppstyle_reporter.Error(nsiqcppstyle_reporter.DummyToken(
-            lexer.filename, "", 0, 0), __name__, "File name(%s) should not start with underbar." % filename)
+            lexer.filename, "", 0, 0), __name__, _("File name(%s) should not start with underbar.") % filename)
 
 
 ruleManager.AddFileStartRule(RunRule)
