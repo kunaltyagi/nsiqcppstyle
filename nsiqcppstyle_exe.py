@@ -44,7 +44,7 @@ try:
 except NameError:
     from sets import Set as set
 
-version = "0.2.2.13"
+version = "0.3.0.1"
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
@@ -57,7 +57,7 @@ def ShowMessageAndExit(msg, usageOutput=True):
 
 
 def Usage():
-    print \
+    print( \
         """
 ======================================================================================
 Usage: nsiqcppstyle [Options]
@@ -92,7 +92,7 @@ Usage: nsiqcppstyle [Options]
 
 * nsiqcppstyle reports coding standard violations on C/C++ source code.
 * In default, it doesn't apply any rules on the source. If you want to apply rule,
-  they are should be provided in the filefilter.txt file in following form.
+  they should be provided in the filefilter.txt file in following form.
   ~ RULENAME
 
 * You can customize the rule behavior by providing --var=key: value pair when executing
@@ -125,12 +125,13 @@ Usage: nsiqcppstyle [Options]
   And It checks only new and modified file. Please refer the nsiqcollector
   to generate basefilelist.txt.
 
-"""
+""")
     sys.exit(0)
 
 
 def main(argv=None):
     global filename
+
     if argv is None:
         argv = sys.argv
     try:
@@ -159,7 +160,7 @@ def main(argv=None):
         updateNsiqCppStyle = False
         for o, a in opts:
             if o in ("-h", "--help"):
-                print title
+                print(title)
                 Usage()
             elif o in ("-r", "--list-rules"):
                 ShowRuleList()
@@ -179,7 +180,7 @@ def main(argv=None):
                 _nsiqcppstyle_state.showUrl = True
             elif o == '--output':
                 if not a in ('emacs', 'vs7', 'csv', 'xml', 'eclipse'):
-                    print title
+                    print(title)
                     ShowMessageAndExit(
                         'The only allowed output formats are emacs, vs7 and csv.')
                 _nsiqcppstyle_state.output_format = a
@@ -305,7 +306,7 @@ def main(argv=None):
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
         return _nsiqcppstyle_state.error_count
 
-    except Usage as err:
+    except Exception as err:
         console.Err.Error(err.msg)
         console.Err.Error("for help use --help")
         sys.exit(-1)
@@ -609,7 +610,7 @@ class NullBaseFileList(object):
 def ShowRuleList():
     nsiqcppstyle_rulemanager.ruleManager.availRuleNames.sort()
     for rule in nsiqcppstyle_rulemanager.ruleManager.availRuleNames:
-        print "~", rule
+        print("~", rule)
     sys.exit(1)
 
 

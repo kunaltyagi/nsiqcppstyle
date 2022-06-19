@@ -1,6 +1,5 @@
 import re
 import string
-from types import StringType
 import nsiqcppstyle_util
 import os
 import urllib
@@ -20,8 +19,8 @@ def Update(currentVersion):
     systemKey = nsiqcppstyle_util.GetSystemKey()
     # Get the latest version info
     try:
-        print 'Update: checking for update'
-        print url + "/update/" + systemKey
+        print('Update: checking for update')
+        print(url + "/update/" + systemKey)
         request = urllib2.urlopen(url + "/update/" + systemKey)
         response = request.read()
     except urllib2.HTTPError as e:
@@ -44,11 +43,11 @@ def Update(currentVersion):
     try:
         updateInfo = updateagent.minjson.safeRead(response)
     except Exception as e:
-        print e
+        print(e)
         raise Exception('Unable to get latest version info. Try again later.')
 
     if Version(updateInfo['version']) > Version(currentVersion):
-        print 'A new version is available.'
+        print('A new version is available.')
 
         # Loop through the new files and call the download function
         for agentFile in updateInfo['files']:
@@ -71,7 +70,7 @@ def Update(currentVersion):
 
             agentFile['tempFile'] = DownloadFile(url, agentFile, systemKey)
             if agentFile['tempFile'] is None:
-                print "Update Failed while downloading : " + agentFile['name']
+                print("Update Failed while downloading : " + agentFile['name'])
                 return
             agentFile['new'] = True
         import shutil
@@ -84,7 +83,7 @@ def Update(currentVersion):
                     eachFileName.endswith(".exe")):
                 continue
             if agentFile.get('new', None) is not None:
-                print 'Updating ' + agentFile['name']
+                print('Updating ' + agentFile['name'])
                 newModule = os.path.join(runtimePath, agentFile['name'])
 
                 try:
@@ -101,7 +100,7 @@ def Update(currentVersion):
 
 
 def DownloadFile(url, agentFile, systemKey, recursed=False):
-    print 'Downloading ' + agentFile['name']
+    print('Downloading ' + agentFile['name'])
     downloadedFile = urllib.urlretrieve(url + '/update/' + systemKey +
                                         "/" + agentFile['name'])
 
@@ -119,7 +118,7 @@ def DownloadFile(url, agentFile, systemKey, recursed=False):
         if recursed == False:
             DownloadFile(url, agentFile, systemKey, True)
         else:
-            print agentFile['name'] + ' did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.'
+            print(agentFile['name'] + ' did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.')
             return None
 
 
@@ -152,7 +151,7 @@ class Version:
         return "LooseVersion ('%s')" % str(self)
 
     def __cmp__(self, other):
-        if isinstance(other, StringType):
+        if isinstance(other, str):
             other = Version(other)
 
         return cmp(self.version, other.version)
