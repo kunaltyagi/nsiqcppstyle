@@ -37,13 +37,8 @@ If the class/struct name starts with "C", "C" can be ommited in the file name.
 """
 
 from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulemanager import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
-try:
-    set()
-except NameError:
-    from sets import Set as set
 
 classname = None
 

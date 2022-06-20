@@ -26,7 +26,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------
 
-import sys
 import os
 import traceback
 from nsiqcppstyle_outputer import _consoleOutputer as console

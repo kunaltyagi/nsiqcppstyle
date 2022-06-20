@@ -38,11 +38,7 @@ import nsiqcppstyle_state
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_reporter
 import updateagent.agent
-from nsiqcppstyle_util import *  # @UnusedWildImport
-try:
-    set()
-except NameError:
-    from sets import Set as set
+from nsiqcppstyle_util import *
 
 version = "0.3.0.1"
 ##########################################################################
@@ -57,8 +53,7 @@ def ShowMessageAndExit(msg, usageOutput=True):
 
 
 def Usage():
-    print( \
-        """
+    print("""
 ======================================================================================
 Usage: nsiqcppstyle [Options]
            targetdirectory
@@ -307,7 +302,7 @@ def main(argv=None):
         return _nsiqcppstyle_state.error_count
 
     except Exception as err:
-        console.Err.Error(err.msg)
+        console.Err.Error(err)
         console.Err.Error("for help use --help")
         sys.exit(-1)
 
@@ -430,7 +425,7 @@ class FilterManager:
     def GetFilterFile(self, filterfile):
         if not os.path.exists(filterfile):
             return None
-        f = file(filterfile, 'r')
+        f = open(filterfile, 'r')
         return f
 
 ##############################################################################
@@ -585,7 +580,7 @@ class BaseFileList(object):
         if os.path.isdir(targetDir):
             fsrc = os.path.join(targetDir, "basefilelist.txt")
             if os.path.exists(fsrc):
-                f = file(fsrc)
+                f = open(fsrc)
                 for line in f.readlines():
                     self.baseFileList[line.strip()] = True
 
