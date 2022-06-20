@@ -888,6 +888,10 @@ class LexerReflect(object):
             f = open(filename)
             lines = f.readlines()
             f.close()
+        except UnicodeDecodeError as ex:
+            console.Out.Ci("[ERROR] UnicodeDecodeError in validate_file: " + str(ex))
+            console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
+            raise ex
         except IOError:
             return                      # Couldn't find the file.  Don't worry about it
 
