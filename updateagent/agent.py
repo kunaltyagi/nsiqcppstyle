@@ -1,8 +1,8 @@
 import re
-import string
 import nsiqcppstyle_util
 import os
 import urllib
+from nsiqcppstyle_util import *
 try:
     import hashlib
     md5_constructor = hashlib.md5
@@ -63,7 +63,7 @@ def Update(currentVersion):
 
             if os.path.exists(filestr):
                 checksum = md5_constructor()
-                f = file(filestr, 'rb').read()
+                f = open(filestr, 'rb').read()
                 checksum.update(f)
                 if agentFile["md5"] == checksum.hexdigest():
                     continue
@@ -106,7 +106,7 @@ def DownloadFile(url, agentFile, systemKey, recursed=False):
 
     checksum = md5_constructor()
 
-    f = file(downloadedFile[0], 'rb')
+    f = open(downloadedFile[0], 'rb')
     part = f.read()
     checksum.update(part)
     f.close()
@@ -154,4 +154,4 @@ class Version:
         if isinstance(other, str):
             other = Version(other)
 
-        return cmp(self.version, other.version)
+        return CmpObjects(self.version, other.version)

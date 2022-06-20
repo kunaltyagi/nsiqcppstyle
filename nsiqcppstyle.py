@@ -27,39 +27,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-import sys
-import os
-import csv  # @UnusedImport
-import urllib  # @UnusedImport
+from nsiqcppstyle_util import *
 try:
     import hashlib  # @UnusedImport
 except ImportError:
     import md5  # @UnusedImport
-import unittest  # @UnusedImport
-import platform  # @UnusedImport
-import sre_compile  # @UnusedImport
-import shutil  # @UnusedImport
-
-
-def WeAreFrozen():
-    return hasattr(sys, "frozen")
-
-
-def ModulePath():
-    if WeAreFrozen():
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(__file__)
-
-
-def GetRuntimePath():
-    "Return the path of this tool"
-    if (sys.platform == "win32"):
-        runtimePath = ModulePath()
-    else:
-        modename = globals()['__name__']
-        module = sys.modules[modename]
-        runtimePath = os.path.dirname(module.__file__)
-    return runtimePath
 
 
 if __name__ == "__main__":

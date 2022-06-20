@@ -55,3 +55,7 @@ def GetSystemKey():
         return "window"
     else:
         return "linux"
+
+
+def CmpObjects(a, b):
+    return (a > b) - (a < b)

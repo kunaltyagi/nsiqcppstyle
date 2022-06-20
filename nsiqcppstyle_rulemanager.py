@@ -248,9 +248,8 @@ class RollbackImporter:
         __builtins__["__import__"] = self._import
         self.newModules = {}
 
-    def _import(self, *args, **kwargs):
-        name = args[0]
-        result = self.realImport(*args, **kwargs)
+    def _import(self, name, *args, **kwargs):
+        result = self.realImport(name, *args, **kwargs)
         if name.find("rules") != -1:
             self.newModules[name] = 1
         return result

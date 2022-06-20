@@ -35,28 +35,17 @@ __version__ = "3.2"
 __tabversion__ = "3.2"       # Version of table file used
 
 import re
-import sys
 import types
 import copy
-import os
+from nsiqcppstyle_util import *
 
 # This tuple contains known string types
-try:
-    # Python 2.6
-    StringTypes = (types.StringType, types.UnicodeType)
-except AttributeError:
-    # Python 3.0
-    StringTypes = (str, bytes)
+StringTypes = (str, bytes)
 
-# Extract the code attribute of a function. Different implementations
-# are for Python 2/3 compatibility.
+# Extract the code attribute of a function.
 
-if sys.version_info[0] < 3:
-    def func_code(f):
-        return f.func_code
-else:
-    def func_code(f):
-        return f.__code__
+def func_code(f):
+    return f.__code__
 
 # This regular expression is used to match valid token names
 _is_identifier = re.compile(r'^[a-zA-Z0-9_]+$')
@@ -755,8 +744,8 @@ class LexerReflect(object):
         # Sort the functions by line number
         for f in self.funcsym.values():
             if sys.version_info[0] < 3:
-                f.sort(lambda x, y: cmp(func_code(x[1]).co_firstlineno,
-                                        func_code(y[1]).co_firstlineno))
+                f.sort(lambda x, y: CmpObjects(func_code(x[1]).co_firstlineno,
+                                               func_code(y[1]).co_firstlineno))
             else:
                 # Python 3.0
                 f.sort(key=lambda x: func_code(x[1]).co_firstlineno)

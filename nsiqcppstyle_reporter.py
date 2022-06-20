@@ -47,14 +47,14 @@ def PrepareReport(outputPath, format):
     if format == "csv":
         if os.path.isdir(outputPath):
             outputPath = os.path.join(outputPath, "nsiqcppstyle_report.csv")
-        csvfile = file(outputPath, "wb")
+        csvfile = open(outputPath, "wb")
         writer = csv.writer(csvfile)
         writer.writerow(("File", "Line", "Column",
                          "Message", "Rule", "Rule Url"))
     elif format == "xml":
         if os.path.isdir(outputPath):
             outputPath = os.path.join(outputPath, "nsiqcppstyle_report.xml")
-        writer = file(outputPath, "wb")
+        writer = open(outputPath, "wb")
         writer.write("<?xml version='1.0'?>\n<checkstyle version='4.4'>\n")
 
 
