@@ -169,14 +169,10 @@ class Lexer:
         return c
 
     # ------------------------------------------------------------
-    # writetab() - Write lexer information to a table file
+    # actual_writetab() - Perform actual file write of lexer
+    #                     information to a table file
     # ------------------------------------------------------------
-    def writetab(self, tabfile, outputdir=""):
-        if isinstance(tabfile, types.ModuleType):
-            return
-        basetabfilename = tabfile.split(".")[-1]
-        filename = os.path.join(outputdir, basetabfilename) + ".py"
-        tf = open(filename, "w")
+    def actual_writetab(self, tabfile, tf):
         tf.write("# %s.py. This file automatically created by PLY (version %s). Don't edit!\n" % (
             tabfile, __version__))
         tf.write("_tabversion   = %s\n" % repr(__version__))
@@ -211,7 +207,17 @@ class Lexer:
             else:
                 taberr[key] = None
         tf.write("_lexstateerrorf = %s\n" % repr(taberr))
-        tf.close()
+
+    # ------------------------------------------------------------
+    # writetab() - Write lexer information to a table file
+    # ------------------------------------------------------------
+    def writetab(self, tabfile, outputdir=""):
+        if isinstance(tabfile, types.ModuleType):
+            return
+        basetabfilename = tabfile.split(".")[-1]
+        filename = os.path.join(outputdir, basetabfilename) + ".py"
+        with open(filename, "w") as tf:
+            self.actual_writetab(tabfile, tf)
 
     # ------------------------------------------------------------
     # readtab() - Read lexer information from a tab file
@@ -885,9 +891,8 @@ class LexerReflect(object):
             return         # No idea what the file is. Return OK
 
         try:
-            f = open(filename)
-            lines = f.readlines()
-            f.close()
+            with open(filename) as f:
+                lines = f.readlines()
         except UnicodeDecodeError as ex:
             console.Out.Ci("[ERROR] UnicodeDecodeError in validate_file: " + str(ex))
             console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
@@ -1086,9 +1091,8 @@ def runmain(lexer=None, data=None):
     if not data:
         try:
             filename = sys.argv[1]
-            f = open(filename)
-            data = f.read()
-            f.close()
+            with open(filename) as f:
+                data = f.read()
         except IndexError:
             sys.stdout.write(
                 "Reading from standard input (type EOF to end):\n")

@@ -425,12 +425,7 @@ class FilterManager:
     def GetFilterFile(self, filterfile):
         if not os.path.exists(filterfile):
             return None
-        try:
-            f = open(filterfile, 'r')
-        except UnicodeDecodeError as ex:
-            console.Out.Ci("[ERROR] UnicodeDecodeError in GetFilterFile: " + str(ex))
-            console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filtername))
-            raise ex
+        f = open(filterfile, 'r')
         return f
 
 ##############################################################################
@@ -585,9 +580,9 @@ class BaseFileList(object):
         if os.path.isdir(targetDir):
             fsrc = os.path.join(targetDir, "basefilelist.txt")
             if os.path.exists(fsrc):
-                f = open(fsrc)
-                for line in f.readlines():
-                    self.baseFileList[line.strip()] = True
+                with open(fsrc) as f:
+                    for line in f.readlines():
+                        self.baseFileList[line.strip()] = True
 
     def IsNewOrChanged(self, filename):
         item = os.path.basename(filename) + str(os.path.getsize(filename))

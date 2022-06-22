@@ -343,13 +343,13 @@ class CppLexerNavigator(object):
         lexer = nsiqcppstyle_lexer.lex()
         self.data = data
         if data is None:
-            f = open(filename)
-            try:
-                self.data = f.read()
-            except UnicodeDecodeError as ex:
-                console.Out.Ci("[ERROR] UnicodeDecodeError in CppLexerNavigator: " + str(ex))
-                console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
-                raise ex
+            with open(filename) as f:
+                try:
+                    self.data = f.read()
+                except UnicodeDecodeError as ex:
+                    console.Out.Ci("[ERROR] UnicodeDecodeError in CppLexerNavigator: " + str(ex))
+                    console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
+                    raise ex
         self.lines = self.data.splitlines()
         lexer.input(self.data)
         index = 0
@@ -990,7 +990,7 @@ def ProcessFile(ruleManager, file, data=None):
     #    print file
     try:
         lexer = CppLexerNavigator(file, data)
-    except:
+    except UnicodeDecodeError:
         # If an exception was thrown (i.e., UnicodeDecodeError), it was
         # caught, process, logged to stdout, and the exception was raised
         # again.  At this point in the code, there is nothing else to do
