@@ -169,10 +169,10 @@ class Lexer:
         return c
 
     # ------------------------------------------------------------
-    # actual_writetab() - Perform actual file write of lexer
-    #                     information to a table file
+    # _writetab_impl() - Perform actual file write of lexer
+    #                    information to a table file
     # ------------------------------------------------------------
-    def actual_writetab(self, tabfile, tf):
+    def _writetab_impl(self, tabfile, tf):
         tf.write("# %s.py. This file automatically created by PLY (version %s). Don't edit!\n" % (
             tabfile, __version__))
         tf.write("_tabversion   = %s\n" % repr(__version__))
@@ -217,7 +217,7 @@ class Lexer:
         basetabfilename = tabfile.split(".")[-1]
         filename = os.path.join(outputdir, basetabfilename) + ".py"
         with open(filename, "w") as tf:
-            self.actual_writetab(tabfile, tf)
+            self._writetab_impl(tabfile, tf)
 
     # ------------------------------------------------------------
     # readtab() - Read lexer information from a tab file
