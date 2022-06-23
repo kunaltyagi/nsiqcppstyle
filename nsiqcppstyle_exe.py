@@ -580,9 +580,9 @@ class BaseFileList(object):
         if os.path.isdir(targetDir):
             fsrc = os.path.join(targetDir, "basefilelist.txt")
             if os.path.exists(fsrc):
-                f = open(fsrc)
-                for line in f.readlines():
-                    self.baseFileList[line.strip()] = True
+                with open(fsrc) as f:
+                    for line in f.readlines():
+                        self.baseFileList[line.strip()] = True
 
     def IsNewOrChanged(self, filename):
         item = os.path.basename(filename) + str(os.path.getsize(filename))
