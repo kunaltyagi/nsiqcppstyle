@@ -4,7 +4,7 @@ It check if there is doxygen sytle comment in front of each function definition.
 It only check none static and none private funcions definition.
 Unfortunately, this rule can not determine the method is private or not,
 if the function definition is located in a cpp file.
-Please put the '// NS' if the right side of the private function signature to suppress the false alarms.
+Please put the '// NS' on the right side of the private function signature to suppress the false alarms.
 
 Example)
  = a.cpp =

@@ -36,7 +36,7 @@ class unitTest(unittest.TestCase):
         lexer = nsiqcppstyle_checker.CppLexerNavigator(
             "a.cpp", "void FunctionName() " + specifier + ";")
         # This step resolves comments and some token types like FUNCTION
-        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        nsiqcppstyle_checker.ConstructContextInfo(lexer)
         lexer.Reset()
 
         assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'VOID')
@@ -64,7 +64,7 @@ class unitTest(unittest.TestCase):
         lexer = nsiqcppstyle_checker.CppLexerNavigator(
             "a.cpp", "std::set<int> m;")
         # This step resolves comments and some token types like FUNCTION
-        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        nsiqcppstyle_checker.ConstructContextInfo(lexer)
         lexer.Reset()
 
         ltToken = lexer.GetNextTokenInType("LT")
@@ -80,7 +80,7 @@ class unitTest(unittest.TestCase):
         lexer = nsiqcppstyle_checker.CppLexerNavigator(
             "a.cpp", "std::map<std::set<int>, float> m;")
         # This step resolves comments and some token types like FUNCTION
-        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        nsiqcppstyle_checker.ConstructContextInfo(lexer)
         lexer.Reset()
 
         # Get the first < token
@@ -106,7 +106,7 @@ class unitTest(unittest.TestCase):
         lexer = nsiqcppstyle_checker.CppLexerNavigator(
             "a.cpp", "std::set<std::map<int, float>> m;")
         # This step resolves comments and some token types like FUNCTION
-        nsiqcppstyle_checker.ContructContextInfo(lexer)
+        nsiqcppstyle_checker.ConstructContextInfo(lexer)
         lexer.Reset()
 
         # Get the first < token
@@ -153,7 +153,7 @@ void function2() {
 }
 """
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
-        nsiqcppstyle_checker.ContructContextInfo(navigator)
+        nsiqcppstyle_checker.ConstructContextInfo(navigator)
         navigator.Reset()
         while(True):
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
@@ -172,7 +172,7 @@ int a;
 
         console.SetLevel(console.Level.Verbose)
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
-        nsiqcppstyle_checker.ContructContextInfo(navigator)
+        nsiqcppstyle_checker.ConstructContextInfo(navigator)
         navigator.Reset()
         while(True):
             tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
@@ -185,7 +185,7 @@ int a;
 foo (bar*)[];
 """
         navigator = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", data)
-        nsiqcppstyle_checker.ContructContextInfo(navigator)
+        nsiqcppstyle_checker.ConstructContextInfo(navigator)
         navigator.Reset()
         tok = navigator.GetNextTokenSkipWhiteSpaceAndComment()
         assert(tok.type == 'ID' and tok.value == 'foo')

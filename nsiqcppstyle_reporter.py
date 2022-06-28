@@ -204,6 +204,8 @@ def ErrorInternal(t, ruleName, message):
     Print error
     """
     global rule
+
+    # Remove the known prefix of "rules." from the path
     ruleName = ruleName[6:]
 
     if t is None:

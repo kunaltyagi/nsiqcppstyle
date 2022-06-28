@@ -217,6 +217,13 @@ def main(argv=None):
         nsiqcppstyle_reporter.PrepareReport(outputPath,
                                             _nsiqcppstyle_state.output_format)
         analyzedFiles = []
+
+        # <session_start_rules_called> is a flag that tracks whether
+        # RunSessionStartRules() has been called already.  This is necessary
+        # because nsiqcppstyle loads all rules for each file processed. The
+        # session start rules should be caled once and only once.
+        #session_start_rules_called = False    #debug
+
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
@@ -253,6 +260,13 @@ def main(argv=None):
                 continue
 
             ruleManager.LoadRules(filter.nsiqCppStyleRules)
+
+            #if not session_start_rules_called:
+            #    session_start_rules_called = True
+            #    ruleManager.RunSessionStartRules()
+
+            ruleManager.RunSessionStartRules()    #debug
+
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames,
@@ -299,6 +313,7 @@ def main(argv=None):
         nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles,
                                                     _nsiqcppstyle_state, filter)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
+        ruleManager.RunSessionEndRules()
         return _nsiqcppstyle_state.error_count
 
     except Exception as err:
