@@ -222,7 +222,6 @@ def main(argv=None):
         # RunSessionStartRules() has been called already.  This is necessary
         # because nsiqcppstyle loads all rules for each file processed. The
         # session start rules should be caled once and only once.
-        #session_start_rules_called = False    #debug
 
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
@@ -260,12 +259,7 @@ def main(argv=None):
                 continue
 
             ruleManager.LoadRules(filter.nsiqCppStyleRules)
-
-            #if not session_start_rules_called:
-            #    session_start_rules_called = True
-            #    ruleManager.RunSessionStartRules()
-
-            ruleManager.RunSessionStartRules()    #debug
+            ruleManager.RunSessionStartRules()
 
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
