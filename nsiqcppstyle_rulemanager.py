@@ -25,11 +25,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os  # @UnusedImport
-import sys  # @UnusedImport
 import sre_compile
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import *  # @UnusedWildImport
+from typing import Callable
+from nsiqcppstyle_types import *
 
 
 class RuleManager:
@@ -206,155 +206,78 @@ class RuleManager:
         del self.preprocessRules[:]
         del self.commentRules[:]
 
-    def AddPreprocessRule(self, preprocessRule):
-        """
-        Add rule which runs in preprocess statements
-        Added rule should be function with following prototype:
-            def RunRule(lexer, contextStack)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                contextStack is a stack showing the lexical context the token resides in
-        """
-        self.preprocessRules.append(preprocessRule)
+    def AddPreprocessRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+        """ Add rule which runs in preprocess statements """
+        self.preprocessRules.append(user_function)
 
-    def AddCommentRule(self, commentRule):
-        """
-        Add rule which runs when a comment is encountered
-        Added rule should be function with following prototype:
-            def RunRule(lexer, token)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                token is the current token being processed
-        """
-        self.commentRules.append(commentRule)
+    def AddCommentRule(self, user_function: Callable[[LexerType, TokenType], None]):
+        """ Add rule which runs when a comment is encountered """
+        self.commentRules.append(user_function)
 
-    def AddFunctionScopeRule(self, functionScopeRule):
-        """
-        Add rule which runs in function scope
-        Added rule should be function with following prototype:
-            def RunRule(lexer, contextStack)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                contextStack is a stack showing the lexical context the token resides in
-        """
-        self.functionScopeRules.append(functionScopeRule)
+    def AddFunctionScopeRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+        """ Add rule which runs in function scope """
+        self.functionScopeRules.append(user_function)
 
-    def AddFunctionNameRule(self, functionRule):
-        """
-        Add rule on the function name place
-        Added rule should be function with following prototype:
-            def RunRule(lexer, fullName, decl, contextStack, context)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                fullName is the full function name (e.g., foo::bar)
-                decl is a boolean flag denoting whether the function is a declaration (True) or
-                     definition (False)
-                contextStack is a stack showing the lexical context the token resides in
-                context is the new context entry that will be pushed to the contextStack due to this token
-        """
-        self.functionNameRules.append(functionRule)
+    def AddFunctionNameRule(self,
+                            user_function: Callable[
+                                [LexerType, FullNameType, DeclarationType, ContextStackType, ContextType],
+                                None]):
+        """ Add rule on the function name place """
+        self.functionNameRules.append(user_function)
 
-    def AddLineRule(self, lineRule):
-        """
-        Add rule on the each line
-        Added rule should be function with following prototype:
-            def RunRule(lexer, line, lineNumber)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                line is the text of the physical line just read
-                lineNumber is the line offset of <line> in the file being processed
-        """
-        self.lineRules.append(lineRule)
+    def AddLineRule(self, user_function: Callable[[LexerType, LineType, LineNumberType], None]):
+        """ Add rule on the each line """
+        self.lineRules.append(user_function)
 
-    def AddRule(self, rule):
-        """
-        Add rule on any token
-        Added rule should be function with following prototype:
-            def RunRule(lexer, contextStack)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                contextStack is a stack showing the lexical context the token resides in
-        """
-        self.rules.append(rule)
+    def AddRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+        """ Add rule on any token """
+        self.rules.append(user_function)
 
-    def AddTypeNameRule(self, typeNameRule):
-        """
-        Add rule on any type (class / struct / union / namespace / enum)
-        Added rule should be function with following prototype:
-            def RunRule(lexer, typeName, typeFullName, decl, contextStack, typeContext)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                typeName is the name of the C++ type encountered (e.g., "CLASS", "STRUCT")
-                typeFullName is the typed variable name (e.g., the class name)
-                decl is a boolean flag denoting whether the function is a declaration (True) or
-                     definition (False)
-                contextStack is a stack showing the lexical context the token resides in
-                typeContext is the new context entry that will be pushed to the contextStack due to this token
-        """
-        self.typeNameRules.append(typeNameRule)
+    def AddTypeNameRule(self, user_function: Callable[
+                                [LexerType, TypeNameType, TypeFullNameType,
+                                 DeclarationType, ContextStackType, TypeContextType],
+                                None]):
+        """ Add rule on any type (class / struct / union / namespace / enum) """
+        self.typeNameRules.append(user_function)
 
-    def AddTypeScopeRule(self, typeScopeRule):
-        """
-        Add rule when the token is within a type definition scope
-        Added rule should be function with following prototype:
-            def RunRule(lexer, typeName, typeFullName, decl, contextStack, typeContext)
-                lexer is the lexer used to analyze the source, it points the start token of source.
-                contextStack is a stack showing the lexical context the token resides in
-        """
-        self.typeScopeRules.append(typeScopeRule)
+    def AddTypeScopeRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+        """ Add rule when the token is within a type definition scope """
+        self.typeScopeRules.append(user_function)
 
-    def AddFileEndRule(self, fileEndRule):
-        """
-        Add rule on the file end
-        Added rule should be function with following prototype:
-            def RunRule(lexer, filename, dirname)
-            lexer is the lexer used to analyze the source. it points the end token of source.
-            filename is the filename analyzed.
-            dirname is the file directory.
-        """
-        self.fileEndRules.append(fileEndRule)
+    def AddFileEndRule(self, user_function: Callable[[LexerType, FileNameType, DirNameType], None]):
+        """ Add rule on the file end """
+        self.fileEndRules.append(user_function)
 
-    def AddFileStartRule(self, fileStartRule):
-        """
-        Add rule on the file start
-        Added rule should be function with following prototype:
-            def RunRule(lexer, filename, dirname)
-            lexer is the lexer used to analyze the source. it points the start token of source.
-            filename is the filename analyzed.
-            dirname is the file directory.
-        """
-        self.fileStartRules.append(fileStartRule)
+    def AddFileStartRule(self, user_function: Callable[[LexerType, FileNameType, DirNameType], None]):
+        """ Add rule on the file start """
+        self.fileStartRules.append(user_function)
 
-    def AddSessionEndRule(self, sessionEndRule):
+    def AddSessionEndRule(self, user_function: Callable[[], None]):
         """
         Add rule on the session end.
 
         This rule is called when the script has finished processing all target files.
         It is called only once at the end of the script's run.
-
-        Added rule should be function with following prototype:
-            def RunRule()
         """
-        self.sessionEndRules.append(sessionEndRule)
+        self.sessionEndRules.append(user_function)
 
-    def AddSessionStartRule(self, sessionStartRule):
+    def AddSessionStartRule(self, user_function: Callable[[], None]):
         """
         Add rule on the session start
 
         This rule is called before the script begins processing the first target file.
         It is called only once at the start of the script's processing activities.
+        """
+        self.sessionStartRules.append(user_function)
 
-        Added rule should be function with following prototype:
-            def RunRule()
-        """
-        self.sessionStartRules.append(sessionStartRule)
-
-    def AddProjectRules(self, projectRule):
-        """
-        Add rule on the project
-        Added Rule should be function with following prototype:
-            def RunRule(targetName)
-            targetName is the analysis target directory.
-        """
-        self.projectRules.append(projectRule)
+    def AddProjectRules(self, user_function: Callable[[TargetPathType], None]):
+        """ Add rule on the project """
+        self.projectRules.append(user_function)
 
 
 class RollbackImporter:
     def __init__(self):
-        "Creates an instance and installs as the global importer"
+        """Creates an instance and installs as the global importer"""
         self.previousModules = sys.modules.copy()
         self.realImport = __builtins__["__import__"]
         __builtins__["__import__"] = self._import
