@@ -41,25 +41,25 @@ DirNameType = NewType('DirNameType', str)
 # The name of the file being analyzed
 FileNameType = NewType('FileNameType', str)
 
-# The full function name
+# A full function name
 FullNameType = NewType('FullNameType', str)
 
-# The lexer used to analyze the source, it points to the starting token of the source
+# The lexer object used to analyze the source file
 LexerType = NewType('LexerType', nsiqcppstyle_checker.CppLexerNavigator)
 
-# The line offset of the <LineType> in the file being processed
+# The line number (> 0) of the <LineType> in the file currently being processed
 LineNumberType = NewType('LineNumberType', int)
 
-# The text of the physical line just read
+# The text of the source file line just read
 LineType = NewType('LineType', str)
 
-# The analysis target directory
+# The target directory currently being analyzed
 TargetPathType = NewType('TargetPathType', Union[str, bytes])
 
-# The current token being processed
+# The token currently being processed
 TokenType = NewType('ContextStackType', nsiqcppstyle_lexer.LexToken)
 
-# The new context entry that will be pushed to the contextStack due to this token
+# The new context entry that will be pushed to the contextStack due to this "type" token
 TypeContextType = NewType('TypeContextType', ContextType)
 
 # The typed variable name (e.g., the class name)

@@ -192,19 +192,20 @@ class RuleManager:
 
     def ResetRegisteredRules(self):
         """ Reset all registered rules. """
-        del self.functionNameRules[:]
-        del self.functionScopeRules[:]
-        del self.lineRules[:]
-        del self.rules[:]
-        del self.typeNameRules[:]
-        del self.typeScopeRules[:]
-        del self.fileStartRules[:]
-        del self.fileEndRules[:]
-        del self.sessionStartRules[:]
-        del self.sessionEndRules[:]
-        del self.projectRules[:]
-        del self.preprocessRules[:]
-        del self.commentRules[:]
+
+        self.functionNameRules.clear()
+        self.functionScopeRules.clear()
+        self.lineRules.clear()
+        self.rules.clear()
+        self.typeNameRules.clear()
+        self.typeScopeRules.clear()
+        self.fileStartRules.clear()
+        self.fileEndRules.clear()
+        self.sessionStartRules.clear()
+        self.sessionEndRules.clear()
+        self.projectRules.clear()
+        self.preprocessRules.clear()
+        self.commentRules.clear()
 
     def AddPreprocessRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
         """ Add rule which runs in preprocess statements """
