@@ -218,11 +218,6 @@ def main(argv=None):
                                             _nsiqcppstyle_state.output_format)
         analyzedFiles = []
 
-        # <session_start_rules_called> is a flag that tracks whether
-        # RunSessionStartRules() has been called already.  This is necessary
-        # because nsiqcppstyle loads all rules for each file processed. The
-        # session start rules should be caled once and only once.
-
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)

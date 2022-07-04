@@ -27,7 +27,7 @@ from nsiqcppstyle_rulemanager import *
 from nsiqcppstyle_types import *
 
 
-def RunRule(lexer: LexerType, line: LineType, lineno: LineNumberType) -> None:
+def RunRule(lexer: Lexer, line: LineText, lineno: LineNumber) -> None:
     if not Match(r"^\s*$", line):
         if Search("^\t", line):
             nsiqcppstyle_reporter.Error(DummyToken(

@@ -207,49 +207,49 @@ class RuleManager:
         self.preprocessRules.clear()
         self.commentRules.clear()
 
-    def AddPreprocessRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+    def AddPreprocessRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule which runs in preprocess statements """
         self.preprocessRules.append(user_function)
 
-    def AddCommentRule(self, user_function: Callable[[LexerType, TokenType], None]):
+    def AddCommentRule(self, user_function: Callable[[Lexer, Token], None]):
         """ Add rule which runs when a comment is encountered """
         self.commentRules.append(user_function)
 
-    def AddFunctionScopeRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+    def AddFunctionScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule which runs in function scope """
         self.functionScopeRules.append(user_function)
 
     def AddFunctionNameRule(self,
                             user_function: Callable[
-                                [LexerType, FullNameType, DeclarationType, ContextStackType, ContextType],
+                                [Lexer, FullFunctionName, Declaration, ContextStack, Context],
                                 None]):
         """ Add rule on the function name place """
         self.functionNameRules.append(user_function)
 
-    def AddLineRule(self, user_function: Callable[[LexerType, LineType, LineNumberType], None]):
+    def AddLineRule(self, user_function: Callable[[Lexer, LineText, LineNumber], None]):
         """ Add rule on the each line """
         self.lineRules.append(user_function)
 
-    def AddRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+    def AddRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule on any token """
         self.rules.append(user_function)
 
     def AddTypeNameRule(self, user_function: Callable[
-                                [LexerType, TypeNameType, TypeFullNameType,
-                                 DeclarationType, ContextStackType, TypeContextType],
+                                [Lexer, TypeName, TypeFullName,
+                                 Declaration, ContextStack, Context],
                                 None]):
         """ Add rule on any type (class / struct / union / namespace / enum) """
         self.typeNameRules.append(user_function)
 
-    def AddTypeScopeRule(self, user_function: Callable[[LexerType, ContextStackType], None]):
+    def AddTypeScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule when the token is within a type definition scope """
         self.typeScopeRules.append(user_function)
 
-    def AddFileEndRule(self, user_function: Callable[[LexerType, FileNameType, DirNameType], None]):
+    def AddFileEndRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
         """ Add rule on the file end """
         self.fileEndRules.append(user_function)
 
-    def AddFileStartRule(self, user_function: Callable[[LexerType, FileNameType, DirNameType], None]):
+    def AddFileStartRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
         """ Add rule on the file start """
         self.fileStartRules.append(user_function)
 
@@ -271,7 +271,7 @@ class RuleManager:
         """
         self.sessionStartRules.append(user_function)
 
-    def AddProjectRules(self, user_function: Callable[[TargetPathType], None]):
+    def AddProjectRules(self, user_function: Callable[[TargetDirectory], None]):
         """ Add rule on the project """
         self.projectRules.append(user_function)
 
