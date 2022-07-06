@@ -1,5 +1,5 @@
 # Copyright (c) 2022 All rights reserved.
-# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: GPL-2.0-only
 
 from typing import NewType, Union
 import nsiqcppstyle_lexer

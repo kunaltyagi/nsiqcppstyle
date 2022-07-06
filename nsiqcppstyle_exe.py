@@ -348,7 +348,7 @@ def GetRealTargetPaths(args):
 #       CheckPathPermission(realPath, "Target directory")
         if not os.path.exists(realPath):
             ShowMessageAndExit(
-                "Error!: Target directory %s is not exists" % eachTarget)
+                "Error!: Target directory %s does not exist" % eachTarget)
     return targetPaths
 
 ##########################################################################
