@@ -4,12 +4,7 @@
 from typing import NewType, Union
 import nsiqcppstyle_lexer
 import nsiqcppstyle_checker
-
-# A stack showing the lexical context the token resides in
-ContextStack = NewType('ContextStack', nsiqcppstyle_checker.ContextStack)
-
-# The new context entry that will be pushed to the contextStack due to this token
-Context = NewType('Context', nsiqcppstyle_checker.Context)
+from nsiqcppstyle_checker import Context, ContextStack
 
 # A boolean flag denoting whether the function is a declaration (True) or definition (False)
 Declaration = NewType('Declaration', bool)
