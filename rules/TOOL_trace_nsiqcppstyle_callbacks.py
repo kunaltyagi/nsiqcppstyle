@@ -1,5 +1,4 @@
 from nsiqcppstyle_rulemanager import *
-import nsiqcppstyle_types
 
 def PrintContextStack(contextStack):
     if (contextStack != None) and (contextStack.contextstack != None) and (len(contextStack.contextstack) > 0):
@@ -50,7 +49,7 @@ def ProjectRule(targetName):
     print("ProjectRule       (targetName='%s')" % (targetName))
 
 def TypeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
-    print("TypeNameRule      (lexer, typeName='%s', typeFullName='%s', decl='%s')" % (typeName, typeFullname, decl))
+    print("TypeNameRule      (lexer, typeName='%s', typeFullName='%s', decl='%s')" % (typeName, typeFullName, decl))
     PrintContextStack(contextStack)
 
 def TypeScopeRule(lexer, contextStack):
