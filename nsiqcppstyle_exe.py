@@ -609,7 +609,8 @@ class NullBaseFileList(object):
 def ShowRuleList():
     nsiqcppstyle_rulemanager.ruleManager.availRuleNames.sort()
     for rule in nsiqcppstyle_rulemanager.ruleManager.availRuleNames:
-        print("~", rule)
+        if rule.startswith('RULE_'):
+            print("~", rule)
     sys.exit(1)
 
 

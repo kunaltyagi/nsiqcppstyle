@@ -891,8 +891,8 @@ class Context:
         self.additional = ""
 
     def __str__(self):
-        return ", ".join([self.type, self.name,
-                          self.startToken, self.endToken])
+        return ", ".join([self.type, "'" + self.name + "'",
+                          str(self.startToken), str(self.endToken)])
 
     def IsContextStart(self, token):
         return token == self.startToken
