@@ -892,7 +892,7 @@ class Context:
 
     def __str__(self):
         return ", ".join([self.type, self.name,
-                          self.startToken, self.endToken])
+                          str(self.startToken), str(self.endToken)])
 
     def IsContextStart(self, token):
         return token == self.startToken
