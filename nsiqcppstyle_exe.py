@@ -217,6 +217,7 @@ def main(argv=None):
         nsiqcppstyle_reporter.PrepareReport(outputPath,
                                             _nsiqcppstyle_state.output_format)
         analyzedFiles = []
+
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
@@ -253,6 +254,8 @@ def main(argv=None):
                 continue
 
             ruleManager.LoadRules(filter.nsiqCppStyleRules)
+            ruleManager.RunSessionStartRules()
+
             _nsiqcppstyle_state.checkers = filter.nsiqCppStyleRules
             _nsiqcppstyle_state.varMap = filter.varMap
             nsiqcppstyle_reporter.ReportRules(ruleManager.availRuleNames,
@@ -299,6 +302,7 @@ def main(argv=None):
         nsiqcppstyle_reporter.ReportSummaryToScreen(analyzedFiles,
                                                     _nsiqcppstyle_state, filter)
         nsiqcppstyle_reporter.CloseReport(_nsiqcppstyle_state.output_format)
+        ruleManager.RunSessionEndRules()
         return _nsiqcppstyle_state.error_count
 
     except Exception as err:
@@ -344,7 +348,7 @@ def GetRealTargetPaths(args):
 #       CheckPathPermission(realPath, "Target directory")
         if not os.path.exists(realPath):
             ShowMessageAndExit(
-                "Error!: Target directory %s is not exists" % eachTarget)
+                "Error!: Target directory %s does not exist" % eachTarget)
     return targetPaths
 
 ##########################################################################

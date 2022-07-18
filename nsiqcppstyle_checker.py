@@ -161,7 +161,7 @@ t_ARROW = r'->'
 # ?
 t_TERNARY = r'\?'
 
-# Delimeters
+# Delimiters
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_LBRACKET = r'\['
@@ -244,7 +244,7 @@ reserved = {
     "explicit": "IGNORE",
     "friends": "IGNORE",
     "register": "IGNORE",
-    "unsinged": "IGNORE",
+    "unsigned": "IGNORE",
     "signed": "IGNORE",
     "__based": "IGNORE",
     "__cdecl": "IGNORE",
@@ -892,7 +892,7 @@ class Context:
 
     def __str__(self):
         return ", ".join([self.type, self.name,
-                          self.startToken, self.endToken])
+                          str(self.startToken), str(self.endToken)])
 
     def IsContextStart(self, token):
         return token == self.startToken
@@ -997,13 +997,12 @@ def ProcessFile(ruleManager, file, data=None):
         # other than skip the processing of the file, which is why we
         # just return.
         return
-    ContructContextInfo(lexer)
+    ConstructContextInfo(lexer)
     # Run Rules
     lexer.Reset()
     RunRules(ruleManager, lexer)
 
-
-def ContructContextInfo(lexer):
+def ConstructContextInfo(lexer):
     #    classstate = None
     #    depth = 0
     contextStack = ContextStack()
@@ -1219,7 +1218,7 @@ def RunRules(ruleManager, lexer):
     t = None
     while(True):
         try:
-            t = lexer.GetNextTokenSkipWhiteSpaceAndComment()
+            t = lexer.GetNextTokenSkipWhiteSpace()
             if t is None:
                 break
             if currentLine != t.lineno:
@@ -1236,12 +1235,16 @@ def RunRules(ruleManager, lexer):
                 elif t.type == 'FUNCTION':
                     ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
                                                     t.contextStack, t.context)
+                elif ((t.type == 'COMMENT') or (t.type == 'CPPCOMMENT')):
+                    ruleManager.RunCommentRule(lexer, t)
+                    continue
                 elif t.contextStack is not None and t.contextStack.SigPeek() is not None:
                     sigContext = t.contextStack.SigPeek()
                     if sigContext.type == "FUNCTION_BLOCK":
                         ruleManager.RunFunctionScopeRule(lexer, t.contextStack)
                     elif sigContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "ENUM_BLOCK", "NAMESPACE_BLOCK", "UNION_BLOCK"]:
                         ruleManager.RunTypeScopeRule(lexer, t.contextStack)
+                
                 ruleManager.RunRule(lexer, t.contextStack)
         except Exception as e:
             console.Err.Verbose("Rule Error : ", t, t.contextStack, e)

@@ -34,7 +34,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     if value.startswith("~"):
         value = value[1:]
     if Search("^[A-Z]", value):
-        if IsConstuctor(value, fullName, contextStack.SigPeek()):
+        if IsConstructor(value, fullName, contextStack.SigPeek()):
             return
         if IsOperator(value):
             return

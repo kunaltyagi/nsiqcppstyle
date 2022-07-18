@@ -31,7 +31,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     t = lexer.GetCurToken()
     value = t.value
     upperBlock = contextStack.SigPeek()
-    if IsConstuctor(value, fullName, upperBlock):
+    if IsConstructor(value, fullName, upperBlock):
         return
     if IsOperator(value):
         return

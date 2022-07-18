@@ -25,11 +25,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os  # @UnusedImport
-import sys  # @UnusedImport
 import sre_compile
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import *  # @UnusedWildImport
+from typing import Callable
+from nsiqcppstyle_types import *
 
 
 class RuleManager:
@@ -50,6 +50,7 @@ class RuleManager:
         self.loadedRule = []
         self.rules = []
         self.preprocessRules = []
+        self.commentRules = []
         self.functionNameRules = []
         self.functionScopeRules = []
         self.typeNameRules = []
@@ -57,6 +58,8 @@ class RuleManager:
         self.lineRules = []
         self.fileEndRules = []
         self.fileStartRules = []
+        self.sessionEndRules = []
+        self.sessionStartRules = []
         self.projectRules = []
         self.rollBackImporter = None
 #       self.LoadAllRules()
@@ -99,6 +102,13 @@ class RuleManager:
         for preprocessRule in self.preprocessRules:
             data = lexer.Backup()
             preprocessRule(lexer, contextStack)
+            lexer.Restore(data)
+
+    def RunCommentRule(self, lexer, token):
+        """ Rule when a comment is encountered """
+        for eachCommentRule in self.commentRules:
+            data = lexer.Backup()
+            eachCommentRule(lexer, token)
             lexer.Restore(data)
 
     def RunFunctionNameRule(self, lexer, functionFullName,
@@ -161,6 +171,16 @@ class RuleManager:
             fileStartRule(lexer, filename, dirname)
             lexer.Restore(data)
 
+    def RunSessionEndRules(self):
+        """ Run rules which runs at the end of the script session. """
+        for sessionEndRule in self.sessionEndRules:
+            sessionEndRule()
+
+    def RunSessionStartRules(self):
+        """ Run rules which runs at the start of the script session. """
+        for sessionStartRule in self.sessionStartRules:
+            sessionStartRule()
+
     def RunProjectRules(self, targetName):
         """ Run rules which runs once a project. """
         for projectRule in self.projectRules:
@@ -172,77 +192,93 @@ class RuleManager:
 
     def ResetRegisteredRules(self):
         """ Reset all registered rules. """
-        del self.functionNameRules[:]
-        del self.functionScopeRules[:]
-        del self.lineRules[:]
-        del self.rules[:]
-        del self.typeNameRules[:]
-        del self.typeScopeRules[:]
-        del self.fileStartRules[:]
-        del self.fileEndRules[:]
-        del self.projectRules[:]
-        del self.preprocessRules[:]
 
-    def AddPreprocessRule(self, preprocessRule):
+        self.functionNameRules.clear()
+        self.functionScopeRules.clear()
+        self.lineRules.clear()
+        self.rules.clear()
+        self.typeNameRules.clear()
+        self.typeScopeRules.clear()
+        self.fileStartRules.clear()
+        self.fileEndRules.clear()
+        self.sessionStartRules.clear()
+        self.sessionEndRules.clear()
+        self.projectRules.clear()
+        self.preprocessRules.clear()
+        self.commentRules.clear()
+
+    def AddPreprocessRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule which runs in preprocess statements """
-        self.preprocessRules.append(preprocessRule)
+        self.preprocessRules.append(user_function)
 
-    def AddFunctionScopeRule(self, functionScopeRule):
+    def AddCommentRule(self, user_function: Callable[[Lexer, Token], None]):
+        """ Add rule which runs when a comment is encountered """
+        self.commentRules.append(user_function)
+
+    def AddFunctionScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule which runs in function scope """
-        self.functionScopeRules.append(functionScopeRule)
+        self.functionScopeRules.append(user_function)
 
-    def AddFunctionNameRule(self, functionRule):
-        """ Add rule on the function name place"""
-        self.functionNameRules.append(functionRule)
+    def AddFunctionNameRule(self,
+                            user_function: Callable[
+                                [Lexer, FullFunctionName, Declaration, ContextStack, Context],
+                                None]):
+        """ Add rule on the function name place """
+        self.functionNameRules.append(user_function)
 
-    def AddLineRule(self, lineRule):
+    def AddLineRule(self, user_function: Callable[[Lexer, LineText, LineNumber], None]):
         """ Add rule on the each line """
-        self.lineRules.append(lineRule)
+        self.lineRules.append(user_function)
 
-    def AddRule(self, rule):
+    def AddRule(self, user_function: Callable[[Lexer, ContextStack], None]):
         """ Add rule on any token """
-        self.rules.append(rule)
+        self.rules.append(user_function)
 
-    def AddTypeNameRule(self, typeNameRule):
-        """ Add rule on any type (class / struct / union / namesapce / enum) """
-        self.typeNameRules.append(typeNameRule)
+    def AddTypeNameRule(self, user_function: Callable[
+                                [Lexer, TypeName, TypeFullName,
+                                 Declaration, ContextStack, Context],
+                                None]):
+        """ Add rule on any type (class / struct / union / namespace / enum) """
+        self.typeNameRules.append(user_function)
 
-    def AddTypeScopeRule(self, typeScopeRule):
-        """ Add rule on the any type definition scope """
-        self.typeScopeRules.append(typeScopeRule)
+    def AddTypeScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
+        """ Add rule when the token is within a type definition scope """
+        self.typeScopeRules.append(user_function)
 
-    def AddFileEndRule(self, fileEndRule):
-        """
-        Add rule on the file end
-        Added Rule should be function with following prototype "def RunRule(lexer, filename, dirname)"
-        lexer is the lexer used to analyze the source. it points the end token of source.
-        filename is the filename analyzed.
-        dirname is the file directory.
-        """
-        self.fileEndRules.append(fileEndRule)
+    def AddFileEndRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
+        """ Add rule on the file end """
+        self.fileEndRules.append(user_function)
 
-    def AddFileStartRule(self, fileStartRule):
-        """
-        Add rule on the file start
-        Added Rule should be function with following prototype "def RunRule(lexer, filename, dirname)"
-        lexer is the lexer used to analyze the source. it points the start token of source.
-        filename is the filename analyzed.
-        dirname is the file directory.
-        """
-        self.fileStartRules.append(fileStartRule)
+    def AddFileStartRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
+        """ Add rule on the file start """
+        self.fileStartRules.append(user_function)
 
-    def AddProjectRules(self, projectRule):
+    def AddSessionEndRule(self, user_function: Callable[[], None]):
         """
-        Add rule on the project
-        Added Rule should be function with following prototype "def RunRule(targetName)"
-        targetName is the analysis target directory.
+        Add rule on the session end.
+
+        This rule is called when the script has finished processing all target files.
+        It is called only once at the end of the script's run.
         """
-        self.projectRules.append(projectRule)
+        self.sessionEndRules.append(user_function)
+
+    def AddSessionStartRule(self, user_function: Callable[[], None]):
+        """
+        Add rule on the session start
+
+        This rule is called before the script begins processing the first target file.
+        It is called only once at the start of the script's processing activities.
+        """
+        self.sessionStartRules.append(user_function)
+
+    def AddProjectRules(self, user_function: Callable[[TargetDirectory], None]):
+        """ Add rule on the project """
+        self.projectRules.append(user_function)
 
 
 class RollbackImporter:
     def __init__(self):
-        "Creates an instance and installs as the global importer"
+        """Creates an instance and installs as the global importer"""
         self.previousModules = sys.modules.copy()
         self.realImport = __builtins__["__import__"]
         __builtins__["__import__"] = self._import

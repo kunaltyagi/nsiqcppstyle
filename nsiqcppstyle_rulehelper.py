@@ -80,8 +80,8 @@ def GetIndentation(token):
     return indent
 
 
-def IsConstuctor(value, fullName, context):
-    """ Check if the passed value is the contructor or destructor """
+def IsConstructor(value, fullName, context):
+    """ Check if the passed value is the constructor or destructor """
     fullName = fullName.replace("~", "")
     names = fullName.split("::")
     if len(names) != 1 and names[-1] == value:
