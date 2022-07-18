@@ -4,7 +4,10 @@
 from typing import NewType, Union
 import nsiqcppstyle_lexer
 import nsiqcppstyle_checker
-from nsiqcppstyle_checker import Context, ContextStack
+
+# Expose already existing types (i.e., Context and ContextStack)
+Context = nsiqcppstyle_checker.Context
+ContextStack = nsiqcppstyle_checker.ContextStack
 
 # A boolean flag denoting whether the function is a declaration (True) or definition (False)
 Declaration = NewType('Declaration', bool)
