@@ -6,11 +6,8 @@ REM Purpose: Trace every N'Siq CppStyle callback for a given input source file. 
 REM          the trace, the rule developer can plan how to write a new rule.
 
 if [%1]==[] goto no_file_given
-if exist filefilter.trace-callbacks.txt del filefilter.trace-callbacks.txt
 
-echo ~ TOOL_trace_nsiqcppstyle_callbacks > filefilter.trace-callbacks.txt
-
-python nsiqcppstyle.py -f filefilter.trace-callbacks.txt %1
+python nsiqcppstyle.py --filter-string="~ TOOL_trace_nsiqcppstyle_callbacks" %1
 goto finish
 
 :no_file_given
@@ -22,4 +19,3 @@ echo USAGE: trace-callbacks.bat full-path-to-source-file
 goto finish
 
 :finish
-if exist filefilter.trace-callbacks.txt del filefilter.trace-callbacks.txt

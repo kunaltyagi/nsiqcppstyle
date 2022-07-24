@@ -2,7 +2,7 @@ from nsiqcppstyle_rulemanager import *
 
 def PrintContextStack(contextStack):
     if (contextStack != None) and (contextStack.contextstack != None) and (len(contextStack.contextstack) > 0):
-        indent_string = (20 * ' ')
+        indent_string = (19 * ' ')
         print("%sContext stack (%d):" % (indent_string, len(contextStack.contextstack)))
         for t in contextStack.contextstack:
             print('%s    %s' % (indent_string, str(t)))

@@ -72,6 +72,10 @@ Usage: nsiqcppstyle [Options]
                 (target/filefilter.txt)
                 If you provide the file path (not a folder path) for the target,
                 -f option should be provided.
+  --filter-string=<filter string>
+                Semicolon-delimited string of valid filter file lines.  Enables specifying
+                the contents of a filter file without reading from the file system (e.g.,
+                in a read-only file system)
   --var=key: value,key: value
                 provide the variables to customize the rule behavior.
   --list-rules / -r  Show all rules available.
@@ -131,9 +135,9 @@ def main(argv=None):
         argv = sys.argv
     try:
         try:
-            opts, args = getopt.getopt(argv[1:], "o: s: m: hqvrf: ", ["help", "csv",
+            opts, args = getopt.getopt(argv[1:], "o: s: hqvrf: ", ["help", "csv",
                                                                       "output=", "list_rules", "verbose=", "show-url", "no-update",
-                                                                      "ci", "quiet", "var=", "noBase"])
+                                                                      "ci", "quiet", "var=", "noBase", "filter-string="])
         except getopt.error as msg:
             raise ShowMessageAndExit(msg)
             return 0
@@ -142,6 +146,7 @@ def main(argv=None):
         _nsiqcppstyle_state.output_format = "vs7"
         filterScope = "default"
         filterPath = ""
+        filterString = ""
         noBase = False
         varMap = {}
         extLangMap = {
@@ -167,6 +172,8 @@ def main(argv=None):
                 updateNsiqCppStyle = False
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
+            elif o == "--filter-string":
+                filterString = a.strip()
             elif o == "-v":
                 console.SetLevel(console.Level.Verbose)
             elif o == "-s":
@@ -238,7 +245,7 @@ def main(argv=None):
                 basefilelist = BaseFileList(targetPath)
 
             # Get Active Filter
-            filterManager = FilterManager(filefilterPath, extLangMapCopy,
+            filterManager = FilterManager(filefilterPath, filterString, extLangMapCopy,
                                           varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
@@ -362,7 +369,38 @@ def GetRealTargetPaths(args):
 class FilterManager:
     defaultFilterName = "default"
 
-    def __init__(self, fileFilterPath, extLangMap, varMap, activeFilterName):
+    def _ProcessFilterLine(self, filter, line):
+        line = line.strip()
+        if line.startswith("#") or len(line) == 0:
+            # Comment or empty line, just return
+            return
+        if line.startswith("*"):
+            if (len(line[1:].strip()) != 0):
+                filterName = line[1:].strip()
+                filter = self.GetFilter(filterName)
+        elif line.startswith("="):
+            if (len(line[1:].strip()) != 0):
+                filter.AddLangMap(line[1:].strip(),
+                                  "\"" + line + "\" of filefilter.txt")
+        elif line.startswith("~"):
+            if (len(line[1:].strip()) != 0):
+                filter.AddCppChecker(line[1:].strip())
+        elif line.startswith("+"):
+            arg = line[1:].strip()
+            if arg != "":
+                filter.AddInclude(arg)
+        elif line.startswith("-"):
+            arg = line[1:].strip()
+            if arg != "":
+                filter.AddExclude(arg)
+        elif line.startswith("%"):
+            arg = line[1:].strip()
+            if arg != "":
+                filter.AddVarMap(arg, "\"" + arg + "\" of filefilter.txt")
+
+        return filter
+
+    def __init__(self, fileFilterPath, filterString, extLangMap, varMap, activeFilterName):
         self.fileFilterPath = fileFilterPath
         self.baseExtLangMap = extLangMap
         self.baseVarMap = varMap
@@ -371,40 +409,22 @@ class FilterManager:
         filter = self.GetFilter(self.defaultFilterName)
         self.activeFilterName = self.defaultFilterName
 
+        if filterString:
+            lines = filterString.split(';')
+            for line in lines:
+                filter = self._ProcessFilterLine(filter, line.strip())
+
         f = self.GetFilterFile(fileFilterPath)
-        if f is None:
+        if f:
+            for line in f.readlines():
+                filter = self._ProcessFilterLine(filter, line)
+            f.close()
+
+        if len(filter.nsiqCppStyleRules) == 0:
             filter.AddExclude("/.svn/")
             filter.AddExclude("/.cvs/")
             return
 
-        for line in f.readlines():
-            line = line.strip()
-            if line.startswith("#") or len(line) == 0:
-                continue
-            if line.startswith("*"):
-                if (len(line[1:].strip()) != 0):
-                    filterName = line[1:].strip()
-                    filter = self.GetFilter(filterName)
-            elif line.startswith("="):
-                if (len(line[1:].strip()) != 0):
-                    filter.AddLangMap(line[1:].strip(),
-                                      "\"" + line + "\" of filefilter.txt")
-            elif line.startswith("~"):
-                if (len(line[1:].strip()) != 0):
-                    filter.AddCppChecker(line[1:].strip())
-            elif line.startswith("+"):
-                arg = line[1:].strip()
-                if arg != "":
-                    filter.AddInclude(arg)
-            elif line.startswith("-"):
-                arg = line[1:].strip()
-                if arg != "":
-                    filter.AddExclude(arg)
-            elif line.startswith("%"):
-                arg = line[1:].strip()
-                if arg != "":
-                    filter.AddVarMap(arg, "\"" + arg + "\" of filefilter.txt")
-        f.close()
         for eachMapKey in self.filterMap.keys():
             self.filterMap[eachMapKey].AddExclude("/.cvs/")
             self.filterMap[eachMapKey].AddExclude("/.svn/")
