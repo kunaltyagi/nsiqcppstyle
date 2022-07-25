@@ -74,7 +74,7 @@ Usage: nsiqcppstyle [Options]
                 -f option should be provided.
   --filter-string=<filter string>
                 Semicolon-delimited string of valid filter file lines.  Enables specifying
-                the contents of a filter file without reading from the file system (e.g.,
+                the contents of a filter file without writing it to the file system (e.g.,
                 in a read-only file system)
   --var=key: value,key: value
                 provide the variables to customize the rule behavior.
