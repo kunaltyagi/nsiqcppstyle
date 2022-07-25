@@ -1,69 +1,81 @@
+# Copyright (c) 2022 All rights reserved.
+# SPDX-License-Identifier: GPL-2.0-only
 from nsiqcppstyle_rulemanager import *
+from nsiqcppstyle_types import *
 
-def PrintContextStack(contextStack):
-    if (contextStack != None) and (contextStack.contextstack != None) and (len(contextStack.contextstack) > 0):
-        indent_string = (19 * ' ')
-        print("%sContext stack (%d):" % (indent_string, len(contextStack.contextstack)))
+def PrintContextStack(contextStack: ContextStack, isLastParameter: bool):
+    appendString = ''
+    if isLastParameter:
+        appendString = ')'
+    else:
+        appendString = ','
+    indent_string = (15 * ' ')
+
+    if (contextStack is None) or (contextStack.contextstack is None) or (len(contextStack.contextstack) == 0):
+        print("%scontextStack (empty)%s" % (indent_string, appendString))
+    else:
+        print("%scontextStack (%d)%s" % (indent_string, len(contextStack.contextstack), appendString))
         for t in contextStack.contextstack:
             print('%s    %s' % (indent_string, str(t)))
 
 def FunctionScopeRule(lexer, contextStack):
-    print("FunctionScopeRule (lexer, contextStack)")
-    PrintContextStack(contextStack)
+    print("FunctionScope (lexer, ")
+    PrintContextStack(contextStack, True)
 
 def FunctionNameRule(lexer, fullName, decl, contextStack, context):
-    print("FunctionNameRule  (lexer,")
-    print("                   fullName='%s'," % (fullName))
-    print("                   decl='%s'," % (decl))
-    print("                   contextStack,")
+    print("FunctionName  (lexer,")
+    print("               fullName='%s'," % (fullName))
+    print("               decl='%s'," % (decl))
+    PrintContextStack(contextStack, False)
     print("                   context='%s')" % (str(context)))
-    PrintContextStack(contextStack)
 
 
 def PreprocessRule(lexer, contextStack):
-    print("PreprocessRule    (lexer,")
-    print("                   contextStack,")
-    print("                   token=%s" % (lexer.GetCurToken()))
-    PrintContextStack(contextStack)
+    print("Preprocess    (lexer,")
+    PrintContextStack(contextStack, False)
+    print("               token=%s)" % (lexer.GetCurToken()))
 
 def CommentRule(lexer, token):
-    print("CommentRule       (lexer, token=%s)" % (lexer.GetCurToken()))
+    print("Comment       (lexer, token=%s)" % (lexer.GetCurToken()))
 
 def LineRule(lexer, line, lineNumber):
     print("--------------------------------------------------")
-    print("LineRule          (lexer, line='%s', lineNumber=%d)" % (line, lineNumber))
+    print("Line          (lexer, line='%s', lineNumber=%d)" % (line, lineNumber))
 
 def TokenRule(lexer, contextStack):
-    print("TokenRule         (lexer,")
-    print("                   contextStack,")
-    print("                   token=%s)" % (lexer.GetCurToken()))
-    PrintContextStack(contextStack)
+    print("Token         (lexer,")
+    PrintContextStack(contextStack, False)
+    print("               token=%s)" % (lexer.GetCurToken()))
 
 def FileStartRule(lexer, filename, dirname):
-    print("FileStartRule     (lexer, filename='%s', dirname='%s')" % (filename, dirname))
+    print("FileStart     (lexer, filename='%s', dirname='%s')" % (filename, dirname))
 
 def FileEndRule(lexer, filename, dirname):
-    print("FileEndRule       (lexer, filename='%s', dirname='%s')" % (filename, dirname))
+    print("FileEnd       (lexer, filename='%s', dirname='%s')" % (filename, dirname))
 
 def ProjectRule(targetName):
-    print("ProjectRule       (targetName='%s')" % (targetName))
+    print("Project       (targetName='%s')" % (targetName))
 
 def TypeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
-    print("TypeNameRule      (lexer, typeName='%s', typeFullName='%s', decl='%s')" % (typeName, typeFullName, decl))
-    PrintContextStack(contextStack)
+    print("TypeName      (lexer,")
+    print("               typeName='%s'," % (typeName))
+    print("               typeFullName='%s'," % (typeFullName))
+    print("               decl='%s'" % (decl))
+    PrintContextStack(contextStack, False)
+    print("               typeContext='%s')" % (str(typeContext)))
 
 def TypeScopeRule(lexer, contextStack):
-    print("TypeScopeRule     (lexer, contextStack)")
-    PrintContextStack(contextStack)
+    print("TypeScope     (lexer, ")
+    PrintContextStack(contextStack, True)
 
 def SessionStartRule():
     # Print instructions, legend, etc. to help the developer
     print("Legend: LexToken contain six fields: (type, value, lineno, column, lexpos, inactive, pp)")
     print("")
-    print("SessionStartRule  ()")
+    print("SessionStart  ()")
 
 def SessionEndRule():
-    print("SessionEndRule    ()")
+    print("SessionEnd    ()")
 
 ruleManager.AddFunctionScopeRule(FunctionScopeRule)
 ruleManager.AddFunctionNameRule(FunctionNameRule)
