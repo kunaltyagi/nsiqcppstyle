@@ -28,9 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 import getopt
-import os  # @UnusedImport
 import re
-import sys  # @UnusedImport
 import copy
 import nsiqcppstyle_checker
 from nsiqcppstyle_outputer import _consoleOutputer as console
@@ -40,7 +38,7 @@ import nsiqcppstyle_reporter
 import updateagent.agent
 from nsiqcppstyle_util import *
 
-version = "0.3.0.1"
+version = "0.3.0.2"
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
@@ -140,7 +138,6 @@ def main(argv=None):
                                                                       "ci", "quiet", "var=", "noBase", "filter-string="])
         except getopt.error as msg:
             raise ShowMessageAndExit(msg)
-            return 0
 
         outputPath = ""
         _nsiqcppstyle_state.output_format = "vs7"
@@ -150,11 +147,11 @@ def main(argv=None):
         noBase = False
         varMap = {}
         extLangMap = {
-            "Html": set(["htm", "html"]),
-            "Java": set(["java"]),
-            "Javascript/ActionScript": set(["js", "as"]),
-            "JSP/PHP": set(["jsp", "php", "JSP", "PHP"]),
-            "C/C++": set(["cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"])
+            "Html": {"htm", "html"},
+            "Java": {"java"},
+            "Javascript/ActionScript": {"js", "as"},
+            "JSP/PHP": {"jsp", "php", "JSP", "PHP"},
+            "C/C++": {"cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"}
         }
 
         updateNsiqCppStyle = False
@@ -206,6 +203,9 @@ def main(argv=None):
                 console.Out.Error(e)
 
         targetPaths = GetRealTargetPaths(args)
+        if len(targetPaths) == 0:
+            ShowMessageAndExit("No target paths provided")
+
         multipleTarget = True
         if len(targetPaths) == 1:
             multipleTarget = False
@@ -228,6 +228,8 @@ def main(argv=None):
         nsiqcppstyle_reporter.PrepareReport(outputPath,
                                             _nsiqcppstyle_state.output_format)
         analyzedFiles = []
+        filterManager = None
+        filter = None
 
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
@@ -349,7 +351,7 @@ def GetOutputPath(outputBasePath, outputPath):
 
 
 def GetRealTargetPaths(args):
-    "extract real target path list from args"
+    """extract real target path list from args"""
     if len(args) == 0:
         ShowMessageAndExit("Error!: Target directory must be provided")
     targetPaths = []
@@ -379,7 +381,7 @@ class FilterManager:
             # Comment or empty line, just return
             return
         if line.startswith("*"):
-            if (len(line[1:].strip()) != 0):
+            if len(line[1:].strip()) != 0:
                 filterName = line[1:].strip()
                 filter = self.GetFilter(filterName)
         elif line.startswith("="):
@@ -441,11 +443,9 @@ class FilterManager:
                       copy.deepcopy(self.baseVarMap))
 
     def GetFilter(self, filterName):
-        if filterName in self.filterMap:
-            return self.filterMap[filterName]
-        else:
+        if not filterName in self.filterMap:
             self.filterMap[filterName] = self.CreateNewFilter(filterName)
-            return self.filterMap[filterName]
+        return self.filterMap[filterName]
 
     def GetActiveFilter(self):
         return self.GetFilter(self.activeFilterName)
