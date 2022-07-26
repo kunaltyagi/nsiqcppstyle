@@ -210,6 +210,10 @@ def main(argv=None):
         if len(targetPaths) == 1:
             multipleTarget = False
 
+        # Check: "-f" and "--filter-string" are mutually exclusive
+        if filterPath and filterString:
+            ShowMessageAndExit("'-f' and '--filter-string' command line options are mutually exclusive")
+
         # If multiple target
         if multipleTarget:
             if len(outputPath) == 0:
