@@ -9,14 +9,14 @@ def PrintContextStack(contextStack: ContextStack, isLastParameter: bool):
         appendString = ')'
     else:
         appendString = ','
-    indent_string = (15 * ' ')
+    indentString = (15 * ' ')
 
     if (contextStack is None) or (contextStack.contextstack is None) or (len(contextStack.contextstack) == 0):
-        print("%scontextStack (empty)%s" % (indent_string, appendString))
+        print(f"{indentString}contextStack (empty){appendString}")
     else:
-        print("%scontextStack (%d)%s" % (indent_string, len(contextStack.contextstack), appendString))
+        print(f"{indentString}contextStack ({len(contextStack.contextstack)}){appendString}")
         for t in contextStack.contextstack:
-            print('%s    %s' % (indent_string, str(t)))
+            print(f'{indentString}    {str(t)}')
 
 def FunctionScopeRule(lexer, contextStack):
     print("FunctionScope (lexer, ")
@@ -24,45 +24,45 @@ def FunctionScopeRule(lexer, contextStack):
 
 def FunctionNameRule(lexer, fullName, decl, contextStack, context):
     print("FunctionName  (lexer,")
-    print("               fullName='%s'," % (fullName))
-    print("               decl='%s'," % (decl))
+    print(f"               fullName='{fullName}',")
+    print(f"               decl='{decl}',")
     PrintContextStack(contextStack, False)
-    print("                   context='%s')" % (str(context)))
+    print(f"                   context='{str(context)}')")
 
 
 def PreprocessRule(lexer, contextStack):
     print("Preprocess    (lexer,")
     PrintContextStack(contextStack, False)
-    print("               token=%s)" % (lexer.GetCurToken()))
+    print(f"               token={lexer.GetCurToken()})")
 
 def CommentRule(lexer, token):
-    print("Comment       (lexer, token=%s)" % (lexer.GetCurToken()))
+    print(f"Comment       (lexer, token={lexer.GetCurToken()})")
 
 def LineRule(lexer, line, lineNumber):
     print("--------------------------------------------------")
-    print("Line          (lexer, line='%s', lineNumber=%d)" % (line, lineNumber))
+    print(f"Line          (lexer, line='{line}', lineNumber={lineNumber})")
 
 def TokenRule(lexer, contextStack):
     print("Token         (lexer,")
     PrintContextStack(contextStack, False)
-    print("               token=%s)" % (lexer.GetCurToken()))
+    print(f"               token={lexer.GetCurToken()})")
 
 def FileStartRule(lexer, filename, dirname):
-    print("FileStart     (lexer, filename='%s', dirname='%s')" % (filename, dirname))
+    print(f"FileStart     (lexer, filename='{filename}', dirname='{dirname}')")
 
 def FileEndRule(lexer, filename, dirname):
-    print("FileEnd       (lexer, filename='%s', dirname='%s')" % (filename, dirname))
+    print(f"FileEnd       (lexer, filename='{filename}', dirname='{dirname}')")
 
 def ProjectRule(targetName):
-    print("Project       (targetName='%s')" % (targetName))
+    print(f"Project       (targetName='{targetName}')")
 
 def TypeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
     print("TypeName      (lexer,")
-    print("               typeName='%s'," % (typeName))
-    print("               typeFullName='%s'," % (typeFullName))
-    print("               decl='%s'" % (decl))
+    print(f"               typeName='{typeName}',")
+    print(f"               typeFullName='{typeFullName}',")
+    print(f"               decl='{decl}'")
     PrintContextStack(contextStack, False)
-    print("               typeContext='%s')" % (str(typeContext)))
+    print(f"               typeContext='{str(typeContext)}')")
 
 def TypeScopeRule(lexer, contextStack):
     print("TypeScope     (lexer, ")
