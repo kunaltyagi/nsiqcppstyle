@@ -38,7 +38,7 @@ import nsiqcppstyle_reporter
 import updateagent.agent
 from nsiqcppstyle_util import *
 
-version = "0.3.0.2"
+version = "0.3.1"
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
@@ -228,7 +228,6 @@ def main(argv=None):
         nsiqcppstyle_reporter.PrepareReport(outputPath,
                                             _nsiqcppstyle_state.output_format)
         analyzedFiles = []
-        filterManager = None
         filter = None
 
         for targetPath in targetPaths:
