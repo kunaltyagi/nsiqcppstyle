@@ -71,9 +71,9 @@ Usage: nsiqcppstyle [Options]
                 If you provide the file path (not a folder path) for the target,
                 -f option should be provided.
   --filter-string=<filter string>
-                Semicolon-delimited string of valid filter file lines.  Enables specifying
-                the contents of a filter file without writing it to the file system (e.g.,
-                in a read-only file system)
+                A single, valid filter file line.  This option may be repeated multiple
+                times.  Enables specifying the contents of a filter file without needing 
+                to create one (e.g., in a read-only file system)
   --var=key: value,key: value
                 provide the variables to customize the rule behavior.
   --list-rules / -r  Show all rules available.
@@ -143,7 +143,7 @@ def main(argv=None):
         _nsiqcppstyle_state.output_format = "vs7"
         filterScope = "default"
         filterPath = ""
-        filterString = ""
+        filterStringList = []
         noBase = False
         varMap = {}
         extLangMap = {
@@ -170,7 +170,7 @@ def main(argv=None):
             elif o == "-f":
                 filterPath = a.strip().replace("\"", "")
             elif o == "--filter-string":
-                filterString = a.strip()
+                filterStringList.append(a)
             elif o == "-v":
                 console.SetLevel(console.Level.Verbose)
             elif o == "-s":
@@ -211,7 +211,7 @@ def main(argv=None):
             multipleTarget = False
 
         # Check: "-f" and "--filter-string" are mutually exclusive
-        if filterPath and filterString:
+        if filterPath and filterStringList:
             ShowMessageAndExit("'-f' and '--filter-string' command line options are mutually exclusive")
 
         # If multiple target
@@ -251,7 +251,7 @@ def main(argv=None):
                 basefilelist = BaseFileList(targetPath)
 
             # Get Active Filter
-            filterManager = FilterManager(filefilterPath, filterString, extLangMapCopy,
+            filterManager = FilterManager(filefilterPath, filterStringList, extLangMapCopy,
                                           varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
@@ -406,7 +406,7 @@ class FilterManager:
 
         return filter
 
-    def __init__(self, fileFilterPath, filterString, extLangMap, varMap, activeFilterName):
+    def __init__(self, fileFilterPath, filterStringList, extLangMap, varMap, activeFilterName):
         self.fileFilterPath = fileFilterPath
         self.baseExtLangMap = extLangMap
         self.baseVarMap = varMap
@@ -415,10 +415,9 @@ class FilterManager:
         filter = self.GetFilter(self.defaultFilterName)
         self.activeFilterName = self.defaultFilterName
 
-        if filterString:
-            lines = filterString.split(';')
-            for line in lines:
-                filter = self._ProcessFilterLine(filter, line.strip())
+        if filterStringList:
+            for line in filterStringList:
+                filter = self._ProcessFilterLine(filter, line)
 
         f = self.GetFilterFile(fileFilterPath)
         if f:
