@@ -377,16 +377,11 @@ class FilterManager:
     doubleQuote = '"'
 
     def _ProcessFilterLine(self, filter, raw_line):
-        # <line> may be enclosed in single/double quotes, and the
-        # inner string may start/end with whitespace, clean it up
-        # before using it.
-        line = raw_line.strip()
-        if line.startswith(self.singleQuote):
-            if line.endswith(self.singleQuote):
-                line = line[1:-1].strip()
-        elif line.startswith(self.doubleQuote):
-            if line.endswith(self.doubleQuote):
-                line = line[1:-1].strip()
+        # <raw_line> may be enclosed in single/double quotes, and
+        # the inner string may start/end with whitespace, clean it
+        # up before using it.
+        line = RemoveOuterQuotes(raw_line)
+
         if line.startswith("#") or len(line) == 0:
             # Comment or empty line, just return
             return
