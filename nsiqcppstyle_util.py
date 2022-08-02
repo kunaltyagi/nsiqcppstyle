@@ -28,6 +28,8 @@
 import os
 import sys
 
+SINGLE_QUOTE = "'"
+DOUBLE_QUOTE = '"'
 
 def WeAreFrozen():
     return hasattr(sys, "frozen")
@@ -59,3 +61,10 @@ def GetSystemKey():
 
 def CmpObjects(a, b):
     return (a > b) - (a < b)
+
+
+def RemoveOuterQuotes(raw_string):
+    final_string = raw_string.strip()
+    if final_string[0] == final_string[-1] and final_string[0] in [SINGLE_QUOTE, DOUBLE_QUOTE]:
+        final_string = final_string[1:-1].strip()
+    return final_string
