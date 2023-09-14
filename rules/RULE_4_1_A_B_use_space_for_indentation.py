@@ -1,6 +1,6 @@
 """
 Use spaces for indentation.
-This rule check if the each line starts with tabs.
+This rule ensures that each line starts with spaces.
 In addition, it suppresses the violation when the line contains only spaces and tabs.
 
 == Violation ==
@@ -28,6 +28,14 @@ from nsiqcppstyle_types import *
 
 
 def RunRule(lexer: Lexer, line: LineText, lineno: LineNumber) -> None:
+    t = lexer.GetCurToken()
+
+    # Skip comment lines
+    if (t.type in ["COMMENT", "CPPCOMMENT"]):
+        next_token = lexer.GetNextTokenSkipWhiteSpaceAndComment()
+        if next_token.lineno != t.lineno:
+            return
+
     if not Match(r"^\s*$", line):
         if Search("^\t", line):
             nsiqcppstyle_reporter.Error(DummyToken(
@@ -61,6 +69,18 @@ class K {
     def test3(self):
         self.Analyze("test/thisFile.c",
                      """
+class K {
+
+Hello
+}""")
+        self.ExpectSuccess(__name__)
+
+    def test4(self):
+        self.Analyze("test/thisFile.c",
+                     """
+ /**
+\t* Check for Doxygen Comment. This rule doesn't care about doxygen comment block.
+  */
 class K {
 
 Hello
