@@ -54,8 +54,8 @@ operator = (
     'RSHIFTEQUAL',
     'ANDEQUAL',
     'XOREQUAL',
-    'OREQUAL'
-
+    'OREQUAL',
+    'SPACESHIP'
 )
 
 nextoperator = (
@@ -248,3 +248,31 @@ wewe
 
 """)
         self.ExpectSuccess(__name__)
+
+    def testSpaceshipOperatorOK(self):
+        self.Analyze("test/thisFile.c",
+                     """
+const bool isEq = std::is_eq(a <=> b);
+""")
+        self.ExpectSuccess(__name__)
+
+    def testSpaceshipOperatorKOLeft(self):
+        self.Analyze("test/thisFile.c",
+                     """
+const bool isEq = std::is_eq(a<=> b);
+""")
+        self.ExpectError(__name__)
+
+    def testSpaceshipOperatorKORight(self):
+        self.Analyze("test/thisFile.c",
+                     """
+const bool isEq = std::is_eq(a <=>b);
+""")
+        self.ExpectError(__name__)
+
+    def testSpaceshipOperatorKOBoth(self):
+        self.Analyze("test/thisFile.c",
+                     """
+const bool isEq = std::is_eq(a<=>b);
+""")
+        self.ExpectError(__name__)
