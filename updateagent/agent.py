@@ -134,8 +134,9 @@ class Version:
         # from the parsed tuple -- so I just store the string here for
         # use by __str__
         self.vstring = vstring
-        components = filter(lambda x: x and x != '.',
-                            self.component_re.split(vstring))
+        components = list(filter(lambda x: x and x != '.',
+                            self.component_re.split(vstring)))
+
         for i in range(len(components)):
             try:
                 components[i] = int(components[i])
@@ -155,3 +156,9 @@ class Version:
             other = Version(other)
 
         return CmpObjects(self.version, other.version)
+
+    def __lt__(self, other):
+        if isinstance(other, str):
+            other = Version(other)
+
+        return CmpObjects(self.version, other.version) < 0
