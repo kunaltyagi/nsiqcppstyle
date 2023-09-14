@@ -1230,13 +1230,13 @@ def RunRules(ruleManager, lexer):
             if t.pp == True:
                 ruleManager.RunPreprocessRule(lexer, t.contextStack)
             else:
-                if t.type == 'TYPE':
+                if t.type == "TYPE":
                     ruleManager.RunTypeNameRule(lexer, t.value.upper(), t.fullName,
                                                 t.decl, t.contextStack, t.context)
-                elif t.type == 'FUNCTION':
+                elif t.type == "FUNCTION":
                     ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
                                                     t.contextStack, t.context)
-                elif ((t.type == 'COMMENT') or (t.type == 'CPPCOMMENT')):
+                elif t.type in ["COMMENT", "CPPCOMMENT"]:
                     ruleManager.RunCommentRule(lexer, t)
                     continue
                 elif t.contextStack is not None and t.contextStack.SigPeek() is not None:
