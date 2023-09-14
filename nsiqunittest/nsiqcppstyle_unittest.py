@@ -32,24 +32,26 @@ import nsiqcppstyle_state
 
 
 class unitTest(unittest.TestCase):
-    def __testFunctionSpecifier(self, specifier):
-        lexer = nsiqcppstyle_checker.CppLexerNavigator(
-            "a.cpp", "void FunctionName() " + specifier + ";")
+    @staticmethod
+    def __expectTokenTypes(code, expectedTokenTypes):
+        lexer = nsiqcppstyle_checker.CppLexerNavigator("a.cpp", code)
         # This step resolves comments and some token types like FUNCTION
         nsiqcppstyle_checker.ConstructContextInfo(lexer)
         lexer.Reset()
 
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'VOID')
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'FUNCTION')
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'LPAREN')
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'RPAREN')
-        # Specifier keyword
-        specifierToken = lexer.GetNextTokenSkipWhiteSpaceAndComment()
-        assert(specifierToken.type == 'IGNORE')
-        assert(specifierToken.value == specifier)
+        tokens = []
+        while True:
+            token = lexer.GetNextTokenSkipWhiteSpaceAndComment()
+            if (token == None):
+                break
 
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment().type == 'SEMI')
-        assert(lexer.GetNextTokenSkipWhiteSpaceAndComment() is None)
+            tokens.append(token.type)
+
+        assert(expectedTokenTypes == tokens)
+
+    def __testFunctionSpecifier(self, specifier):
+        expectedTokenTypes = [ "VOID", "FUNCTION", "LPAREN", "RPAREN", "IGNORE", "SEMI" ]
+        self.__expectTokenTypes("void FunctionName() " + specifier + ";", expectedTokenTypes)
 
     def testIgnoreFinalFunctionSpecifier(self):
         self.__testFunctionSpecifier("final")
@@ -59,6 +61,12 @@ class unitTest(unittest.TestCase):
 
     def testIgnoreNoexceptFunctionSpecifier(self):
         self.__testFunctionSpecifier("noexcept")
+
+    def testParseSpaceshipOperator(self):
+        expectedTokenTypes = [ "AUTO", "FUNCTION", "SPACESHIP", "LPAREN",
+                               "CONST", "ID", "AND", "COMMA", "CONST", "ID", "AND",
+                               "RPAREN", "SEMI" ]
+        self.__expectTokenTypes("auto operator<=>(const P&, const P&);", expectedTokenTypes)
 
     def testGetPrevMatchingLT(self):
         lexer = nsiqcppstyle_checker.CppLexerNavigator(
