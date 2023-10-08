@@ -621,7 +621,7 @@ class LexerReflect:
             self.error = 1
             return
 
-        if not isinstance(tokens, list | tuple):
+        if not isinstance(tokens, (list, tuple)):
             self.log.error("tokens must be a list or tuple")
             self.error = 1
             return
@@ -665,7 +665,7 @@ class LexerReflect:
         self.states = self.ldict.get("states", None)
         # Build statemap
         if self.states:
-            if not isinstance(self.states, tuple | list):
+            if not isinstance(self.states, (tuple, list)):
                 self.log.error("states must be defined as a tuple or list")
                 self.error = 1
             else:
@@ -988,7 +988,7 @@ def lex(
         lexobj.lextokens[n] = 1
 
     # Get literals specification
-    if isinstance(linfo.literals, list | tuple):
+    if isinstance(linfo.literals, (list, tuple)):
         lexobj.lexliterals = type(linfo.literals[0])().join(linfo.literals)
     else:
         lexobj.lexliterals = linfo.literals
