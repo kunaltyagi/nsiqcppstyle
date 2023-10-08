@@ -1,6 +1,6 @@
 """
 Use tabs for indentation.
-This rule check if the each line starts with a space.
+This rule ensures that each line starts with tabs.
 In addition, it suppresses the violation when the line contains only spaces and tabs.
 
 == Violation ==
@@ -25,6 +25,14 @@ from nsiqcppstyle_rulemanager import *
 
 
 def RunRule(lexer, line, lineno):
+    t = lexer.GetCurToken()
+
+    # Skip comment lines
+    if (t.type in ["COMMENT", "CPPCOMMENT"]):
+        next_token = lexer.GetNextTokenSkipWhiteSpaceAndComment()
+        if next_token.lineno != t.lineno:
+            return
+
     if not Match(r"^\s*$", line):
         if Search("^ ", line):
             nsiqcppstyle_reporter.Error(DummyToken(

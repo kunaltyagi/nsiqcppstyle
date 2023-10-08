@@ -34,11 +34,11 @@ from nsiqcppstyle_rulehelper import *  # @UnusedWildImport
 
 tokens = [
     'ID',
-    # Operators (+,-,*,/,%,|,&,~,^,<<,>>, ||, &&, !, <, <=, >, >=, ==, !=)
+    # Operators (+,-,*,/,%,|,&,~,^,<<,>>, ||, &&, !, <, <=, >, >=, ==, !=, <=>)
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MODULO',
     'OR', 'AND', 'NOT', 'XOR', 'LSHIFT', 'RSHIFT',
     'LOR', 'LAND', 'LNOT',
-    'LT', 'LE', 'GT', 'GE', 'EQ', 'NE',
+    'LT', 'LE', 'GT', 'GE', 'EQ', 'NE', 'SPACESHIP',
 
     # Assignment (=, *=, /=, %=, +=, -=, <<=, >>=, &=, ^=, |=)
     'EQUALS', 'TIMESEQUAL', 'DIVEQUAL', 'MODEQUAL', 'PLUSEQUAL', 'MINUSEQUAL',
@@ -135,6 +135,7 @@ t_LE = r'<='
 t_GE = r'>='
 t_EQ = r'=='
 t_NE = r'!='
+t_SPACESHIP = r'<=>'
 t_DOUBLECOLON = r'::'
 # Assignment operators
 
@@ -1229,13 +1230,13 @@ def RunRules(ruleManager, lexer):
             if t.pp == True:
                 ruleManager.RunPreprocessRule(lexer, t.contextStack)
             else:
-                if t.type == 'TYPE':
+                if t.type == "TYPE":
                     ruleManager.RunTypeNameRule(lexer, t.value.upper(), t.fullName,
                                                 t.decl, t.contextStack, t.context)
-                elif t.type == 'FUNCTION':
+                elif t.type == "FUNCTION":
                     ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
                                                     t.contextStack, t.context)
-                elif ((t.type == 'COMMENT') or (t.type == 'CPPCOMMENT')):
+                elif t.type in ("COMMENT", "CPPCOMMENT"):
                     ruleManager.RunCommentRule(lexer, t)
                     continue
                 elif t.contextStack is not None and t.contextStack.SigPeek() is not None:
@@ -1244,7 +1245,7 @@ def RunRules(ruleManager, lexer):
                         ruleManager.RunFunctionScopeRule(lexer, t.contextStack)
                     elif sigContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "ENUM_BLOCK", "NAMESPACE_BLOCK", "UNION_BLOCK"]:
                         ruleManager.RunTypeScopeRule(lexer, t.contextStack)
-                
+
                 ruleManager.RunRule(lexer, t.contextStack)
         except Exception as e:
             console.Err.Verbose("Rule Error : ", t, t.contextStack, e)
