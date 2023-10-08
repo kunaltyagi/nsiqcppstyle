@@ -38,8 +38,8 @@ import nsiqcppstyle_state
 import updateagent.agent
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import *
+from __about__ import __version__ as version
 
-version = "0.3.1"
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 
