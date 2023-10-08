@@ -1236,7 +1236,7 @@ def RunRules(ruleManager, lexer):
                 elif t.type == "FUNCTION":
                     ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
                                                     t.contextStack, t.context)
-                elif t.type in ["COMMENT", "CPPCOMMENT"]:
+                elif t.type in ("COMMENT", "CPPCOMMENT"):
                     ruleManager.RunCommentRule(lexer, t)
                     continue
                 elif t.contextStack is not None and t.contextStack.SigPeek() is not None:
