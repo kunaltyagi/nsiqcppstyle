@@ -25,8 +25,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sre_compile
-from collections.abc import Callable
+import re
+import sys
+
+if sys.version_info.minor < 9:
+    from typing import Callable
+else:
+    from collections.abc import Callable
 
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_types import *
@@ -38,7 +43,7 @@ class RuleManager:
         self.availRuleNames = []
         basePath = os.path.join(runtimePath, "rules")
         ruleFiles = os.listdir(basePath)
-        rulePattern = sre_compile.compile(r"^(.*)\.py$")
+        rulePattern = re.compile(r"^(.*)\.py$")
         for eachRuleFile in ruleFiles:
             if os.path.isfile(os.path.join(basePath, eachRuleFile)):
                 ruleMatch = rulePattern.match(eachRuleFile)
