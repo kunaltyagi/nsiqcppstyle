@@ -12,10 +12,10 @@ Instead use system independent types (int16_t, int64_t, int32_t) respectively.
 
     int32_t b;
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 systemDependentType = {"SHORT": "int16_t", "LONG": "int64_t", "INT": "int32_t"}
 
@@ -25,8 +25,14 @@ def RunRule(lexer, contextStack):
     if t.type in ["SHORT", "LONG", "INT"]:
         context = contextStack.Peek()
         if context is None or context.type != "PARENBLOCK":
-            nsiqcppstyle_reporter.Error(t, __name__,
-                                        "Do not use system dependent type(%s). Use system independent type like (%s)" % (t.value, systemDependentType[t.type]))
+            nsiqcppstyle_reporter.Error(
+                t,
+                __name__,
+                "Do not use system dependent type({}). Use system independent type like ({})".format(
+                    t.value,
+                    systemDependentType[t.type],
+                ),
+            )
 
 
 ruleManager.AddRule(RunRule)
@@ -42,34 +48,42 @@ class testRule(nct):
         ruleManager.AddRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int k;
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void T() {
     long long k = 1;
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int32_t k = 2
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void k() {
     for (int j = 0; j < 11; j++) {
     }
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)

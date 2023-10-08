@@ -26,10 +26,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sre_compile
+from collections.abc import Callable
+
 from nsiqcppstyle_outputer import _consoleOutputer as console
-from nsiqcppstyle_util import *  # @UnusedWildImport
-from typing import Callable
 from nsiqcppstyle_types import *
+from nsiqcppstyle_util import *  # @UnusedWildImport
 
 
 class RuleManager:
@@ -41,8 +42,7 @@ class RuleManager:
         for eachRuleFile in ruleFiles:
             if os.path.isfile(os.path.join(basePath, eachRuleFile)):
                 ruleMatch = rulePattern.match(eachRuleFile)
-                if ruleMatch is not None and eachRuleFile.find(
-                        "__init__") == -1:
+                if ruleMatch is not None and eachRuleFile.find("__init__") == -1:
                     ruleName = ruleMatch.group(1)
                     self.availRuleNames.append(ruleName)
         self.availRuleCount = len(self.availRuleNames)
@@ -62,7 +62,8 @@ class RuleManager:
         self.sessionStartRules = []
         self.projectRules = []
         self.rollBackImporter = None
-#       self.LoadAllRules()
+
+    #       self.LoadAllRules()
 
     def LoadRules(self, checkingRuleNames):
         """
@@ -79,16 +80,14 @@ class RuleManager:
         for ruleName in checkingRuleNames:
             count = self.availRuleNames.count(ruleName)
             if count == 0:
-                console.Out.Error(
-                    "%s does not exist or incompatible." % ruleName)
+                console.Out.Error("%s does not exist or incompatible." % ruleName)
                 continue
             else:
                 console.Out.Info("  - ", ruleName, "is applied.")
             ruleModule = __import__("rules." + ruleName)
             self.loadedRule.append(ruleModule)
         if len(self.loadedRule) == 0:
-            console.Out.Ci(
-                "  No Rule is specified. Please configure rules in filefilter.txt.")
+            console.Out.Ci("  No Rule is specified. Please configure rules in filefilter.txt.")
         console.Out.Ci(console.Separator)
 
     def ResetRules(self):
@@ -98,91 +97,87 @@ class RuleManager:
     # Rule Runner
     ##########################################################################
     def RunPreprocessRule(self, lexer, contextStack):
-        """ Run rules which runs in the preprecessor blocks """
+        """Run rules which runs in the preprecessor blocks"""
         for preprocessRule in self.preprocessRules:
             data = lexer.Backup()
             preprocessRule(lexer, contextStack)
             lexer.Restore(data)
 
     def RunCommentRule(self, lexer, token):
-        """ Rule when a comment is encountered """
+        """Rule when a comment is encountered"""
         for eachCommentRule in self.commentRules:
             data = lexer.Backup()
             eachCommentRule(lexer, token)
             lexer.Restore(data)
 
-    def RunFunctionNameRule(self, lexer, functionFullName,
-                            decl, contextStack, functionContext):
-        """ Run rules which runs on the function name """
+    def RunFunctionNameRule(self, lexer, functionFullName, decl, contextStack, functionContext):
+        """Run rules which runs on the function name"""
         for eachFunctionNameRule in self.functionNameRules:
             data = lexer.Backup()
-            eachFunctionNameRule(lexer, functionFullName,
-                                 decl, contextStack, functionContext)
+            eachFunctionNameRule(lexer, functionFullName, decl, contextStack, functionContext)
             lexer.Restore(data)
 
     def RunFunctionScopeRule(self, lexer, contextStack):
-        """ Run rules which runs in the function blocks """
+        """Run rules which runs in the function blocks"""
         for eachFunctionScopeRule in self.functionScopeRules:
             data = lexer.Backup()
             eachFunctionScopeRule(lexer, contextStack)
             lexer.Restore(data)
 
-    def RunTypeNameRule(self, lexer, typeName, typeFullName,
-                        decl, contextStack, typeContext):
-        """ Run rules which runs on the type names """
+    def RunTypeNameRule(self, lexer, typeName, typeFullName, decl, contextStack, typeContext):
+        """Run rules which runs on the type names"""
         for typeNameRule in self.typeNameRules:
             data = lexer.Backup()
-            typeNameRule(lexer, typeName, typeFullName,
-                         decl, contextStack, typeContext)
+            typeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext)
             lexer.Restore(data)
 
     def RunTypeScopeRule(self, lexer, contextStack):
-        """ Run rules which runs in the type blocks """
+        """Run rules which runs in the type blocks"""
         for typeScopeRule in self.typeScopeRules:
             data = lexer.Backup()
             typeScopeRule(lexer, contextStack)
             lexer.Restore(data)
 
     def RunRule(self, lexer, contextStack):
-        """ Run rules which runs in any tokens """
+        """Run rules which runs in any tokens"""
         for rule in self.rules:
             data = lexer.Backup()
             rule(lexer, contextStack)
             lexer.Restore(data)
 
     def RunLineRule(self, lexer, line, lineno):
-        """ Run rules which runs in each lines. """
+        """Run rules which runs in each lines."""
         for lineRule in self.lineRules:
             data = lexer.Backup()
             lineRule(lexer, line, lineno)
             lexer.Restore(data)
 
     def RunFileEndRule(self, lexer, filename, dirname):
-        """ Run rules which runs at the end of files. """
+        """Run rules which runs at the end of files."""
         for fileEndRule in self.fileEndRules:
             data = lexer.Backup()
             fileEndRule(lexer, filename, dirname)
             lexer.Restore(data)
 
     def RunFileStartRule(self, lexer, filename, dirname):
-        """ Run rules which runs at the start of files. """
+        """Run rules which runs at the start of files."""
         for fileStartRule in self.fileStartRules:
             data = lexer.Backup()
             fileStartRule(lexer, filename, dirname)
             lexer.Restore(data)
 
     def RunSessionEndRules(self):
-        """ Run rules which runs at the end of the script session. """
+        """Run rules which runs at the end of the script session."""
         for sessionEndRule in self.sessionEndRules:
             sessionEndRule()
 
     def RunSessionStartRules(self):
-        """ Run rules which runs at the start of the script session. """
+        """Run rules which runs at the start of the script session."""
         for sessionStartRule in self.sessionStartRules:
             sessionStartRule()
 
     def RunProjectRules(self, targetName):
-        """ Run rules which runs once a project. """
+        """Run rules which runs once a project."""
         for projectRule in self.projectRules:
             projectRule(targetName)
 
@@ -191,7 +186,7 @@ class RuleManager:
     ##########################################################################
 
     def ResetRegisteredRules(self):
-        """ Reset all registered rules. """
+        """Reset all registered rules."""
 
         self.functionNameRules.clear()
         self.functionScopeRules.clear()
@@ -208,49 +203,49 @@ class RuleManager:
         self.commentRules.clear()
 
     def AddPreprocessRule(self, user_function: Callable[[Lexer, ContextStack], None]):
-        """ Add rule which runs in preprocess statements """
+        """Add rule which runs in preprocess statements"""
         self.preprocessRules.append(user_function)
 
     def AddCommentRule(self, user_function: Callable[[Lexer, Token], None]):
-        """ Add rule which runs when a comment is encountered """
+        """Add rule which runs when a comment is encountered"""
         self.commentRules.append(user_function)
 
     def AddFunctionScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
-        """ Add rule which runs in function scope """
+        """Add rule which runs in function scope"""
         self.functionScopeRules.append(user_function)
 
-    def AddFunctionNameRule(self,
-                            user_function: Callable[
-                                [Lexer, FullFunctionName, Declaration, ContextStack, Context],
-                                None]):
-        """ Add rule on the function name place """
+    def AddFunctionNameRule(
+        self,
+        user_function: Callable[[Lexer, FullFunctionName, Declaration, ContextStack, Context], None],
+    ):
+        """Add rule on the function name place"""
         self.functionNameRules.append(user_function)
 
     def AddLineRule(self, user_function: Callable[[Lexer, LineText, LineNumber], None]):
-        """ Add rule on the each line """
+        """Add rule on the each line"""
         self.lineRules.append(user_function)
 
     def AddRule(self, user_function: Callable[[Lexer, ContextStack], None]):
-        """ Add rule on any token """
+        """Add rule on any token"""
         self.rules.append(user_function)
 
-    def AddTypeNameRule(self, user_function: Callable[
-                                [Lexer, TypeName, TypeFullName,
-                                 Declaration, ContextStack, Context],
-                                None]):
-        """ Add rule on any type (class / struct / union / namespace / enum) """
+    def AddTypeNameRule(
+        self,
+        user_function: Callable[[Lexer, TypeName, TypeFullName, Declaration, ContextStack, Context], None],
+    ):
+        """Add rule on any type (class / struct / union / namespace / enum)"""
         self.typeNameRules.append(user_function)
 
     def AddTypeScopeRule(self, user_function: Callable[[Lexer, ContextStack], None]):
-        """ Add rule when the token is within a type definition scope """
+        """Add rule when the token is within a type definition scope"""
         self.typeScopeRules.append(user_function)
 
     def AddFileEndRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
-        """ Add rule on the file end """
+        """Add rule on the file end"""
         self.fileEndRules.append(user_function)
 
     def AddFileStartRule(self, user_function: Callable[[Lexer, FileName, DirName], None]):
-        """ Add rule on the file start """
+        """Add rule on the file start"""
         self.fileStartRules.append(user_function)
 
     def AddSessionEndRule(self, user_function: Callable[[], None]):
@@ -272,7 +267,7 @@ class RuleManager:
         self.sessionStartRules.append(user_function)
 
     def AddProjectRules(self, user_function: Callable[[TargetDirectory], None]):
-        """ Add rule on the project """
+        """Add rule on the project"""
         self.projectRules.append(user_function)
 
 
@@ -291,11 +286,10 @@ class RollbackImporter:
         return result
 
     def uninstall(self):
-        for modname in self.newModules.keys():
-            if modname.find("rules") != -1:
-                if modname not in self.previousModules:
-                    # Force reload when modname next imported
-                    del(sys.modules[modname])
+        for modname in self.newModules:
+            if modname.find("rules") != -1 and modname not in self.previousModules:
+                # Force reload when modname next imported
+                del sys.modules[modname]
         __builtins__["__import__"] = self.realImport
 
 

@@ -53,13 +53,13 @@ void KK::C()  // NS
     void FunctionB();  <== Don't care. It's the declared in the header.
 
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
 import nsiqcppstyle_reporter
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, fullName, decl, contextStack, context):
-    ext = lexer.filename[lexer.filename.rfind("."):]
+    ext = lexer.filename[lexer.filename.rfind(".") :]
     if not decl and ext != ".h" and context is not None:
         upperBlock = contextStack.SigPeek()
         if upperBlock is not None and upperBlock.type == "CLASS_BLOCK" and upperBlock.additional == "PRIVATE":
@@ -75,14 +75,15 @@ def RunRule(lexer, fullName, decl, contextStack, context):
         t2 = lexer.GetPrevTokenInType("COMMENT")
         lexer.PopTokenIndex()
         lexer.PushTokenIndex()
-        t3 = lexer.GetPrevTokenInTypeList(
-            ["SEMI", "PREPROCESSOR"], False, True)
+        t3 = lexer.GetPrevTokenInTypeList(["SEMI", "PREPROCESSOR"], False, True)
         lexer.PopTokenIndex()
-        if t2 is not None and t2.additional == "DOXYGEN":
-            if t3 is None or t.lexpos > t3.lexpos:
-                return
+        if t2 is not None and t2.additional == "DOXYGEN" and (t3 is None or t.lexpos > t3.lexpos):
+            return
         nsiqcppstyle_reporter.Error(
-            t, __name__, "Doxygen Comment should be provided in front of function (%s) in impl file." % fullName)
+            t,
+            __name__,
+            "Doxygen Comment should be provided in front of function (%s) in impl file." % fullName,
+        )
 
 
 ruleManager.AddFunctionNameRule(RunRule)
@@ -110,38 +111,45 @@ class testRule(nct):
         ruleManager.AddTypeScopeRule(RunTypeScopeRule)
 
     def test1(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void FunctionA() {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 /*
  *
  */
 extern void FunctionB() {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 class A {
 public:
     void ~A() {
     }
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 class J {
     /** HELLO */
     C() {
@@ -153,44 +161,53 @@ private :
     B() {}
 
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 /*
  *
  */
 static void FunctionB() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test6(self):
-        self.Analyze("thisfile.h",
-                     """
+        self.Analyze(
+            "thisfile.h",
+            """
 int a;
 void FunctionB(){
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test7(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int a;
 void FunctionB(){
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test8(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 class J {
     C() {
     }
 }
-""")
+""",
+        )
         self.ExpectError(__name__)

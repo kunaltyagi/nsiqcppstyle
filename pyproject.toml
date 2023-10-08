@@ -71,8 +71,8 @@ extra-dependencies = ["black>=23.9.0", "mypy>=1.5.0", "ruff>=0.0.290"]
 typing = "mypy --install-types --non-interactive {args:.}"
 # style = ["ruff {args:.}", "black --check --diff {args:.}"]
 style = ["black --check --diff {args:.}"]
-fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
-# fmt = ["black {args:.}"]
+# fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
+fmt = ["black {args:.}"]
 all = ["style", "typing"]
 
 [tool.hatch.build.targets.sdist]

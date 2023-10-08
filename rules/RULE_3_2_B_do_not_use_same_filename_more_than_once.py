@@ -18,10 +18,11 @@ Do not use same filenames more than once.
     testdir/stadfx.*
     testdir1/stdafx.*
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+import string
+
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
-import string
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 filenameMap = {}
 
@@ -37,9 +38,14 @@ def RunRule(lexer, filename, dirname):
         filenameMap[filename].append(os.path.join(dirname, filename))
     else:
         filenameMap[filename].append(os.path.join(dirname, filename))
-        nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0, 0), __name__,
-                                    'Do not use same filename(%s) more than once. This filename is used in %s' % (
-                                        filename, ", ".join(filenameMap[filename])))
+        nsiqcppstyle_reporter.Error(
+            DummyToken(lexer.filename, "", 0, 0),
+            __name__,
+            "Do not use same filename({}) more than once. This filename is used in {}".format(
+                filename,
+                ", ".join(filenameMap[filename]),
+            ),
+        )
 
 
 ruleManager.AddFileStartRule(RunRule)
@@ -57,7 +63,7 @@ class testRule(nct):
 
     def test1(self):
         """
-            Test for correct reporting of multiple files with same name
+        Test for correct reporting of multiple files with same name
         """
         self.Analyze("test/thisfile.c", "")
         self.Analyze("test2/thisfile.c", "")
@@ -65,7 +71,7 @@ class testRule(nct):
 
     def test2(self):
         """
-            Test for correct reporting of multiple files with different names
+        Test for correct reporting of multiple files with different names
         """
         self.Analyze("test/thisfile.c", "")
         self.Analyze("test/thisfile.h", "")
@@ -73,7 +79,7 @@ class testRule(nct):
 
     def test3(self):
         """
-                Test for correct resolution of exceptions
+        Test for correct resolution of exceptions
         """
         self.Analyze("test/stdafx.h", "")
         self.Analyze("test/stdafx.h", "")

@@ -19,10 +19,10 @@ and it doesn't report a violation on it.
     const int k = 3; <== OK
     const char *t = "EWEE"; <== OK
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, contextStack):
@@ -30,11 +30,9 @@ def RunRule(lexer, contextStack):
     if t.type == "PREPROCESSOR" and t.value.find("define") != -1:
         d = lexer.GetNextTokenSkipWhiteSpaceAndComment()
         k2 = lexer.GetNextTokenSkipWhiteSpaceAndComment()
-        if d.type == "ID" and k2 is not None and k2.type in [
-                "NUMBER", "STRING", "CHARACTOR"] and d.lineno == k2.lineno:
+        if d.type == "ID" and k2 is not None and k2.type in ["NUMBER", "STRING", "CHARACTOR"] and d.lineno == k2.lineno:
             if not Search("^_", d.value):
-                nsiqcppstyle_reporter.Error(d, __name__,
-                                            "Do not use macro(%s) for constant" % d.value)
+                nsiqcppstyle_reporter.Error(d, __name__, "Do not use macro(%s) for constant" % d.value)
 
 
 ruleManager.AddPreprocessRule(RunRule)
@@ -50,25 +48,37 @@ class testRule(nct):
         ruleManager.AddPreprocessRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 #define k 1
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 #define tt(A) 3
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 #  define t "ewew"
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 #  define _t "ewew"
-""")
+""",
+        )
         self.ExpectSuccess(__name__)

@@ -13,16 +13,19 @@ This rule only applied on the only 'c' file.
     testdir1/test1.c      <== OK.
 """
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, filename, dirname):
-    if filename[filename.rfind("."):] == ".c" and Search("[A-Z]", filename):
-        nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0, 0), __name__,
-                                    "Do not use uppercase for c file name (%s)." % filename)
+    if filename[filename.rfind(".") :] == ".c" and Search("[A-Z]", filename):
+        nsiqcppstyle_reporter.Error(
+            DummyToken(lexer.filename, "", 0, 0),
+            __name__,
+            "Do not use uppercase for c file name (%s)." % filename,
+        )
 
 
 ruleManager.AddFileStartRule(RunRule)

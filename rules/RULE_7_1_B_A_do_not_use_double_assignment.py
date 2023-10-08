@@ -20,18 +20,19 @@ if it's shown... this rule reports a violation.
     }
 
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, line, lineno):
-    if (Search(r"[a-zA-Z0-9]+\s*=\s*[a-zA-Z0-9]+\s*=", line)):
+    if Search(r"[a-zA-Z0-9]+\s*=\s*[a-zA-Z0-9]+\s*=", line):
         # Check it's not string. Followings are best guess....
-        if line.count("\"") == 0 and not line.endswith("\\"):
-            nsiqcppstyle_reporter.Error(DummyToken(
-                lexer.filename, line, lineno, 0), __name__, "Do not use double assignment in a same line")
+        if line.count('"') == 0 and not line.endswith("\\"):
+            nsiqcppstyle_reporter.Error(
+                DummyToken(lexer.filename, line, lineno, 0), __name__, "Do not use double assignment in a same line",
+            )
 
 
 ruleManager.AddLineRule(RunRule)
@@ -46,37 +47,51 @@ class testRule(nct):
         ruleManager.AddLineRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 void Hello() {
    int k = a = 2;
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 int k = c = 2;
 void Hello() {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 int k = 2; int j = 2;
 void Hello() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 a = "dsd=wew=e";
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 
         l_Req.strGameInfoString = "P=&P0=YW55Y2FsbDQ0Mw==&P1=S19VTklUVEVTVA==&P2=MjU3&P3=aHR0cDovL2hhbmNkbi5oYW5nYW1lLmNvbS\
                               9wdWIvcGxpaS9hbHBoYQ==&P4=U3FmYWplbzUyVm1JMStzamg4emREc0lNWDMvQkppRzR5ekttNFNFQ09MdzJXSjV\
@@ -99,5 +114,6 @@ a = "dsd=wew=e";
                               zUV9TSzI1TEtWZndxR2JtTkhwTU1Pczk0YWhNVXM3ZjdRWmVBZVVEMm52MVk0dTRMUGNreXhSZ1EzNVJyZER4UzBk\
                               TzZfRXdVRXNxRUNjY1V4ZmpaamRobEtvYUtQS19CNjhUay02LV9mMm5wQ2RGZDJrNDhXdHVROWxnaHFMbS1mdzNzT\
                               HdfMktsNjVGWC1uY3pVM0F6NVlUMFJ6UT09";
-""")
+""",
+        )
         self.ExpectSuccess(__name__)

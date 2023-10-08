@@ -24,10 +24,10 @@ if it's shown... this rule reports a violation.
     }
 """
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, contextStack):
@@ -50,17 +50,23 @@ class testRule(nct):
         ruleManager.AddPreprocessRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 void Hello() {
    goto TT:
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c", """
+        self.Analyze(
+            "thisfile.c",
+            """
 goto TT:
 void Hello() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)

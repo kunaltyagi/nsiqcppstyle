@@ -20,10 +20,10 @@ Please turn off this rule. If you think it's too overwhelming.
     }
 """
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, fullName, decl, contextStack, context):
@@ -31,15 +31,17 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     functionName = t.value.lower()
     k = 0
     t2 = None
-    while(True):
+    while True:
         t2 = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
         if t2 is None or k > 4 or t2.type == "SEMI":
             break
         if t2.value.lower() == "bool":
-            if not Search("^(has|is)",
-                          functionName) and functionName != "operator":
-                nsiqcppstyle_reporter.Error(t, __name__,
-                                            "The function name(%s) should start with has or is when returinning bool" % fullName)
+            if not Search("^(has|is)", functionName) and functionName != "operator":
+                nsiqcppstyle_reporter.Error(
+                    t,
+                    __name__,
+                    "The function name(%s) should start with has or is when returinning bool" % fullName,
+                )
             break
         k += 1
 
@@ -56,50 +58,64 @@ class testRule(nct):
         ruleManager.AddFunctionNameRule(RunRule)
 
     def test1(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 bool canHave() {
-}""")
+}""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 bool CTEST:canHave() {
-}""")
+}""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 extern bool CTEST:canHave() {
-}""")
+}""",
+        )
         self.ExpectError(__name__)
 
     def test4(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 extern int CTEST:canHave() {
-}""")
+}""",
+        )
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 extern int CTEST:isIt() {
-}""")
+}""",
+        )
         self.ExpectSuccess(__name__)
 
     def test6(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 class K {
 extern bool CTEST:canHave();
-}""")
+}""",
+        )
         self.ExpectError(__name__)
 
     def test7(self):
-        self.Analyze("test/thisFile.c", """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 /**
               *          Check if the requesting is necessary.
               */
@@ -111,20 +127,24 @@ extern bool CTEST:canHave();
               *          Add the exit gate item.
               */
              void AddGate(GATE gate){m_GateCont.push_back(gate); }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test8(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 boolean operator=();
 boolean KK::operator=();
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test9(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 /**
   * This tests for correct parsing of fn name and nested templates
   **/
@@ -136,12 +156,14 @@ bool canHave(ObjectTypePtr obj) {
 template<class ObjectTypeNotPtr,
          typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
 bool canHave(ObjectTypeNotPtr obj) {
-}""")
+}""",
+        )
         self.ExpectError(__name__)
 
     def test10(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 /**
   * This tests for correct parsing of fn name and nested templates
   **/
@@ -153,5 +175,6 @@ bool isIt(ObjectTypePtr obj) {
 template<class ObjectTypeNotPtr,
          typename = typename std::enable_if<!std::is_pointer<ObjectTypeNotPtr>::value>::type>
 bool isIt(ObjectTypeNotPtr obj) {
-}""")
+}""",
+        )
         self.ExpectSuccess(__name__)

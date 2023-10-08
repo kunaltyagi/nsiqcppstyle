@@ -65,7 +65,7 @@ class ConsoleOuputer:
             consoleHandler.setLevel(ConsoleOuputer.Level.Verbose)
 
             # Create formatter
-            formatter = logging.Formatter('%(message)s')
+            formatter = logging.Formatter("%(message)s")
 
             # Add formatter to consoleHandler
             consoleHandler.setFormatter(formatter)
@@ -90,7 +90,7 @@ class ConsoleOuputer:
 
         def __Format(self, *msgArgs):
             # Format output the same way a direct call to print would
-            return ' '.join(str(a) for a in msgArgs)
+            return " ".join(str(a) for a in msgArgs)
 
 
 _consoleOutputer = ConsoleOuputer()

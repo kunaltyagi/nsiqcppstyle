@@ -25,12 +25,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import nsiqcppstyle_checker
-from nsiqcppstyle_outputer import _consoleOutputer as console
 import unittest
-import nsiqcppstyle_rulemanager
+
+import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
+import nsiqcppstyle_rulemanager
 import nsiqcppstyle_state
+from nsiqcppstyle_outputer import _consoleOutputer as console
 
 errors = []
 
@@ -52,23 +53,19 @@ class nct(unittest.TestCase):
         errors = []
 
     def Analyze(self, filename, data):
-        nsiqcppstyle_checker.ProcessFile(
-            nsiqcppstyle_rulemanager.ruleManager, filename, data)
+        nsiqcppstyle_checker.ProcessFile(nsiqcppstyle_rulemanager.ruleManager, filename, data)
 
     def ExpectError(self, msg):
         result = self._CheckErrorContent(msg)
         # Error with message
-        self.assertTrue(result, "Expected error but got none")
+        assert result, "Expected error but got none"
 
     def ExpectSuccess(self, msg):
         global errors
         result = self._CheckErrorContent(msg)
         # Error with message
-        self.assertFalse(result, "Expected no error but got: " + str(errors))
+        assert not result, "Expected no error but got: " + str(errors)
 
     def _CheckErrorContent(self, msg):
         global errors
-        for err in errors:
-            if err[1] == msg:
-                return True
-        return False
+        return any(err[1] == msg for err in errors)
