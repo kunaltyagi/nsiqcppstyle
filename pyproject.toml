@@ -27,8 +27,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "pip_search"
 ]
 test = [
+  "pytest == 7.4.*",
 ]
 
 [project.urls]
@@ -44,8 +46,16 @@ allow-direct-references = true
 
 [tool.hatch.envs.default]
 dependencies = []
-features = ["dev", "test"]
+features = ["dev"]
+python = "3.8"
 [tool.hatch.envs.default.scripts]
+search = "pip_search {args:.}"
+update = "python --version; echo Updated packages"
+
+[tool.hatch.envs.test]
+dependencies = []
+features = ["test"]
+[tool.hatch.envs.test.scripts]
 test = "pytest --failed-first {args:tests}"
 tdd = "pytest --last-failed --exitfirst --pdb {args:tests}"
 watch_test = "ptw . --failed-first {args:tests}"
@@ -57,16 +67,14 @@ cov-report = [
   "coverage html",
 ]
 cov = ["test-cov", "cov-report"]
-search = "pip_search {args:.}"
-update = "python --version; echo Updated packages"
 
-[[tool.hatch.envs.default.matrix]]
+[[tool.hatch.envs.test.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
-[[tool.hatch.envs.lint.matrix]]
-python = ["3.8"]
 
 [tool.hatch.envs.lint]
 extra-dependencies = ["black>=23.9.0", "mypy>=1.5.0", "ruff>=0.0.290"]
+features = ["test"]
+python = "3.8"
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:.}"
 # style = ["ruff {args:.}", "black --check --diff {args:.}"]
