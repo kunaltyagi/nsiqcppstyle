@@ -29,7 +29,7 @@
 
 # Jim Washington 7 Aug 2005.
 
-from re import compile, sub, search, DOTALL  # @UnusedImport
+from re import DOTALL, compile, search, sub  # @UnusedImport
 
 # set to true if transmission size is much more important than speed
 # only affects writing, and makes a minimal difference in output size.
@@ -37,33 +37,34 @@ alwaysStripWhiteSpace = False
 
 # add to this string if you wish to exclude additional math operators
 # from reading.
-badOperators = '*'
+badOperators = "*"
 
 #################################
 #      read JSON object         #
 #################################
 
-slashstarcomment = compile(r'/\*.*?\*/', DOTALL)
-doubleslashcomment = compile(r'//.*\n')
+slashstarcomment = compile(r"/\*.*?\*/", DOTALL)
+doubleslashcomment = compile(r"//.*\n")
 
 
 def _Read(aString):
     """Use eval in a 'safe' way to turn javascript expression into
-       a python expression.  Allow only True, False, and None in global
-       __builtins__, and since those map as true, false, null in
-       javascript, pass those as locals
+    a python expression.  Allow only True, False, and None in global
+    __builtins__, and since those map as true, false, null in
+    javascript, pass those as locals
     """
     try:
-        result = eval(aString,
-                      {"__builtins__": {'True': True, 'False': False, 'None': None}},
-                      {'null': None, 'true': True, 'false': False})
+        result = eval(
+            aString,
+            {"__builtins__": {"True": True, "False": False, "None": None}},
+            {"null": None, "true": True, "false": False},
+        )
     except NameError:
-        raise ReadException(
-            "Strings must be quoted. Could not read '%s'." %
-            aString)
+        raise ReadException("Strings must be quoted. Could not read '%s'." % aString)
     except SyntaxError:
         raise ReadException("Syntax error.  Could not read '%s'." % aString)
     return result
+
 
 # badOperators is defined at the top of the module
 
@@ -71,13 +72,11 @@ def _Read(aString):
 # generate the regexes for math detection
 regexes = {}
 for operator in badOperators:
-    if operator in '+*':
+    if operator in "+*":
         # '+' and '*' need to be escaped with \ in re
-        regexes[operator, 'numeric operation'] \
-            = compile(r"\d*\s*\%s|\%s\s*\d*" % (operator, operator))
+        regexes[operator, "numeric operation"] = compile(fr"\d*\s*\{operator}|\{operator}\s*\d*")
     else:
-        regexes[operator, 'numeric operation'] \
-            = compile(r"\d*\s*%s|%s\s*\d*" % (operator, operator))
+        regexes[operator, "numeric operation"] = compile(fr"\d*\s*{operator}|{operator}\s*\d*")
 
 
 def _getStringState(aSequence):
@@ -96,17 +95,15 @@ def _getStringState(aSequence):
 
 def _sanityCheckMath(aString):
     """just need to check that, if there is a math operator in the
-       client's JSON, it is inside a quoted string. This is mainly to
-       keep client from successfully sending 'D0S'*9**9**9**9...
-       Return True if OK, False otherwise
+    client's JSON, it is inside a quoted string. This is mainly to
+    keep client from successfully sending 'D0S'*9**9**9**9...
+    Return True if OK, False otherwise
     """
     for operator in badOperators:
         # first check, is it a possible math operation?
-        if regexes[(operator, 'numeric operation')
-                   ].search(aString) is not None:
+        if regexes[(operator, "numeric operation")].search(aString) is not None:
             # OK.  possible math operation. get the operator's locations
-            getlocs = regexes[(operator, 'numeric operation')
-                              ].finditer(aString)
+            getlocs = regexes[(operator, "numeric operation")].finditer(aString)
             locs = [item.span() for item in getlocs]
             halfStrLen = len(aString) / 2
             # fortunately, this should be rare
@@ -118,7 +115,7 @@ def _sanityCheckMath(aString):
                 if exprStart <= halfStrLen:
                     teststr = aString[:exprStart]
                 else:
-                    teststr = list(aString[exprEnd + 1:])
+                    teststr = list(aString[exprEnd + 1 :])
                     teststr.reverse()
                 if not _getStringState(teststr):
                     return False
@@ -127,7 +124,7 @@ def _sanityCheckMath(aString):
 
 def safeRead(aString):
     """turn the js into happier python and check for bad operations
-       before sending it to the interpreter
+    before sending it to the interpreter
     """
     # get rid of trailing null. Konqueror appends this, and the python
     # interpreter balks when it is there.
@@ -137,16 +134,16 @@ def safeRead(aString):
     # strip leading and trailing whitespace
     aString = aString.strip()
     # zap /* ... */ comments
-    aString = slashstarcomment.sub('', aString)
+    aString = slashstarcomment.sub("", aString)
     # zap // comments
-    aString = doubleslashcomment.sub('', aString)
+    aString = doubleslashcomment.sub("", aString)
     # here, we only check for the * operator as a DOS problem by default;
     # additional operators may be excluded by editing badOperators
     # at the top of the module
     if _sanityCheckMath(aString):
         return _Read(aString)
     else:
-        raise ReadException('Unacceptable JSON expression: %s' % aString)
+        raise ReadException("Unacceptable JSON expression: %s" % aString)
 
 
 read = safeRead
@@ -157,7 +154,11 @@ read = safeRead
 
 # alwaysStripWhiteSpace is defined at the top of the module
 
-tfnTuple = (('True', 'true'), ('False', 'false'), ('None', 'null'),)
+tfnTuple = (
+    ("True", "true"),
+    ("False", "false"),
+    ("None", "null"),
+)
 
 
 def _replaceTrueFalseNone(aString):
@@ -170,27 +171,27 @@ def _replaceTrueFalseNone(aString):
 
 def _handleCode(subStr, stripWhiteSpace):
     """replace True, False, and None with javascript counterparts if
-       appropriate, remove unicode u's, fix long L's, make tuples
-       lists, and strip white space if requested
+    appropriate, remove unicode u's, fix long L's, make tuples
+    lists, and strip white space if requested
     """
-    if 'e' in subStr:
+    if "e" in subStr:
         # True, False, and None have 'e' in them. :)
-        subStr = (_replaceTrueFalseNone(subStr))
+        subStr = _replaceTrueFalseNone(subStr)
     if stripWhiteSpace:
         # re.sub might do a better job, but takes longer.
         # Spaces are the majority of the whitespace, anyway...
-        subStr = subStr.replace(' ', '')
+        subStr = subStr.replace(" ", "")
     if subStr[-1] in "uU":
         # remove unicode u's
         subStr = subStr[:-1]
     if "L" in subStr:
         # remove Ls from long ints
-        subStr = subStr.replace("L", '')
+        subStr = subStr.replace("L", "")
     # do tuples as lists
     if "(" in subStr:
-        subStr = subStr.replace("(", '[')
+        subStr = subStr.replace("(", "[")
     if ")" in subStr:
-        subStr = subStr.replace(")", ']')
+        subStr = subStr.replace(")", "]")
     return subStr
 
 
@@ -214,11 +215,11 @@ def doQuotesSwapping(aString):
         endchar = tempstr[-1]
         ts1 = tempstr[1:-2]
         ts1 = ts1.replace("'", escapedSingleQuote)
-        ts1 = "'%s'%s" % (ts1, endchar)
+        ts1 = f"'{ts1}'{endchar}"
         s.append(ts1)
         prevend = end
     s.append(aString[prevend:])
-    return ''.join(s)
+    return "".join(s)
 
 
 def _pyexpr2jsexpr(aString, stripWhiteSpace):
@@ -233,8 +234,8 @@ def _pyexpr2jsexpr(aString, stripWhiteSpace):
     if stripWhiteSpace is True, remove spaces, etc from the non-string
     text.
     """
-#    inSingleQuote = False
-#    inDoubleQuote = False
+    #    inSingleQuote = False
+    #    inDoubleQuote = False
     # python will quote with " when there is a ' in the string,
     # so fix that first
     if redoublequotedstring.search(aString):
@@ -242,7 +243,7 @@ def _pyexpr2jsexpr(aString, stripWhiteSpace):
     marker = None
     if escapedSingleQuote in aString:
         # replace escaped single quotes with a marker
-        marker = markerBase = '|'
+        marker = markerBase = "|"
         markerCount = 1
         while marker in aString:
             # if the marker is already there, make it different

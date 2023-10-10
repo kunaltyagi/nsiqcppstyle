@@ -17,10 +17,10 @@ So it only counts non blank line.
 
 """
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, fullName, decl, contextStack, context):
@@ -28,12 +28,15 @@ def RunRule(lexer, fullName, decl, contextStack, context):
         startline = context.startToken.lineno
         endline = context.endToken.lineno
         count = 0
-        for eachLine in lexer.lines[startline - 1:endline - 1]:
+        for eachLine in lexer.lines[startline - 1 : endline - 1]:
             if not Match(r"^\s*$", eachLine):
                 count += 1
         if count > 200:
             nsiqcppstyle_reporter.Error(
-                context.startToken, __name__, "Do not write function over non blank 200 lines(%s)." % fullName)
+                context.startToken,
+                __name__,
+                "Do not write function over non blank 200 lines(%s)." % fullName,
+            )
 
 
 ruleManager.AddFunctionNameRule(RunRule)

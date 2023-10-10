@@ -2,6 +2,14 @@
 
 nsiqcppstyle is one of the most customizable cpp style checkers about.
 
+## Development
+Please install [hatch](hatch.pypa.io/) using `pip install hatch`. You can either use `hatch run <command>` or activate the virtual environment using `hatch shell <$SHELL>`
+
+Some handy commands:
+
+* `hatch run lint:fmt`: Format code
+* `hatch run update`: Update dependencies post change in `pyproject.toml`
+
 ## Features
 
 * Checks more than 47 rules. You can find the available rules in http://nsiqcppstyle.appspot.com or run the command (given below)

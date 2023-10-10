@@ -22,10 +22,10 @@ When you have to use such sentence, please // NS in the end of line to ignore th
     }
 
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, fullName, decl, contextStack, context):
@@ -34,14 +34,17 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     rparen = lexer.GetNextMatchingToken()
     lexer.PopTokenIndex()
     count = 0
-    while(True):
+    while True:
         t = lexer.GetNextToken(True, True, True, True)
         if t.type == "COMMA":
             count += 1
         elif rparen == t:
             if count >= 5:
                 nsiqcppstyle_reporter.Error(
-                    t, __name__, "function (%s) has more than 5 parameters. please use struct instead." % fullName)
+                    t,
+                    __name__,
+                    "function (%s) has more than 5 parameters. please use struct instead." % fullName,
+                )
             break
 
 
@@ -58,35 +61,43 @@ class testRule(nct):
         ruleManager.AddFunctionNameRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int functionA(int *a, int b, int c, int d, Scope<T,J> a) {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int functionA(int *a, int b, int c,   Scope<T,J> a) {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 int functionA(int *a, int b, int c, tt&b, aa*s, k a) {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 class T {
 int functionA(int *a, int b, int c, tt&b, aa*s, k a) {
 }
 };
-""")
+""",
+        )
         self.ExpectError(__name__)

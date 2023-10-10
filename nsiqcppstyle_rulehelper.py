@@ -26,6 +26,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sre_compile
+
 import nsiqcppstyle_state
 
 _regexp_compile_cache = {}
@@ -36,44 +37,44 @@ def Match(pattern, s):
     # The regexp compilation caching is inlined in both Match and Search for
     # performance reasons; factoring it out into a separate function turns out
     # to be noticeably expensive.
-    if not pattern in _regexp_compile_cache:
+    if pattern not in _regexp_compile_cache:
         _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
     return _regexp_compile_cache[pattern].match(s)
 
 
 def Search(pattern, s):
     """Searches the string for the pattern, caching the compiled regexp."""
-    if not pattern in _regexp_compile_cache:
+    if pattern not in _regexp_compile_cache:
         _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
     return _regexp_compile_cache[pattern].search(s)
 
 
 def FindAll(pattern, s):
     """Searches the string for the pattern, caching the compiled regexp."""
-    if not pattern in _regexp_compile_cache:
+    if pattern not in _regexp_compile_cache:
         _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
     return _regexp_compile_cache[pattern].findall(s)
 
 
 def GetRealColumn(token):
-    """ Get the token's real column """
+    """Get the token's real column"""
     tabsize = int(nsiqcppstyle_state._nsiqcppstyle_state.GetVar("tabsize", 4))
 
-    line = token.line[:token.column]
+    line = token.line[: token.column]
     tabCount = line.count("\t")
     return len(line) + tabCount * (tabsize - 1)
 
 
 def GetIndentation(token):
-    """ Get indentation of the line in which the tokens exists"""
+    """Get indentation of the line in which the tokens exists"""
     tabsize = int(nsiqcppstyle_state._nsiqcppstyle_state.GetVar("tabsize", 4))
 
     line = token.line
     indent = 0
     for char in line:
-        if char == ' ':
+        if char == " ":
             indent += 1
-        elif char == '\t':
+        elif char == "\t":
             indent += tabsize
         else:
             break
@@ -81,7 +82,7 @@ def GetIndentation(token):
 
 
 def IsConstructor(value, fullName, context):
-    """ Check if the passed value is the constructor or destructor """
+    """Check if the passed value is the constructor or destructor"""
     fullName = fullName.replace("~", "")
     names = fullName.split("::")
     if len(names) != 1 and names[-1] == value:
@@ -95,7 +96,7 @@ def IsConstructor(value, fullName, context):
 
 
 def IsOperator(value):
-    """ Check if the passed value is 'operator' """
+    """Check if the passed value is 'operator'"""
     if value is not None and value == "operator":
         return True
     return False

@@ -1,13 +1,18 @@
-import re
-import nsiqcppstyle_util
+import contextlib
 import os
+import re
 import urllib
+
+import nsiqcppstyle_util
 from nsiqcppstyle_util import *
+
 try:
     import hashlib
+
     md5_constructor = hashlib.md5
 except ImportError:
     import md5
+
     md5_constructor = md5.new
 
 url = "http://nsiqcppstyle.appspot.com"
@@ -16,75 +21,71 @@ url = "http://nsiqcppstyle.appspot.com"
 def Update(currentVersion):
     import httplib
     import urllib2
+
     systemKey = nsiqcppstyle_util.GetSystemKey()
     # Get the latest version info
     try:
-        print('Update: checking for update')
+        print("Update: checking for update")
         print(url + "/update/" + systemKey)
         request = urllib2.urlopen(url + "/update/" + systemKey)
         response = request.read()
     except urllib2.HTTPError as e:
-        raise Exception(
-            'Unable to get latest version info - HTTPError = ' + str(e))
+        raise Exception("Unable to get latest version info - HTTPError = " + str(e))
 
     except urllib2.URLError as e:
-        raise Exception(
-            'Unable to get latest version info - URLError = ' + str(e))
+        raise Exception("Unable to get latest version info - URLError = " + str(e))
 
-    except httplib.HTTPException as e:
-        raise Exception('Unable to get latest version info - HTTPException')
+    except httplib.HTTPException:
+        msg = "Unable to get latest version info - HTTPException"
+        raise Exception(msg)
 
     except Exception as e:
-        raise Exception(
-            'Unable to get latest version info - Exception = ' + str(e))
+        raise Exception("Unable to get latest version info - Exception = " + str(e))
 
     updateInfo = None
     import updateagent.minjson
+
     try:
         updateInfo = updateagent.minjson.safeRead(response)
     except Exception as e:
         print(e)
-        raise Exception('Unable to get latest version info. Try again later.')
+        msg = "Unable to get latest version info. Try again later."
+        raise Exception(msg)
 
-    if Version(updateInfo['version']) > Version(currentVersion):
-        print('A new version is available.')
+    if Version(updateInfo["version"]) > Version(currentVersion):
+        print("A new version is available.")
 
         # Loop through the new files and call the download function
-        for agentFile in updateInfo['files']:
-
-            #win32str = agentFile["name"].replace("/", "\\")
+        for agentFile in updateInfo["files"]:
+            # win32str = agentFile["name"].replace("/", "\\")
             eachFileName = agentFile["name"]
-            if (eachFileName.endswith(".dll") or
-                    eachFileName.endswith(".zip") or
-                    eachFileName.endswith(".exe")):
+            if eachFileName.endswith((".dll", ".zip", ".exe")):
                 continue
-            filestr = os.path.join(nsiqcppstyle_util.GetRuntimePath(),
-                                   agentFile["name"])
+            filestr = os.path.join(nsiqcppstyle_util.GetRuntimePath(), agentFile["name"])
 
             if os.path.exists(filestr):
                 checksum = md5_constructor()
-                f = open(filestr, 'rb').read()
+                f = open(filestr, "rb").read()
                 checksum.update(f)
                 if agentFile["md5"] == checksum.hexdigest():
                     continue
 
-            agentFile['tempFile'] = DownloadFile(url, agentFile, systemKey)
-            if agentFile['tempFile'] is None:
-                print("Update Failed while downloading : " + agentFile['name'])
-                return
-            agentFile['new'] = True
+            agentFile["tempFile"] = DownloadFile(url, agentFile, systemKey)
+            if agentFile["tempFile"] is None:
+                print("Update Failed while downloading : " + agentFile["name"])
+                return None
+            agentFile["new"] = True
         import shutil
+
         runtimePath = nsiqcppstyle_util.GetRuntimePath()
 
-        for agentFile in updateInfo['files']:
+        for agentFile in updateInfo["files"]:
             eachFileName = agentFile["name"]
-            if (eachFileName.endswith(".dll") or
-                    eachFileName.endswith(".zip") or
-                    eachFileName.endswith(".exe")):
+            if eachFileName.endswith((".dll", ".zip", ".exe")):
                 continue
-            if agentFile.get('new', None) is not None:
-                print('Updating ' + agentFile['name'])
-                newModule = os.path.join(runtimePath, agentFile['name'])
+            if agentFile.get("new", None) is not None:
+                print("Updating " + agentFile["name"])
+                newModule = os.path.join(runtimePath, agentFile["name"])
 
                 try:
                     if os.path.exists(newModule):
@@ -92,38 +93,41 @@ def Update(currentVersion):
                         basedirname = os.path.dirname(newModule)
                     if not os.path.exists(basedirname):
                         os.makedirs(basedirname)
-                    shutil.move(agentFile['tempFile'], newModule)
-                except OSError as e:
+                    shutil.move(agentFile["tempFile"], newModule)
+                except OSError:
                     pass
         return True
     return False
 
 
 def DownloadFile(url, agentFile, systemKey, recursed=False):
-    print('Downloading ' + agentFile['name'])
-    downloadedFile = urllib.urlretrieve(url + '/update/' + systemKey +
-                                        "/" + agentFile['name'])
+    print("Downloading " + agentFile["name"])
+    downloadedFile = urllib.urlretrieve(url + "/update/" + systemKey + "/" + agentFile["name"])
 
     checksum = md5_constructor()
 
-    f = open(downloadedFile[0], 'rb')
+    f = open(downloadedFile[0], "rb")
     part = f.read()
     checksum.update(part)
     f.close()
     # Do we have a match?
-    if checksum.hexdigest() == agentFile['md5']:
+    if checksum.hexdigest() == agentFile["md5"]:
         return downloadedFile[0]
     else:
         # Try once more
-        if recursed == False:
+        if recursed is False:
             DownloadFile(url, agentFile, systemKey, True)
+            return None
         else:
-            print(agentFile['name'] + ' did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.')
+            print(
+                agentFile["name"]
+                + " did not match its checksum - it is corrupted. This may be caused by network issues so please try again in a moment.",
+            )
             return None
 
 
 class Version:
-    component_re = re.compile(r'(\d+ | [a-z]+ | \.)', re.VERBOSE)
+    component_re = re.compile(r"(\d+ | [a-z]+ | \.)", re.VERBOSE)
 
     def __init__(self, vstring=None):
         if vstring:
@@ -134,14 +138,11 @@ class Version:
         # from the parsed tuple -- so I just store the string here for
         # use by __str__
         self.vstring = vstring
-        components = list(filter(lambda x: x and x != '.',
-                                 self.component_re.split(vstring)))
+        components = list(filter(lambda x: x and x != ".", self.component_re.split(vstring)))
 
         for i in range(len(components)):
-            try:
+            with contextlib.suppress(ValueError):
                 components[i] = int(components[i])
-            except ValueError:
-                pass
 
         self.version = components
 

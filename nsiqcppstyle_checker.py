@@ -28,82 +28,135 @@
 
 import os
 import traceback
+
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_rulehelper import *  # @UnusedWildImport
+
 # Reserved words
 
 tokens = [
-    'ID',
+    "ID",
     # Operators (+,-,*,/,%,|,&,~,^,<<,>>, ||, &&, !, <, <=, >, >=, ==, !=, <=>)
-    'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MODULO',
-    'OR', 'AND', 'NOT', 'XOR', 'LSHIFT', 'RSHIFT',
-    'LOR', 'LAND', 'LNOT',
-    'LT', 'LE', 'GT', 'GE', 'EQ', 'NE', 'SPACESHIP',
-
+    "PLUS",
+    "MINUS",
+    "TIMES",
+    "DIVIDE",
+    "MODULO",
+    "OR",
+    "AND",
+    "NOT",
+    "XOR",
+    "LSHIFT",
+    "RSHIFT",
+    "LOR",
+    "LAND",
+    "LNOT",
+    "LT",
+    "LE",
+    "GT",
+    "GE",
+    "EQ",
+    "NE",
+    "SPACESHIP",
     # Assignment (=, *=, /=, %=, +=, -=, <<=, >>=, &=, ^=, |=)
-    'EQUALS', 'TIMESEQUAL', 'DIVEQUAL', 'MODEQUAL', 'PLUSEQUAL', 'MINUSEQUAL',
-    'LSHIFTEQUAL', 'RSHIFTEQUAL', 'ANDEQUAL', 'XOREQUAL', 'OREQUAL',
-
+    "EQUALS",
+    "TIMESEQUAL",
+    "DIVEQUAL",
+    "MODEQUAL",
+    "PLUSEQUAL",
+    "MINUSEQUAL",
+    "LSHIFTEQUAL",
+    "RSHIFTEQUAL",
+    "ANDEQUAL",
+    "XOREQUAL",
+    "OREQUAL",
     # Increment/decrement (++,--)
-    'PLUSPLUS', 'MINUSMINUS',
-
+    "PLUSPLUS",
+    "MINUSMINUS",
     # Structure dereference (->)
-    'ARROW',
-
+    "ARROW",
     # Ternary operator (?)
-    'TERNARY',
-
+    "TERNARY",
     # Delimeters ( ) [ ] { } , . ; :
-    'LPAREN', 'RPAREN',
-    'LBRACKET', 'RBRACKET',
-    'LBRACE', 'RBRACE',
-    'COMMA', 'PERIOD', 'SEMI', 'COLON', 'DOUBLECOLON',
-
+    "LPAREN",
+    "RPAREN",
+    "LBRACKET",
+    "RBRACKET",
+    "LBRACE",
+    "RBRACE",
+    "COMMA",
+    "PERIOD",
+    "SEMI",
+    "COLON",
+    "DOUBLECOLON",
     # Ellipsis (...)
-    'ELLIPSIS',
-
+    "ELLIPSIS",
     # macro
-    'PREPROCESSOR',
-    'SHARPSHARP',
-    'SHARP',
-
+    "PREPROCESSOR",
+    "SHARPSHARP",
+    "SHARP",
     #
-    'NUMBER',
-    'CHARACTER', 'STRING',
-    'SPACE',
-    'COMMENT', 'CPPCOMMENT',
-    'LINEFEED',
-
-    'PREPROCESSORNEXT',
-    'ASM',
-    'IGNORE', 'DEFAULT', 'DELETE',
-
+    "NUMBER",
+    "CHARACTER",
+    "STRING",
+    "SPACE",
+    "COMMENT",
+    "CPPCOMMENT",
+    "LINEFEED",
+    "PREPROCESSORNEXT",
+    "ASM",
+    "IGNORE",
+    "DEFAULT",
+    "DELETE",
     # cast
-    'CONST_CAST', 'DYNAMIC_CAST', 'REINTERPRET_CAST', 'STATIC_CAST',
-
+    "CONST_CAST",
+    "DYNAMIC_CAST",
+    "REINTERPRET_CAST",
+    "STATIC_CAST",
     # control
-    'CONST',
-    'WHILE', 'IF', 'FOR', 'DO', 'ELSE',
-    'ENUM', 'EXPORT', 'EXTERN', 'TRUE', 'FALSE', 'GOTO',
-    'SWITCH', 'CASE', 'CONTST', 'CATCH',
-    'BREAK', 'CONTINUE',
-    'TRY', 'THROW',
-
+    "CONST",
+    "WHILE",
+    "IF",
+    "FOR",
+    "DO",
+    "ELSE",
+    "ENUM",
+    "EXPORT",
+    "EXTERN",
+    "TRUE",
+    "FALSE",
+    "GOTO",
+    "SWITCH",
+    "CASE",
+    "CONTST",
+    "CATCH",
+    "BREAK",
+    "CONTINUE",
+    "TRY",
+    "THROW",
     # Operator
-    'NEW', 'OPERATOR',
-    'SIZEOF',
-
-    'INLINE', 'NAMESPACE', 'RETURN',
-
+    "NEW",
+    "OPERATOR",
+    "SIZEOF",
+    "INLINE",
+    "NAMESPACE",
+    "RETURN",
     # visibility
-    'PUBLIC', 'PRIVATE', 'PROTECTED',
-
+    "PUBLIC",
+    "PRIVATE",
+    "PROTECTED",
     # Type
-    'STATIC', 'STRUCT', 'TEMPLATE', 'THIS', 'TYPEDEF',
-    'TYPENAME', 'UNION', 'USING', 'VIRTUAL',
-    'CLASS', "AUTO",
-
-
+    "STATIC",
+    "STRUCT",
+    "TEMPLATE",
+    "THIS",
+    "TYPEDEF",
+    "TYPENAME",
+    "UNION",
+    "USING",
+    "VIRTUAL",
+    "CLASS",
+    "AUTO",
     "CHAR",
     "INT",
     "LONG",
@@ -111,75 +164,75 @@ tokens = [
     "FLOAT",
     "SHORT",
     "BOOL",
-    "VOID"
+    "VOID",
 ]
 
 # Operators
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_MODULO = r'%'
-t_OR = r'\|'
-t_AND = r'&'
-t_NOT = r'~'
-t_XOR = r'\^'
-t_LSHIFT = r'<<'
-t_RSHIFT = r'>>'
-t_LOR = r'\|\|'
-t_LAND = r'&&'
-t_LNOT = r'!'
-t_LT = r'<'
-t_GT = r'>'
-t_LE = r'<='
-t_GE = r'>='
-t_EQ = r'=='
-t_NE = r'!='
-t_SPACESHIP = r'<=>'
-t_DOUBLECOLON = r'::'
+t_PLUS = r"\+"
+t_MINUS = r"-"
+t_TIMES = r"\*"
+t_DIVIDE = r"/"
+t_MODULO = r"%"
+t_OR = r"\|"
+t_AND = r"&"
+t_NOT = r"~"
+t_XOR = r"\^"
+t_LSHIFT = r"<<"
+t_RSHIFT = r">>"
+t_LOR = r"\|\|"
+t_LAND = r"&&"
+t_LNOT = r"!"
+t_LT = r"<"
+t_GT = r">"
+t_LE = r"<="
+t_GE = r">="
+t_EQ = r"=="
+t_NE = r"!="
+t_SPACESHIP = r"<=>"
+t_DOUBLECOLON = r"::"
 # Assignment operators
 
-t_PREPROCESSOR = r'\#\s*[A-Za-z_][A-Za-z0-9_]*'
-t_EQUALS = r'='
-t_TIMESEQUAL = r'\*='
-t_DIVEQUAL = r'/='
-t_MODEQUAL = r'%='
-t_PLUSEQUAL = r'\+='
-t_MINUSEQUAL = r'-='
-t_LSHIFTEQUAL = r'<<='
-t_RSHIFTEQUAL = r'>>='
-t_ANDEQUAL = r'&='
-t_OREQUAL = r'\|='
-t_XOREQUAL = r'\^='
+t_PREPROCESSOR = r"\#\s*[A-Za-z_][A-Za-z0-9_]*"
+t_EQUALS = r"="
+t_TIMESEQUAL = r"\*="
+t_DIVEQUAL = r"/="
+t_MODEQUAL = r"%="
+t_PLUSEQUAL = r"\+="
+t_MINUSEQUAL = r"-="
+t_LSHIFTEQUAL = r"<<="
+t_RSHIFTEQUAL = r">>="
+t_ANDEQUAL = r"&="
+t_OREQUAL = r"\|="
+t_XOREQUAL = r"\^="
 
 # Increment/decrement
-t_PLUSPLUS = r'\+\+'
-t_MINUSMINUS = r'--'
+t_PLUSPLUS = r"\+\+"
+t_MINUSMINUS = r"--"
 
 # ->
-t_ARROW = r'->'
+t_ARROW = r"->"
 
 # ?
-t_TERNARY = r'\?'
+t_TERNARY = r"\?"
 
 # Delimiters
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
-t_LBRACKET = r'\['
-t_RBRACKET = r'\]'
-t_LBRACE = r'\{'
-t_RBRACE = r'\}'
-t_COMMA = r','
-t_PERIOD = r'\.'
-t_SEMI = r';'
-t_COLON = r':'
-t_ELLIPSIS = r'\.\.\.'
+t_LPAREN = r"\("
+t_RPAREN = r"\)"
+t_LBRACKET = r"\["
+t_RBRACKET = r"\]"
+t_LBRACE = r"\{"
+t_RBRACE = r"\}"
+t_COMMA = r","
+t_PERIOD = r"\."
+t_SEMI = r";"
+t_COLON = r":"
+t_ELLIPSIS = r"\.\.\."
 
 
 # Identifiers
 def t_ID(t):
-    r'[A-Za-z_][A-Za-z0-9_]*'
-    t.type = reserved.get(t.value, 'ID')
+    r"[A-Za-z_][A-Za-z0-9_]*"
+    t.type = reserved.get(t.value, "ID")
     return t
 
 
@@ -259,7 +312,7 @@ reserved = {
     "dllexport": "IGNORE",
     "final": "IGNORE",
     "override": "IGNORE",
-    "noexcept": "IGNORE"
+    "noexcept": "IGNORE",
 }
 
 
@@ -269,55 +322,56 @@ def t_IGNORE(t):
 
 
 def t_LINEFEED(t):
-    r'[\n]+'
-    t.lexer.lineno += t.value.count('\n')
+    r"[\n]+"
+    t.lexer.lineno += t.value.count("\n")
     return t
 
 
 def t_SPACE(t):
-    r'[ \t]+'
+    r"[ \t]+"
     return t
 
 
 t_PREPROCESSORNEXT = r"\\"
 
-t_NUMBER = r'[0-9][0-9XxA-Fa-fL]*'
+t_NUMBER = r"[0-9][0-9XxA-Fa-fL]*"
 
-t_SHARPSHARP = r'\#\#'
+t_SHARPSHARP = r"\#\#"
 
-t_SHARP = r'\#'
+t_SHARP = r"\#"
 
 # String literal
 
 
 def t_STRING(t):
     r'"([^\\]|(\\.)|(\\\n))*?"'
-    t.lexer.lineno += t.value.count('\n')
+    t.lexer.lineno += t.value.count("\n")
     return t
 
 
 # Character constant 'c' or L'c'
-t_CHARACTER = r'(L)?\'([^\\\n]|(\\.))*?\''
+t_CHARACTER = r"(L)?\'([^\\\n]|(\\.))*?\'"
 
 # Comment (C-Style)
 
 
 def t_COMMENT(t):
-    r'/\*(.|\n)*?\*/'
-    t.lexer.lineno += t.value.count('\n')
+    r"/\*(.|\n)*?\*/"
+    t.lexer.lineno += t.value.count("\n")
     if Search(r"/\*\*\s", t.value):
-        t.additional = 'DOXYGEN'
+        t.additional = "DOXYGEN"
     return t
+
 
 # Comment (C++-Style)
 
 
 def t_CPPCOMMENT(t):
-    r'//.*'
+    r"//.*"
     if Search(r"^///\b", t.value):
-        t.additional = 'DOXYGEN'
+        t.additional = "DOXYGEN"
     if Search(r"^///<", t.value):
-        t.additional = 'DOXYGENPOST'
+        t.additional = "DOXYGENPOST"
 
     return t
 
@@ -327,7 +381,7 @@ def t_error(t):
     t.lexer.skip(1)
 
 
-class CppLexerNavigator(object):
+class CppLexerNavigator:
     """
     Main class for Cpp Lexer
     """
@@ -341,6 +395,7 @@ class CppLexerNavigator(object):
         self.reverseMatchingPair = {}
         self.ifdefstack = []
         import nsiqcppstyle_lexer
+
         lexer = nsiqcppstyle_lexer.lex()
         self.data = data
         if data is None:
@@ -349,8 +404,10 @@ class CppLexerNavigator(object):
                     self.data = f.read()
                 except UnicodeDecodeError as ex:
                     console.Out.Ci("[ERROR] UnicodeDecodeError in CppLexerNavigator: " + str(ex))
-                    console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
-                    raise ex
+                    console.Out.Ci(
+                        "[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename),
+                    )
+                    raise
         self.lines = self.data.splitlines()
         lexer.input(self.data)
         index = 0
@@ -366,10 +423,10 @@ class CppLexerNavigator(object):
             tok.line = self.lines[tok.lineno - 1]
             tok.filename = self.filename
             tok.pp = None
-#                self.ProcessIfdef(tok)
+        #                self.ProcessIfdef(tok)
         self.tokenlistsize = len(self.tokenlist)
         self.PushTokenIndex()
-        while(True):
+        while True:
             t = self.GetNextToken()
             if t is None:
                 break
@@ -386,13 +443,9 @@ class CppLexerNavigator(object):
                     self.ifdefstack.append(False)
                 else:
                     self.ifdefstack.append(True)
-            elif Match(r"^#\s*endif$", token.value):
-                if len(self.ifdefstack) != 0:
-                    self.ifdefstack.pop()
-        for ifdef in self.ifdefstack:
-            if not ifdef:
-                return True
-        return False
+            elif Match(r"^#\s*endif$", token.value) and len(self.ifdefstack) != 0:
+                self.ifdefstack.pop()
+        return any(not ifdef for ifdef in self.ifdefstack)
 
     def Backup(self):
         """
@@ -431,10 +484,10 @@ class CppLexerNavigator(object):
         """
         Get given token column
         """
-        last_cr = self.data.rfind('\n', 0, token.lexpos)
+        last_cr = self.data.rfind("\n", 0, token.lexpos)
         if last_cr < 0:
             last_cr = -1
-        column = (token.lexpos - last_cr)
+        column = token.lexpos - last_cr
         if column == 0:
             return 1
         return column
@@ -476,7 +529,7 @@ class CppLexerNavigator(object):
         """
         self.PushTokenIndex()
         token = None
-        for x in range(offset):  # @UnusedVariable
+        for _x in range(offset):  # @UnusedVariable
             token = self.GetNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
         self.PopTokenIndex()
         return token
@@ -504,7 +557,7 @@ class CppLexerNavigator(object):
         """
         self.PushTokenIndex()
         token = None
-        for x in range(offset):  # @UnusedVariable
+        for _x in range(offset):  # @UnusedVariable
             token = self.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
         self.PopTokenIndex()
         return token
@@ -549,9 +602,7 @@ class CppLexerNavigator(object):
         """
         return self.GetPrevToken(True, True)
 
-    def GetNextToken(self, skipWhiteSpace=False,
-                     skipComment=False, skipDirective=False,
-                     skipMatchingBraces=False):
+    def GetNextToken(self, skipWhiteSpace=False, skipComment=False, skipDirective=False, skipMatchingBraces=False):
         """
         Get Next Token with various option
         - skipWhiteSpace - skip white space
@@ -560,19 +611,17 @@ class CppLexerNavigator(object):
         - skipMatchingBraces - skip all { [ ( and matching pair
         """
         context = self._SkipContext(skipWhiteSpace, skipComment)
-        while(True):
+        while True:
             token = self._GetNextToken()
             if token is None:
                 return token
-            if token.inactive == True:
+            if token.inactive is True:
                 continue
-            if skipMatchingBraces and token.type in [
-                    "LPAREN", "LBRACE", "LBRACKET"]:
+            if skipMatchingBraces and token.type in ["LPAREN", "LBRACE", "LBRACKET"]:
                 self.GetNextMatchingToken()
                 continue
-            if skipDirective:
-                if token.pp == True:
-                    continue
+            if skipDirective and token.pp is True:
+                continue
             if token.type not in context:
                 if token is not None:
                     token.column = self._GetColumn(token)
@@ -583,8 +632,8 @@ class CppLexerNavigator(object):
             self.PushTokenIndex()
         gtStack = []
         if self.GetCurToken().type != "LT":
-            raise RuntimeError(
-                'Matching next GT token should be examined when cur token is <')
+            msg = "Matching next GT token should be examined when cur token is <"
+            raise RuntimeError(msg)
         gtStack.append(self.GetCurToken())
         t = self._GetNextMatchingGTToken(gtStack)
         if keepCur:
@@ -619,8 +668,8 @@ class CppLexerNavigator(object):
             self.PushTokenIndex()
         tokenStack = []
         if self.GetCurToken().type not in ["LPAREN", "LBRACE", "LBRACKET"]:
-            raise RuntimeError(
-                'Matching token should be examined when cur token is { [ (')
+            msg = "Matching token should be examined when cur token is { [ ("
+            raise RuntimeError(msg)
         tokenStack.append(self.GetCurToken())
         t = self._GetNextMatchingToken(tokenStack)
         if keepCur:
@@ -666,22 +715,18 @@ class CppLexerNavigator(object):
     def GetPrevTokenSkipWhiteSpace(self):
         return self.GetPrevToken(True)
 
-#    def GetPrevTokenSkipWhiteSpaceAndComment(self):
-#        return self.GetPrevToken(True, True)
+    #    def GetPrevTokenSkipWhiteSpaceAndComment(self):
+    #        return self.GetPrevToken(True, True)
 
-    def GetPrevToken(self, skipWhiteSpace=False,
-                     skipComment=False, skipDirective=False,
-                     skipMatchingBraces=False):
+    def GetPrevToken(self, skipWhiteSpace=False, skipComment=False, skipDirective=False, skipMatchingBraces=False):
         context = self._SkipContext(skipWhiteSpace, skipComment)
-        while(True):
+        while True:
             token = self._GetPrevToken()
             if token is None:
                 return token
             if token.inactive:
                 continue
-            if skipMatchingBraces and token.type in [
-                    "RPAREN", "RBRACE", "RBRACKET"]:
-
+            if skipMatchingBraces and token.type in ["RPAREN", "RBRACE", "RBRACKET"]:
                 self.GetPrevMatchingToken()
 
                 continue
@@ -696,9 +741,9 @@ class CppLexerNavigator(object):
         if keepCur:
             self.PushTokenIndex()
         gtStack = []
-        if not self.GetCurToken().type in ["GT", "RSHIFT"]:
-            raise RuntimeError(
-                'Matching previous LT token should be examined when cur token is > or >>')
+        if self.GetCurToken().type not in ["GT", "RSHIFT"]:
+            msg = "Matching previous LT token should be examined when cur token is > or >>"
+            raise RuntimeError(msg)
         # If >> token is found, append it twice
         if self.GetCurToken().type == "RSHIFT":
             gtStack.append(self.GetCurToken())
@@ -728,8 +773,8 @@ class CppLexerNavigator(object):
             self.PushTokenIndex()
         tokenStack = []
         if self.GetCurToken().type not in ["RPAREN", "RBRACE", "RBRACKET"]:
-            raise RuntimeError(
-                'Matching token should be examined when cur token is } ) ]')
+            msg = "Matching token should be examined when cur token is } ) ]"
+            raise RuntimeError(msg)
         tokenStack.append(self.GetCurToken())
 
         t = self._GetPrevMatchingToken(tokenStack)
@@ -767,8 +812,7 @@ class CppLexerNavigator(object):
                 else:
                     return None
 
-    def _SkipContext(self, skipWhiteSpace=False,
-                     skipComment=False):
+    def _SkipContext(self, skipWhiteSpace=False, skipComment=False):
         context = []
         if skipWhiteSpace:
             context.append("SPACE")
@@ -798,7 +842,7 @@ class CppLexerNavigator(object):
         if keepCur:
             self.PushTokenIndex()
         token = None
-        while(True):
+        while True:
             token = self.GetPrevToken()
             if token is None:
                 break
@@ -810,12 +854,11 @@ class CppLexerNavigator(object):
             self.PopTokenIndex()
         return token
 
-    def GetPrevTokenInTypeList(self, typelist, keepCur=True,
-                               skipPreprocess=True):
+    def GetPrevTokenInTypeList(self, typelist, keepCur=True, skipPreprocess=True):
         if keepCur:
             self.PushTokenIndex()
         token = None
-        while(True):
+        while True:
             token = self.GetPrevToken(False, False, skipPreprocess, False)
             if token is None:
                 break
@@ -839,7 +882,7 @@ class CppLexerNavigator(object):
         if keepCur:
             self.PushTokenIndex()
         token = None
-        while(True):
+        while True:
             token = self.GetNextToken()
             if token is None:
                 break
@@ -851,12 +894,11 @@ class CppLexerNavigator(object):
             self.PopTokenIndex()
         return token
 
-    def GetNextTokenInTypeList(self, typelist, keepCur=False,
-                               skipPreprocess=True):
+    def GetNextTokenInTypeList(self, typelist, keepCur=False, skipPreprocess=True):
         if keepCur:
             self.PushTokenIndex()
         token = None
-        while(True):
+        while True:
             token = self.GetNextToken()
             if token is None:
                 break
@@ -876,9 +918,8 @@ class CppLexerNavigator(object):
 
         if token_id3 is None and token_id2 is not None:
             return True
-        if token_id2 is not None:
-            if token_id2.lexpos < token_id3.lexpos:
-                return True
+        if token_id2 is not None and token_id2.lexpos < token_id3.lexpos:
+            return True
         return False
 
 
@@ -892,8 +933,7 @@ class Context:
         self.additional = ""
 
     def __str__(self):
-        return ", ".join([self.type, "'" + self.name + "'",
-                          str(self.startToken), str(self.endToken)])
+        return ", ".join([self.type, "'" + self.name + "'", str(self.startToken), str(self.endToken)])
 
     def IsContextStart(self, token):
         return token == self.startToken
@@ -910,7 +950,6 @@ class Context:
 class ContextStack:
     def __init__(self):
         self.contextstack = []
-        pass
 
     def Push(self, context):
         self.contextstack.append(context)
@@ -927,7 +966,7 @@ class ContextStack:
 
     def SigPeek(self):
         i = len(self.contextstack)
-        while(True):
+        while True:
             if i == 0:
                 break
             i -= 1
@@ -943,7 +982,7 @@ class ContextStack:
 
     def ContainsIn(self, type):
         i = len(self.contextstack)
-        while(True):
+        while True:
             if i == 0:
                 break
             i -= 1
@@ -954,7 +993,7 @@ class ContextStack:
     def __str__(self):
         a = ""
         for eachContext in self.contextstack:
-            a += (eachContext.__str__() + " >> ")
+            a += eachContext.__str__() + " >> "
         return a
 
     def Copy(self):
@@ -973,13 +1012,13 @@ class _ContextStackStack:
     def Pop(self):
         if len(self.contextstackstack) == 0:
             return None
-        context = self.contextstackstack.pop()
-        return context
+        return self.contextstackstack.pop()
 
     def Peek(self):
         if len(self.contextstackstack) == 0:
             return None
         return self.contextstackstack[-1]
+
 
 ############################################################################
 # Parser and Rule Runner Invocator
@@ -1003,6 +1042,7 @@ def ProcessFile(ruleManager, file, data=None):
     lexer.Reset()
     RunRules(ruleManager, lexer)
 
+
 def ConstructContextInfo(lexer):
     #    classstate = None
     #    depth = 0
@@ -1020,7 +1060,7 @@ def ConstructContextInfo(lexer):
             nsiqcppstyle_state._nsiqcppstyle_state.SuppressRule(e)
     t = None
     # Construct Context
-    while(True):
+    while True:
         try:
             t = lexer.GetNextTokenSkipWhiteSpaceAndComment()
             if t is None:
@@ -1031,11 +1071,11 @@ def ConstructContextInfo(lexer):
             if t.type == "PREPROCESSOR":
                 t.pp = True
                 ppScope = True
-            elif ppScope == True:
+            elif ppScope is True:
                 if prevLine == t.lineno - 1:
                     prevToken = lexer.PeekPrevTokenSkipWhiteSpaceAndComment()
                     if prevToken is not None:
-                        ppScope = (prevToken.type == "PREPROCESSORNEXT")
+                        ppScope = prevToken.type == "PREPROCESSORNEXT"
                     t.pp = ppScope
                 elif prevLine == t.lineno:
                     t.pp = True
@@ -1045,9 +1085,8 @@ def ConstructContextInfo(lexer):
             if templateContext is not None and not templateContext.InScope(t):
                 templateContext = None
 
-            if t.type in ['LBRACE', 'LPAREN', 'LBRACKET']:
-                if contextPrediction is not None and \
-                        contextPrediction.IsContextStart(t):
+            if t.type in ["LBRACE", "LPAREN", "LBRACKET"]:
+                if contextPrediction is not None and contextPrediction.IsContextStart(t):
                     contextStack = contextStack.Copy()
                     contextStack.Push(contextPrediction)
                     contextStackStack.Push(contextStack)
@@ -1056,11 +1095,10 @@ def ConstructContextInfo(lexer):
                     mt = lexer.GetNextMatchingToken(True)
                     if mt is not None:
                         contextStack = contextStack.Copy()
-                        contextStack.Push(Context(t.type[1:] + "BLOCK", "",
-                                                  False, t.lexpos, mt.lexpos))
+                        contextStack.Push(Context(t.type[1:] + "BLOCK", "", False, t.lexpos, mt.lexpos))
                         contextStackStack.Push(contextStack)
 
-#       print depth, "Push", contextStack
+            #       print depth, "Push", contextStack
             elif t.type in ["RBRACE", "RPAREN", "RBRACKET"]:
                 contextStackStack.Pop()
                 contextStack = contextStackStack.Peek()
@@ -1075,13 +1113,21 @@ def ConstructContextInfo(lexer):
                     templateContext = Context("TEMPLATE", "", False, t2, t3)
 
                 lexer.PopTokenIndex()
-            elif t.pp != True and templateContext == None and t.type in ["CLASS", "STRUCT", "ENUM", "UNION", "NAMESPACE"] and contextPrediction == None:
+            elif (
+                t.pp is not True
+                and templateContext is None
+                and t.type in ["CLASS", "STRUCT", "ENUM", "UNION", "NAMESPACE"]
+                and contextPrediction is None
+            ):
                 prevToken = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                 hasBody = lexer.HasBody()
                 fullName = ""
                 curContext = contextStack.Peek()
-                if (prevToken is None or prevToken.value != "<") and \
-                        (curContext is None or curContext.type != "PARENBLOCK") and hasBody:
+                if (
+                    (prevToken is None or prevToken.value != "<")
+                    and (curContext is None or curContext.type != "PARENBLOCK")
+                    and hasBody
+                ):
                     lexer.PushTokenIndex()
                     # find start and end brace block
                     contextStart = lexer.GetNextTokenInType("LBRACE")
@@ -1090,7 +1136,7 @@ def ConstructContextInfo(lexer):
                     lexer.PushTokenIndex()
 
                     if contextEnd is not None:
-                        while(True):
+                        while True:
                             token = lexer.GetNextTokenInType("ID")
                             nextIDtoken = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if token is None or token.lexpos > contextStart.lexpos:
@@ -1099,55 +1145,49 @@ def ConstructContextInfo(lexer):
                                 continue
                             nextToken = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if token is not None and nextToken is not None and nextToken.type == "DOUBLECOLON":
-                                fullName += (token.value + "::")
+                                fullName += token.value + "::"
                                 continue
                             else:
                                 fullName += token.value
                                 break
-                        contextPrediction = Context(t.type + "_BLOCK", fullName,
-                                                    True, contextStart, contextEnd)
+                        contextPrediction = Context(t.type + "_BLOCK", fullName, True, contextStart, contextEnd)
                     lexer.PopTokenIndex()
                 t.type = "TYPE"
                 t.fullName = fullName
                 t.context = contextPrediction
                 t.decl = not hasBody
-#   RunTypeRule(lexer, fullName, not hasBody, contextStack, contextPrediction)
+            #   RunTypeRule(lexer, fullName, not hasBody, contextStack, contextPrediction)
 
             # Function Prediction
-            elif t.pp != True and t.type in ("ID", "OPERATOR") and contextPrediction == None:
+            elif t.pp is not True and t.type in ("ID", "OPERATOR") and contextPrediction is None:
                 curNotSigContext = contextStack.Peek()
-                if (curNotSigContext is not None and curNotSigContext.sig == False):
+                if curNotSigContext is not None and curNotSigContext.sig is False:
                     continue
                 t2 = None
                 t4 = None
                 if t.type == "ID":
                     t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
-                    t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(
-                        2)
+                    t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(2)
 
                 else:
                     t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
                     if t2.type == "LPAREN":
-                        t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(
-                            3)
-                        t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(
-                            4)
+                        t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(3)
+                        t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(4)
                     else:
-                        t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(
-                            2)
-                        t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(
-                            3)
+                        t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(2)
+                        t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(3)
 
                 t3 = lexer.PeekPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                 curContext = contextStack.SigPeek()
 
-                if (t3 is None or t3.type != "NEW") and \
-                        t2 is not None and \
-                        t2.type == "LPAREN" and \
-                        t4.type != "STRING" and \
-                        (curContext is None or
-                         curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK",
-                                             "NAMESPACE_BLOCK"]):
+                if (
+                    (t3 is None or t3.type != "NEW")
+                    and t2 is not None
+                    and t2.type == "LPAREN"
+                    and t4.type != "STRING"
+                    and (curContext is None or curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "NAMESPACE_BLOCK"])
+                ):
                     # Check The ID after the next RPAREN
                     # if there is ID, None, or LBRACKET it's not a function.
                     # in case HELLO() HELLO2(), or FOO (BAR*)[]
@@ -1168,15 +1208,16 @@ def ConstructContextInfo(lexer):
                     if t.type == "OPERATOR":
                         fullName = fullName + t3.value
                     else:
-                        while(True):
+                        while True:
                             prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if prevName is not None:
                                 if prevName.type == "NOT":
                                     fullName = "~" + fullName
                                 elif prevName.type == "DOUBLECOLON":
                                     fullName = "::" + fullName
-                                    fullName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value + \
-                                        fullName
+                                    fullName = (
+                                        lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value + fullName
+                                    )
                                 else:
                                     break
                             else:
@@ -1189,8 +1230,7 @@ def ConstructContextInfo(lexer):
                         contextStart = lexer.GetNextTokenInType("LBRACE")
                         contextEnd = lexer.GetNextMatchingToken(contextStart)
                         if contextEnd is not None:
-                            contextPrediction = Context("FUNCTION_BLOCK", fullName,
-                                                        True, contextStart, contextEnd)
+                            contextPrediction = Context("FUNCTION_BLOCK", fullName, True, contextStart, contextEnd)
 
                     # RunFunctionRule(lexer, functionName, decl, contextStack, contextPrediction)
                     t.type = "FUNCTION"
@@ -1203,39 +1243,34 @@ def ConstructContextInfo(lexer):
             t.contextStack = contextStack
             prevLine = t.lineno
         except Exception as e:
-            console.Err.Verbose(
-                "Context Construction Error : ", t, t.contextStack, e)
+            console.Err.Verbose("Context Construction Error : ", t, t.contextStack, e)
             console.Err.Verbose(traceback.format_exc())
 
 
 def RunRules(ruleManager, lexer):
     try:
-        ruleManager.RunFileStartRule(lexer, os.path.basename(lexer.filename),
-                                     os.path.dirname(lexer.filename))
+        ruleManager.RunFileStartRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))
     except Exception as e:
         console.Err.Verbose("Rule Error : ", e)
         console.Err.Verbose(traceback.format_exc())
     currentLine = 0
     t = None
-    while(True):
+    while True:
         try:
             t = lexer.GetNextTokenSkipWhiteSpace()
             if t is None:
                 break
             if currentLine != t.lineno:
                 currentLine = t.lineno
-                ruleManager.RunLineRule(
-                    lexer, lexer.GetCurTokenLine(), currentLine)
+                ruleManager.RunLineRule(lexer, lexer.GetCurTokenLine(), currentLine)
 
-            if t.pp == True:
+            if t.pp is True:
                 ruleManager.RunPreprocessRule(lexer, t.contextStack)
             else:
                 if t.type == "TYPE":
-                    ruleManager.RunTypeNameRule(lexer, t.value.upper(), t.fullName,
-                                                t.decl, t.contextStack, t.context)
+                    ruleManager.RunTypeNameRule(lexer, t.value.upper(), t.fullName, t.decl, t.contextStack, t.context)
                 elif t.type == "FUNCTION":
-                    ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl,
-                                                    t.contextStack, t.context)
+                    ruleManager.RunFunctionNameRule(lexer, t.fullName, t.decl, t.contextStack, t.context)
                 elif t.type in ("COMMENT", "CPPCOMMENT"):
                     ruleManager.RunCommentRule(lexer, t)
                     continue
@@ -1243,7 +1278,13 @@ def RunRules(ruleManager, lexer):
                     sigContext = t.contextStack.SigPeek()
                     if sigContext.type == "FUNCTION_BLOCK":
                         ruleManager.RunFunctionScopeRule(lexer, t.contextStack)
-                    elif sigContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK", "ENUM_BLOCK", "NAMESPACE_BLOCK", "UNION_BLOCK"]:
+                    elif sigContext.type in [
+                        "CLASS_BLOCK",
+                        "STRUCT_BLOCK",
+                        "ENUM_BLOCK",
+                        "NAMESPACE_BLOCK",
+                        "UNION_BLOCK",
+                    ]:
                         ruleManager.RunTypeScopeRule(lexer, t.contextStack)
 
                 ruleManager.RunRule(lexer, t.contextStack)
@@ -1251,8 +1292,7 @@ def RunRules(ruleManager, lexer):
             console.Err.Verbose("Rule Error : ", t, t.contextStack, e)
             console.Err.Verbose(traceback.format_exc())
     try:
-        ruleManager.RunFileEndRule(lexer, os.path.basename(lexer.filename),
-                                   os.path.dirname(lexer.filename))
+        ruleManager.RunFileEndRule(lexer, os.path.basename(lexer.filename), os.path.dirname(lexer.filename))
     except Exception as e:
         console.Err.Verbose("Rule Error : ", e)
         console.Err.Verbose(traceback.format_exc())

@@ -1,0 +1,220 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nsiqcppstyle"
+dynamic = ["version"]
+description = 'One of the most customizable cpp style checkers about'
+readme = "README.md"
+requires-python = ">3.7"
+license = "GPL-2.0-or-later"
+keywords = []
+authors = [{ name = "Kunal Tyagi", email = "kunal.tyagi@live.com" }]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = [
+  "pip_search"
+]
+test = [
+  "pytest == 7.4.*",
+]
+
+[project.urls]
+Documentation = "https://github.com/kunaltyagi/nsiqcppstyle/blob/master/README.md"
+Issues = "https://github.com/kunaltyagi/nsiqcppstyle/issues"
+Source = "https://github.com/kunaltyagi/nsiqcppstyle"
+
+[tool.hatch.version]
+path = "__about__.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.envs.default]
+dependencies = []
+features = ["dev"]
+python = "3.8"
+[tool.hatch.envs.default.scripts]
+search = "pip_search {args:.}"
+update = "python --version; echo Updated packages"
+
+[tool.hatch.envs.test]
+dependencies = []
+features = ["test"]
+[tool.hatch.envs.test.scripts]
+test = "pytest --failed-first {args:tests}"
+tdd = "pytest --last-failed --exitfirst --pdb {args:tests}"
+watch_test = "ptw . --failed-first {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage lcov -o .lcov",
+  "coverage report",
+  "coverage html",
+]
+cov = ["test-cov", "cov-report"]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.lint]
+extra-dependencies = ["black>=23.9.0", "mypy>=1.5.0", "ruff>=0.0.290"]
+features = ["test"]
+python = "3.8"
+[tool.hatch.envs.lint.scripts]
+typing = "mypy --install-types --non-interactive {args:.}"
+# style = ["ruff {args:.}", "black --check --diff {args:.}"]
+style = ["black --check --diff {args:.}"]
+# fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
+fmt = ["black {args:.}"]
+all = ["style", "typing"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/updateagent"]
+
+#[tool.hatch.build.targets.wheel]
+#packages = ['.']
+
+# [tool.hatch.build.targets.wheel.hooks.mypyc]
+# dependencies = ["hatch-mypyc"]
+# require-runtime-dependencies = true
+# mypy-args = ["--no-warn-unused-ignores"]
+
+[tool.black]
+target-version = ["py310"]
+line-length = 120
+skip-string-normalization = true
+extend-exclude = """
+temp/
+"""
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+select = [
+  "A",
+  # "ANN", too verbose, useless
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C",
+  "COM",
+  "C4",
+  # "D", for documentation
+  "DTZ",
+  "E",
+  "EM",
+  "EXE",
+  "F",
+  "FLY",
+  "G",
+  "FBT",
+  "I",
+  "ICN",
+  "INP",
+  "INT",
+  "ISC",
+  "N",
+  "NPY",
+  "PD",
+  "PL",
+  "PT",
+  "PIE",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "PTH",
+  "PYI",
+  "PERF",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T",
+  "TD",
+  "TCH",
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Ignore checks for possible passwords
+  "S105",
+  "S106",
+  "S107",
+  # No cryptography in this project
+  "S311",
+  # Ignore complexity
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.isort]
+known-first-party = ["nsiqcppstyle"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.coverage.run]
+#source_pkgs = ["nsiqcppstyle", "tests"]
+branch = true
+parallel = true
+#omit = ["__about__.py"]
+
+[tool.coverage.paths]
+nsiqcppstyle = [".", "*/nsiqcppstyle/"]
+tests = ["nsiqunittest", "*/nsiqcppstyle/nsiqunittest"]
+
+[tool.coverage.report]
+exclude_also = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.mypy]
+follow_imports = "normal"
+pretty = true
+show_column_numbers = true
+#show_error_context = true
+warn_no_return = false
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_unreachable = true
+[[tool.mypy.overrides]]
+module = "nsiqcppstyle.*"
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]

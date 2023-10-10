@@ -16,10 +16,10 @@ align long function parameters on the first parameter when it's defined in multi
                    int c); <== OK.
 
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, fullName, decl, contextStack, context):
@@ -28,7 +28,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     firstElement = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
     firstElementLineNo = firstElement.lineno
     firstElementColumn = GetRealColumn(firstElement)
-    while(True):
+    while True:
         t = lexer.GetNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
         if t is None or t == rparen:
             break
@@ -36,7 +36,11 @@ def RunRule(lexer, fullName, decl, contextStack, context):
             firstElementLineNo = t.lineno
             if firstElementColumn != GetRealColumn(t):
                 nsiqcppstyle_reporter.Error(
-                    t, __name__, "Incorrect align on long parameter list in front of '%s', it should be aligen in column %d." % (t.value, firstElementColumn))
+                    t,
+                    __name__,
+                    "Incorrect align on long parameter list in front of '%s', it should be aligen in column %d."
+                    % (t.value, firstElementColumn),
+                )
 
 
 ruleManager.AddFunctionNameRule(RunRule)
@@ -51,68 +55,81 @@ class testRule(nct):
         ruleManager.AddFunctionNameRule(RunRule)
 
     def test1(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 void function(int k, int j
               int pp)
 {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test2(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 void function(int k, int j,
              int pp)
 {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 void function(int k, int j,
 
              int pp)
 {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test4(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 void function(int k, int j, int pp)
 {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 class A {
 void function(int k, int j,
               int pp);
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test6(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 class A {
 void function(int k, int j,
             int pp);
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test7(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 class A {
 void function(int k, int j,
               int pp)
@@ -121,12 +138,14 @@ void function(int k, int j,
              TT);
 }
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test8(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 class A {
 void function(int k, int j,
               int pp)
@@ -135,22 +154,26 @@ void function(int k, int j,
              TT);
 }
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test9(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 Void aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa( int a,
                                           int b)
 {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test10(self):
-        self.Analyze("test/thisFile.c",
-                     """
+        self.Analyze(
+            "test/thisFile.c",
+            """
 OrgDNSHandler::RESULT_CODE OrgDNSHandler::process( const NRootDNSConfig* pNRootDNSConfig,
                                                    const nano::Variant::List& params,
                                                    int a)
@@ -160,5 +183,6 @@ OrgDNSHandler::RESULT_CODE OrgDNSHandler::process( const NRootDNSConfig* pNRootD
 
 void functionA(int a, int b
                int c);
-""")
+""",
+        )
         self.ExpectSuccess(__name__)

@@ -36,18 +36,17 @@ If the class/struct name starts with "C", "C" can be ommited in the file name.
 
 """
 
-from nsiqunittest.nsiqcppstyle_unittestbase import *
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 classname = None
 
 
 def RunFunctionNameRule(lexer, fullName, decl, contextStack, context):
     names = fullName.split("::")
-    if len(names) > 1:
-        if len(names[0]) != 0:
-            classname.add(names[0])
+    if len(names) > 1 and len(names[0]) != 0:
+        classname.add(names[0])
 
 
 def RunTypeNameRule(lexer, currentType, fullName, decl, contextStack, context):
@@ -74,8 +73,11 @@ def RunFileEndRule(lexer, filename, dirname):
             goodFileName = True
             break
     if not goodFileName:
-        nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0, 0), __name__,
-                                    "The filename does not represent the classnames (%s)" % (classname))
+        nsiqcppstyle_reporter.Error(
+            DummyToken(lexer.filename, "", 0, 0),
+            __name__,
+            "The filename does not represent the classnames (%s)" % (classname),
+        )
 
 
 ruleManager.AddFileStartRule(RunFileStartRule)
@@ -96,91 +98,111 @@ class testRule(nct):
         ruleManager.AddFileEndRule(RunFileEndRule)
 
     def test1(self):
-        self.Analyze("test/aa.c",
-                     """
+        self.Analyze(
+            "test/aa.c",
+            """
 void AA::DSD() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test2(self):
-        self.Analyze("test/ab.c",
-                     """
+        self.Analyze(
+            "test/ab.c",
+            """
 void AA::DSD() {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test3(self):
-        self.Analyze("test/aa.c",
-                     """
+        self.Analyze(
+            "test/aa.c",
+            """
 void CAA::DSD() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("test/aa.c",
-                     """
+        self.Analyze(
+            "test/aa.c",
+            """
 void DSD() {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test5(self):
-        self.Analyze("test/aa.cpp",
-                     """
+        self.Analyze(
+            "test/aa.cpp",
+            """
 struct AA {
 }
 
 class BB {
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test6(self):
-        self.Analyze("test/aa.cpp",
-                     """
+        self.Analyze(
+            "test/aa.cpp",
+            """
 struct AA1 {
 }
 
 class BB {
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test7(self):
-        self.Analyze("test/CamRecorderFactory.cpp",
-                     """
+        self.Analyze(
+            "test/CamRecorderFactory.cpp",
+            """
 class __declspec(dllexport) CCamRecorderFactory
 {
 };
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test8(self):
-        self.Analyze("test/CamRecorderFactory.cpp",
-                     """
+        self.Analyze(
+            "test/CamRecorderFactory.cpp",
+            """
 class DLLEXPORT CCamRecorderFactory
 {
 };
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test9(self):
-        self.Analyze("test/CamRecorderFactory.h",
-                     """
+        self.Analyze(
+            "test/CamRecorderFactory.h",
+            """
 class CamRecorderFactory final
 {
 };
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test10(self):
-        self.Analyze("test/CamRecorderFact.h",
-                     """
+        self.Analyze(
+            "test/CamRecorderFact.h",
+            """
 class CamRecorderFactory final
 {
 };
-""")
+""",
+        )
         self.ExpectError(__name__)

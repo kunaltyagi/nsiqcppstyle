@@ -31,6 +31,7 @@ import sys
 SINGLE_QUOTE = "'"
 DOUBLE_QUOTE = '"'
 
+
 def WeAreFrozen():
     return hasattr(sys, "frozen")
 
@@ -43,17 +44,17 @@ def ModulePath():
 
 def GetRuntimePath():
     "Return the path of this tool"
-    if (sys.platform == "win32"):
+    if sys.platform == "win32":
         runtimePath = ModulePath()
     else:
-        modename = globals()['__name__']
+        modename = globals()["__name__"]
         module = sys.modules[modename]
         runtimePath = os.path.dirname(module.__file__)
     return runtimePath
 
 
 def GetSystemKey():
-    if (sys.platform == "win32"):
+    if sys.platform == "win32":
         return "window"
     else:
         return "linux"

@@ -12,16 +12,19 @@ Only alphabets, numbers and underbars can be used for a filename.
     testdir/test.c
     testdir1/test_1.c
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
+from nsiqcppstyle_checker import *  # @UnusedWildImport
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
-from nsiqcppstyle_checker import *  # @UnusedWildImport
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 
 def RunRule(lexer, filename, dirname):
     if not Match(r"^[_A-Za-z0-9\.]*$", filename):
-        nsiqcppstyle_reporter.Error(DummyToken(lexer.filename, "", 0, 0), __name__,
-                                    'Do not use special characters in file name (%s).' % filename)
+        nsiqcppstyle_reporter.Error(
+            DummyToken(lexer.filename, "", 0, 0),
+            __name__,
+            "Do not use special characters in file name (%s)." % filename,
+        )
 
 
 ruleManager.AddFileStartRule(RunRule)

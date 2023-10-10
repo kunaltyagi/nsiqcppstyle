@@ -20,10 +20,10 @@ If the block depth in the function is more than 4, it reports a violation.
 
 
 """
-from nsiqunittest.nsiqcppstyle_unittestbase import *
-from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_reporter import *
+from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
+from nsiqunittest.nsiqcppstyle_unittestbase import *
 
 depth = 0
 reported = False
@@ -37,7 +37,10 @@ def RunRule(lexer, contextStack):
         depth += 1
         if depth > 5 and not reported:
             nsiqcppstyle_reporter.Error(
-                t, __name__, "Do not make too deep block(%d) ({). It makes not readable code" % depth)
+                t,
+                __name__,
+                "Do not make too deep block(%d) ({). It makes not readable code" % depth,
+            )
             reported = True
     elif t.type == "RBRACE":
         depth -= 1
@@ -64,30 +67,35 @@ class testRule(nct):
         ruleManager.AddFunctionScopeRule(RunRule)
 
     def test1(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void func1() {
 {{{{{{{
        }}}}}}}
 }
-""")
+""",
+        )
         self.ExpectError(__name__)
 
     def test2(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 
 void func1() {
 {{{
 #define {{{{ }}}
        }}}}
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test3(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void func(void)
 {
 if (...)
@@ -106,12 +114,14 @@ printf("...");
 }
 }
 }
-""")
+""",
+        )
         self.ExpectSuccess(__name__)
 
     def test4(self):
-        self.Analyze("thisfile.c",
-                     """
+        self.Analyze(
+            "thisfile.c",
+            """
 void func(void)
 {
 if (...)
@@ -130,5 +140,6 @@ printf("...");
 }
 }
 }
-""")
+""",
+        )
         self.ExpectError(__name__)

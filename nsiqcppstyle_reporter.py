@@ -25,13 +25,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import nsiqcppstyle_state
-import nsiqcppstyle_checker
-from nsiqcppstyle_outputer import _consoleOutputer as console
-import nsiqcppstyle_rulemanager
-import sys
 import csv
 import os
+import sys
+
+import nsiqcppstyle_checker
+import nsiqcppstyle_rulemanager
+import nsiqcppstyle_state
+from nsiqcppstyle_outputer import _consoleOutputer as console
 
 ##########################################################################
 csvfile = None
@@ -49,8 +50,7 @@ def PrepareReport(outputPath, format):
             outputPath = os.path.join(outputPath, "nsiqcppstyle_report.csv")
         csvfile = open(outputPath, "w")
         writer = csv.writer(csvfile)
-        writer.writerow(("File", "Line", "Column",
-                         "Message", "Rule", "Rule Url"))
+        writer.writerow(("File", "Line", "Column", "Message", "Rule", "Rule Url"))
     elif format == "xml":
         if os.path.isdir(outputPath):
             outputPath = os.path.join(outputPath, "nsiqcppstyle_report.xml")
@@ -68,35 +68,26 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter):
     if fileCount != 0:
         buildQuality = (fileCount - violatedFileCount) * 100.0 / fileCount
     console.Out.Ci("\n")
-    console.Out.Ci(
-        "=================================== Summary Report ===================================")
-    console.Out.Ci(" ** Total Available Rules     : %d" %
-                   nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
-    console.Out.Ci(" ** Total Applied Rules       : %d" %
-                   len(nsiqcppstyle_state.checkers))
-    console.Out.Ci(" ** Total Violated Rules      : %d" %
-                   len(nsiqcppstyle_state.errorPerChecker.keys()))
-    console.Out.Ci(" ** Total Errors Occurs       : %d" %
-                   nsiqcppstyle_state.error_count)
+    console.Out.Ci("=================================== Summary Report ===================================")
+    console.Out.Ci(" ** Total Available Rules     : %d" % nsiqcppstyle_rulemanager.ruleManager.availRuleCount)
+    console.Out.Ci(" ** Total Applied Rules       : %d" % len(nsiqcppstyle_state.checkers))
+    console.Out.Ci(" ** Total Violated Rules      : %d" % len(nsiqcppstyle_state.errorPerChecker.keys()))
+    console.Out.Ci(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
     console.Out.Ci(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
     console.Out.Ci(" ** Total Violated Files Count: %d" % violatedFileCount)
     console.Out.Ci(" ** Build Quality             : %.2f%%" % buildQuality)
     if console.IsLevelDisplayed(console.Level.Info):
-        console.Out.Info(
-            "\n================================ Violated Rule Details ===============================")
-        for checker in nsiqcppstyle_state.errorPerChecker.keys():
-            console.Out.Info(" - ", checker, "rule violated :",
-                             nsiqcppstyle_state.errorPerChecker[checker])
-        console.Out.Info(
-            "\n================================ Violated File Details ===============================")
-        for eachFile in nsiqcppstyle_state.errorPerFile.keys():
+        console.Out.Info("\n================================ Violated Rule Details ===============================")
+        for checker in nsiqcppstyle_state.errorPerChecker:
+            console.Out.Info(" - ", checker, "rule violated :", nsiqcppstyle_state.errorPerChecker[checker])
+        console.Out.Info("\n================================ Violated File Details ===============================")
+        for eachFile in nsiqcppstyle_state.errorPerFile:
             count = 0
-            for eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys():
+            for eachRule in nsiqcppstyle_state.errorPerFile[eachFile]:
                 count += nsiqcppstyle_state.errorPerFile[eachFile][eachRule]
             console.Out.Info(" - ", eachFile, " violated in total : ", count)
-            for eachRule in nsiqcppstyle_state.errorPerFile[eachFile].keys():
-                console.Out.Info("   * ", eachRule, " : ",
-                                 nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
+            for eachRule in nsiqcppstyle_state.errorPerFile[eachFile]:
+                console.Out.Info("   * ", eachRule, " : ", nsiqcppstyle_state.errorPerFile[eachFile][eachRule])
 
 
 def CloseReport(format):
@@ -104,6 +95,8 @@ def CloseReport(format):
         global writer
         writer.write("</checkstyle>\n")
         writer.close()
+
+
 ##########################################################################
 
 # ruleMap = {}
@@ -136,39 +129,42 @@ def ReportRules(availRuleName, ruleNames):
 
 
 def StartDir(dirname):
-    if _nsiqcppstyle_state.output_format == 'xml':
+    if _nsiqcppstyle_state.output_format == "xml":
         pass
+
+
 # writer.write("<dir name='%s'>\n" % (dirname))
 
 
 def EndDir():
-    if _nsiqcppstyle_state.output_format == 'xml':
+    if _nsiqcppstyle_state.output_format == "xml":
         pass
         # writer.write("</dir>\n")
 
 
 def StartTarget(targetname):
-    """ Write Report when each target is analyzed"""
-    if _nsiqcppstyle_state.output_format == 'xml':
+    """Write Report when each target is analyzed"""
+    if _nsiqcppstyle_state.output_format == "xml":
         global target
         target = targetname
+
+
 #  writer.write("<target name='%s'>\n" % (targetname))
 
 
 def EndTarget():
-    """ Write Report when each target is ended"""
-    if _nsiqcppstyle_state.output_format == 'xml':
+    """Write Report when each target is ended"""
+    if _nsiqcppstyle_state.output_format == "xml":
         pass  # writer.write("</target>\n")
 
 
 def StartFile(dirname, filename):
-    if _nsiqcppstyle_state.output_format == 'xml':
-        writer.write("<file name='%s'>\n" %
-                     (os.path.join(target, dirname[1:], filename)))
+    if _nsiqcppstyle_state.output_format == "xml":
+        writer.write("<file name='%s'>\n" % (os.path.join(target, dirname[1:], filename)))
 
 
 def EndFile():
-    if _nsiqcppstyle_state.output_format == 'xml':
+    if _nsiqcppstyle_state.output_format == "xml":
         writer.write("</file>\n")
 
 
@@ -182,7 +178,7 @@ def __dict_replace(s, d):
     return s
 
 
-def escape(data, entities={}):
+def escape(data, entities=None):
     """Escape &, <, and > in a string of data.
 
     You can escape other strings of data by passing a dictionary as
@@ -191,6 +187,8 @@ def escape(data, entities={}):
     """
 
     # must do ampersand first
+    if entities is None:
+        entities = {}
     data = data.replace("&", "&amp;")
     data = data.replace(">", "&gt;")
     data = data.replace("<", "&lt;")
@@ -210,28 +208,27 @@ def ErrorInternal(t, ruleName, message):
 
     if t is None:
         return
-    if nsiqcppstyle_checker.Search(r"//\s*NS", t.line) is None and \
-            not _nsiqcppstyle_state.CheckRuleSuppression(ruleName):
+    if nsiqcppstyle_checker.Search(r"//\s*NS", t.line) is None and not _nsiqcppstyle_state.CheckRuleSuppression(
+        ruleName,
+    ):
         _nsiqcppstyle_state.IncrementErrorCount(ruleName, t.filename)
         url = ""
         if _nsiqcppstyle_state.showUrl:
             url = "http://nsiqcppstyle.appspot.com/rule_doc/" + ruleName
-        if _nsiqcppstyle_state.output_format == 'emacs':
-            sys.stdout.write('%s:%s:  %s  [%s] %s\n' % (t.filename, t.lineno,
-                                                        message, ruleName, url))
-        elif _nsiqcppstyle_state.output_format == 'vs7':
-            sys.stdout.write('%s(%s, %s):  %s  [%s] %s\n' % (t.filename, t.lineno,
-                                                             t.column, message, ruleName, url))
-        elif _nsiqcppstyle_state.output_format == 'eclipse':
-            sys.stdout.write('  File "%s", line %d %s (%s)\n' %
-                             (t.filename, t.lineno, message, ruleName))
-        elif _nsiqcppstyle_state.output_format == 'csv':
+        if _nsiqcppstyle_state.output_format == "emacs":
+            sys.stdout.write(f"{t.filename}:{t.lineno}:  {message}  [{ruleName}] {url}\n")
+        elif _nsiqcppstyle_state.output_format == "vs7":
+            sys.stdout.write(f"{t.filename}({t.lineno}, {t.column}):  {message}  [{ruleName}] {url}\n")
+        elif _nsiqcppstyle_state.output_format == "eclipse":
+            sys.stdout.write('  File "%s", line %d %s (%s)\n' % (t.filename, t.lineno, message, ruleName))
+        elif _nsiqcppstyle_state.output_format == "csv":
             global writer
-            writer.writerow(
-                (t.filename, t.lineno, t.column, message, ruleName, url))
-        elif _nsiqcppstyle_state.output_format == 'xml':
-            writer.write("""<error line='%d' col='%d' severity='warning' message='%s' source='%s'/>\n""" %
-                         (t.lineno, t.column, escape(message).replace("'", "\""), ruleName))
+            writer.writerow((t.filename, t.lineno, t.column, message, ruleName, url))
+        elif _nsiqcppstyle_state.output_format == "xml":
+            writer.write(
+                """<error line='%d' col='%d' severity='warning' message='%s' source='%s'/>\n"""
+                % (t.lineno, t.column, escape(message).replace("'", '"'), ruleName),
+            )
 
 
 Error = ErrorInternal

@@ -3,31 +3,31 @@
 from nsiqcppstyle_rulemanager import *
 from nsiqcppstyle_types import *
 
+
 def PrintContextStack(contextStack: ContextStack, isLastParameter: bool):
-    appendString = ''
-    if isLastParameter:
-        appendString = ')'
-    else:
-        appendString = ','
-    indentString = (15 * ' ')
+    appendString = ""
+    appendString = ")" if isLastParameter else ","
+    indentString = 15 * " "
 
     if (contextStack is None) or (contextStack.contextstack is None) or (len(contextStack.contextstack) == 0):
         print(f"{indentString}contextStack (empty){appendString}")
     else:
         print(f"{indentString}contextStack ({len(contextStack.contextstack)}){appendString}")
         for t in contextStack.contextstack:
-            print(f'{indentString}    {str(t)}')
+            print(f"{indentString}    {t!s}")
+
 
 def FunctionScopeRule(lexer, contextStack):
     print("FunctionScope (lexer, ")
     PrintContextStack(contextStack, True)
+
 
 def FunctionNameRule(lexer, fullName, decl, contextStack, context):
     print("FunctionName  (lexer,")
     print(f"               fullName='{fullName}',")
     print(f"               decl='{decl}',")
     PrintContextStack(contextStack, False)
-    print(f"                   context='{str(context)}')")
+    print(f"                   context='{context!s}')")
 
 
 def PreprocessRule(lexer, contextStack):
@@ -35,26 +35,33 @@ def PreprocessRule(lexer, contextStack):
     PrintContextStack(contextStack, False)
     print(f"               token={lexer.GetCurToken()})")
 
+
 def CommentRule(lexer, token):
     print(f"Comment       (lexer, token={lexer.GetCurToken()})")
+
 
 def LineRule(lexer, line, lineNumber):
     print("--------------------------------------------------")
     print(f"Line          (lexer, line='{line}', lineNumber={lineNumber})")
+
 
 def TokenRule(lexer, contextStack):
     print("Token         (lexer,")
     PrintContextStack(contextStack, False)
     print(f"               token={lexer.GetCurToken()})")
 
+
 def FileStartRule(lexer, filename, dirname):
     print(f"FileStart     (lexer, filename='{filename}', dirname='{dirname}')")
+
 
 def FileEndRule(lexer, filename, dirname):
     print(f"FileEnd       (lexer, filename='{filename}', dirname='{dirname}')")
 
+
 def ProjectRule(targetName):
     print(f"Project       (targetName='{targetName}')")
+
 
 def TypeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
     print("TypeName      (lexer,")
@@ -62,11 +69,13 @@ def TypeNameRule(lexer, typeName, typeFullName, decl, contextStack, typeContext)
     print(f"               typeFullName='{typeFullName}',")
     print(f"               decl='{decl}'")
     PrintContextStack(contextStack, False)
-    print(f"               typeContext='{str(typeContext)}')")
+    print(f"               typeContext='{typeContext!s}')")
+
 
 def TypeScopeRule(lexer, contextStack):
     print("TypeScope     (lexer, ")
     PrintContextStack(contextStack, True)
+
 
 def SessionStartRule():
     # Print instructions, legend, etc. to help the developer
@@ -74,8 +83,10 @@ def SessionStartRule():
     print("")
     print("SessionStart  ()")
 
+
 def SessionEndRule():
     print("SessionEnd    ()")
+
 
 ruleManager.AddFunctionScopeRule(FunctionScopeRule)
 ruleManager.AddFunctionNameRule(FunctionNameRule)

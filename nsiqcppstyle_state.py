@@ -26,11 +26,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-class _NsiqCppStyleState(object):
+class _NsiqCppStyleState:
     """Maintains module-wide state.."""
 
     def __init__(self):
-        self.error_count = 0    # global count of reported errors
+        self.error_count = 0  # global count of reported errors
         # filters to apply when emitting error messages
         self.checkers = []
         self.errorPerChecker = {}
@@ -38,7 +38,7 @@ class _NsiqCppStyleState(object):
         # output format:
         # "emacs" - format that emacs can parse (default)
         # "vs7" - format that Microsoft Visual Studio 7 can parse
-        self.output_format = 'vs7'
+        self.output_format = "vs7"
         self.showUrl = False
         self.reportError = False
         self.suppressRules = {}
@@ -60,8 +60,7 @@ class _NsiqCppStyleState(object):
     def IncrementErrorCount(self, category, file):
         """Bumps the module's error statistic."""
         self.error_count += 1
-        self.errorPerChecker[category] = self.errorPerChecker.get(
-            category, 0) + 1
+        self.errorPerChecker[category] = self.errorPerChecker.get(category, 0) + 1
         errorsPerFile = self.errorPerFile.get(file, {})
         errorsPerFile[category] = errorsPerFile.get(category, 0) + 1
         self.errorPerFile[file] = errorsPerFile
