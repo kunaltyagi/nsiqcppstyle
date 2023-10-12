@@ -31,7 +31,9 @@ def RunRule(lexer, line, lineno):
         # Check it's not string. Followings are best guess....
         if line.count('"') == 0 and not line.endswith("\\"):
             nsiqcppstyle_reporter.Error(
-                DummyToken(lexer.filename, line, lineno, 0), __name__, "Do not use double assignment in a same line",
+                DummyToken(lexer.filename, line, lineno, 0),
+                __name__,
+                "Do not use double assignment in a same line",
             )
 
 
