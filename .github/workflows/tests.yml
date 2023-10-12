@@ -1,13 +1,13 @@
 name: Tests CI
 
 on:
-    push:
-        branches: [ "master" ]
-    pull_request:
-        branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
-  Run-tests:
+  run-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
