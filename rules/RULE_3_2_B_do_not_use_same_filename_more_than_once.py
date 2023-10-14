@@ -24,7 +24,7 @@ from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 
-filenameMap = {}
+filenameMap: dict[str, list[str]] = {}
 
 
 def RunRule(lexer, filename, dirname):

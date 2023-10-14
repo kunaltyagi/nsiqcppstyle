@@ -270,7 +270,7 @@ private :
         )
         self.ExpectSuccess(__name__)
 
-    def test14(self):
+    def test16(self):
         self.Analyze(
             "thisfile.h",
             """
@@ -282,7 +282,7 @@ protected :
         )
         self.ExpectError(__name__)
 
-    def test15(self):
+    def test17(self):
         self.Analyze(
             "thisfile.h",
             """

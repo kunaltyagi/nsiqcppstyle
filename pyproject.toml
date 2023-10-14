@@ -22,16 +22,11 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = [
-]
+dependencies = []
 
 [project.optional-dependencies]
-dev = [
-  "pip_search"
-]
-test = [
-  "pytest == 7.4.*",
-]
+dev = ["pip_search"]
+test = ["pytest == 7.4.*"]
 
 [project.urls]
 Documentation = "https://github.com/kunaltyagi/nsiqcppstyle/blob/master/README.md"
@@ -215,6 +210,9 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = "nsiqcppstyle.*"
 ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = "updateagent.*"
+ignore_errors = true
 
 [tool.bandit]
 exclude_dirs = ["tests"]

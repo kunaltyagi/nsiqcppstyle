@@ -22,5 +22,5 @@ jobs:
       - name: Install Hatch
         run: pipx install hatch
 
-      - name: Check style
-        run: hatch run lint:style
+      - name: Check style and typing
+        run: hatch run lint:all
