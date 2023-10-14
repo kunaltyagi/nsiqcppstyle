@@ -1,3 +1,4 @@
+[![Tests CI](https://github.com/kunaltyagi/nsiqcppstyle/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/kunaltyagi/nsiqcppstyle/actions/workflows/tests.yml)
 # About
 
 nsiqcppstyle is one of the most customizable cpp style checkers about.
