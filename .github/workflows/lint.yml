@@ -2,7 +2,7 @@ name: Lint CI
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   run-lints:
@@ -16,7 +16,9 @@ jobs:
       - name: Set up pip cache
         uses: actions/cache@v3.3.2
         with:
-          path: ~/.cache/pip
+          path: |
+            ~/.cache/pip
+            ${{ github.workspace }}/.mypy_cache
           key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: ${{ runner.os }}-pip-
       - name: Install Hatch
