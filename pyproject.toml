@@ -74,8 +74,8 @@ python = "3.8"
 typing = "mypy --install-types --non-interactive {args:.}"
 # style = ["ruff {args:.}", "black --check --diff {args:.}"]
 style = ["black --check --diff {args:.}"]
-# fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
-fmt = ["black {args:.}"]
+fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
+# fmt = ["black {args:.}"]
 all = ["style", "typing"]
 
 [tool.hatch.build.targets.sdist]
@@ -90,7 +90,7 @@ exclude = ["/updateagent"]
 # mypy-args = ["--no-warn-unused-ignores"]
 
 [tool.black]
-target-version = ["py310"]
+target-version = ["py38"]
 line-length = 120
 skip-string-normalization = true
 extend-exclude = """
@@ -98,7 +98,7 @@ temp/
 """
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py38"
 line-length = 120
 select = [
   "A",
