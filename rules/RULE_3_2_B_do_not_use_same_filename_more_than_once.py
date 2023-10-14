@@ -18,13 +18,13 @@ Do not use same filenames more than once.
     testdir/stadfx.*
     testdir1/stdafx.*
 """
-import string
+from typing import List
 
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport
 from nsiqunittest.nsiqcppstyle_unittestbase import *
 
-filenameMap: dict[str, list[str]] = {}
+filenameMap: dict[str, List[str]] = {}
 
 
 def RunRule(lexer, filename, dirname):
