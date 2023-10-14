@@ -1,7 +1,7 @@
 # Copyright (c) 2022 All rights reserved.
 # SPDX-License-Identifier: GPL-2.0-only
 
-from typing import NewType, Union
+from typing import NewType, TypeVar
 
 import nsiqcppstyle_checker
 import nsiqcppstyle_lexer
@@ -32,7 +32,9 @@ LineNumber = NewType("LineNumber", int)
 LineText = NewType("LineText", str)
 
 # The target directory currently being analyzed
-TargetDirectory = NewType("TargetDirectory", Union[str, bytes])
+TargetDirectoryStr = NewType("TargetDirectoryStr", str)
+TargetDirectoryBytes = NewType("TargetDirectoryBytes", bytes)
+TargetDirectory = TypeVar("TargetDirectory", TargetDirectoryStr, TargetDirectoryBytes)
 
 # The token currently being processed
 Token = NewType("Token", nsiqcppstyle_lexer.LexToken)

@@ -178,7 +178,7 @@ void func1()
         )
         self.ExpectError(__name__)
 
-    def test8(self):
+    def test9(self):
         self.Analyze(
             "thisfile.c",
             """
@@ -190,7 +190,7 @@ void func1()
         )
         self.ExpectError(__name__)
 
-    def test9(self):
+    def test10(self):
         # known issue. Not a problem
         self.Analyze(
             "thisfile.c",
