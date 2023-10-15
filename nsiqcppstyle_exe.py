@@ -35,10 +35,9 @@ import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_state
-import updateagent.agent
+from __about__ import __version__ as version
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import *
-from __about__ import __version__ as version
 
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
@@ -96,7 +95,11 @@ def get_parser():
 
     verbosity_gp = parser.add_mutually_exclusive_group(required=False)
     verbosity_gp.add_argument(
-        "-v", "--verbose", action="store_true", default=False, help="Show detail output (verbose mode)"
+        "-v",
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Show detail output (verbose mode)",
     )
     verbosity_gp.add_argument(
         "-q",
@@ -112,7 +115,10 @@ def get_parser():
         help="Enable Continuous Integration mode. If enabled, this tool only reports summary.",
     )
     verbosity_gp.add_argument(
-        "--log-level", choices=["debug", "info", "warning", "error"], default="info", help="Set a logging level"
+        "--log-level",
+        choices=["debug", "info", "warning", "error"],
+        default="info",
+        help="Set a logging level",
     )
 
     parser.add_argument("--version", action="version", version="%(prog)s " + version)
@@ -143,7 +149,10 @@ def get_parser():
         help="Output location, required for multiple targets. If a file is provided, the parent folder is used instead",
     )
     parser.add_argument(
-        "-s", "--filter-scope", default="default", help="Assign Filter scope name to be applied in this analysis"
+        "-s",
+        "--filter-scope",
+        default="default",
+        help="Assign Filter scope name to be applied in this analysis",
     )
 
     filter_gp = parser.add_mutually_exclusive_group(required=False)
@@ -162,7 +171,9 @@ def get_parser():
     )
 
     parser.add_argument(
-        "--noBase", action="store_false", help="Use an null base file list instead of creating one from target"
+        "--noBase",
+        action="store_false",
+        help="Use an null base file list instead of creating one from target",
     )
     parser.add_argument("target_path", nargs="+")
     return parser
@@ -320,14 +331,6 @@ def ProcessFile(ruleManager, file, analyzedFiles):
     console.Out.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
-
-
-def Update():
-    console.Out.Error("Development in progress. Please check manually")
-    """
-    updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update",
-                             version)
-    """
 
 
 def GetOutputPath(outputBasePath, outputPath):
@@ -570,7 +573,7 @@ def GetCliKeyValueMap(kvList):
         kvPair = kv.split(":", 1)
         if len(kvPair) != 2:
             ShowMessageAndExit(
-                "Error!: No key found in {}. Please use KEY:VALUE style to provide key and value".format(kv)
+                f"Error!: No key found in {kv}. Please use KEY:VALUE style to provide key and value",
             )
         varMap[kvPair[0]] = kvPair[1]
     return varMap

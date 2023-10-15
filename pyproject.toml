@@ -210,9 +210,6 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = "nsiqcppstyle.*"
 ignore_missing_imports = true
-[[tool.mypy.overrides]]
-module = "updateagent.*"
-ignore_errors = true
 
 [tool.bandit]
 exclude_dirs = ["tests"]
