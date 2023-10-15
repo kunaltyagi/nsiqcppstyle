@@ -58,7 +58,7 @@ def get_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=title
-        + """Apply rules on C/C++ code
+        + """Apply custom rules on C/C++ code to report violations of your coding standards
 
 [Example]
    nsiqcppstyle .
@@ -66,25 +66,14 @@ def get_parser():
    nsiqcppstyle -f filefilterpath targetfilepath
 """,
         epilog="""
-  -o path       Set the output path. It's only applied when the output is csv or xml.
-  -f path       Set the filefilter path. If not provided, it uses the default filterpath
-                (target/filefilter.txt)
-                If you provide the file path (not a folder path) for the target,
-                -f option should be provided.
-  --filter-string=<filter string>
-                A single, valid filter file line.  This option may be repeated multiple
-                times.  Enables specifying the contents of a filter file without needing
-                to create one (e.g., in a read-only file system)
-  --var=key: value,key: value
-                provide the variables to customize the rule behavior.
 
+* If options like `--filter-string` and `--var` (which accept one or more arguments) are the last option, remember to separate the arguments and targets by adding a `--` before the targets. Eg:
+  --var key1:value key2:value -- my_target_path
 
-* nsiqcppstyle reports coding standard violations on C/C++ source code.
-
-* By default, it doesn't apply any rules on the source. If you want to apply rule, they should be provided in the 'filefilter.txt' file in following form.
+* By default, it doesn't apply any rules on the source. If you want to apply rule, they should be provided in the 'filefilter.txt' file in following format:
   ~ RULENAME
 
-* You can customize the rule behavior by providing --var=key: value pair when executing the tool. You can also insert them in the 'filefilter.txt' with the following format:
+* You can  customize the rule behavior by insert key-value pairs in the 'filefilter.txt' with the following format:
   % key: value
 
 * If you want to filter in or out some source code files in the target directory please locate 'filefilter.txt' file in the target directory in the form of
@@ -101,34 +90,40 @@ def get_parser():
   The included(+)/excluded(-) paths are applied sequentially from top to bottom
   By default, all files under target directory are included for analysis excluding the version control (cvs, svn, git, mercurial) directories.
 
-* If the 'basefilelist.txt' (pair of filename and filesize) is in the target directory, nsiqcppstyle recognizes it and checks only the new and modified file. Please refer the nsiqcollector on how to generate basefilelist.txt.
+* If the 'basefilelist.txt' (pair of filename and filesize) is in the target directory, nsiqcppstyle recognizes it and checks only the new and modified file
 """,
     )
 
-    verbosity = parser.add_mutually_exclusive_group(required=False)
-    verbosity.add_argument(
+    verbosity_gp = parser.add_mutually_exclusive_group(required=False)
+    verbosity_gp.add_argument(
         "-v", "--verbose", action="store_true", default=False, help="Show detail output (verbose mode)"
     )
-    verbosity.add_argument(
+    verbosity_gp.add_argument(
         "-q",
         "--quiet",
         action="store_true",
         default=False,
         help="Enable quiet mode. If enabled, this tool only reports errors.",
     )
-    verbosity.add_argument(
+    verbosity_gp.add_argument(
         "--ci",
         action="store_true",
         default=False,
         help="Enable Continuous Integration mode. If enabled, this tool only reports summary.",
     )
-    verbosity.add_argument(
+    verbosity_gp.add_argument(
         "--log-level", choices=["debug", "info", "warning", "error"], default="info", help="Set a logging level"
     )
 
     parser.add_argument("--version", action="version", version="%(prog)s " + version)
     parser.add_argument("--show-url", action="store_true", default=False)
     parser.add_argument("-r", "--list-rules", action="store_true", default=False, help="Show rule list")
+    parser.add_argument(
+        "--var",
+        action="extend",
+        nargs="+",
+        help="Provide variables in 'KEY:VALUE' format to customize the rule behavior. Can be used multiple times",
+    )
     parser.add_argument(
         "--output",
         choices=[
@@ -151,14 +146,20 @@ def get_parser():
         "-s", "--filter-scope", default="default", help="Assign Filter scope name to be applied in this analysis"
     )
 
-    filter = parser.add_mutually_exclusive_group(required=False)
-    filter.add_argument(
+    filter_gp = parser.add_mutually_exclusive_group(required=False)
+    filter_gp.add_argument(
         "-f",
         "--filter-path",
         default="",
         help="Custom location of 'filefilter.txt'. By default the directory of the target is searched for  the 'filefilter.txt'",
     )
-    filter.add_argument("--filter-string", action="append")
+
+    filter_gp.add_argument(
+        "--filter-string",
+        action="extend",
+        nargs="+",
+        help="A single, valid filter file line. Enables specifying the contents of a filter file without creating one (e.g., in a read-only file system). Can be used multiple times",
+    )
 
     parser.add_argument(
         "--noBase", action="store_false", help="Use an null base file list instead of creating one from target"
@@ -171,7 +172,7 @@ def main():
     global filename
 
     parser = get_parser()
-    args, classic_args = parser.parse_known_args()
+    args = parser.parse_args()
     _nsiqcppstyle_state.output_format = args.output
     _nsiqcppstyle_state.showUrl = args.show_url
     filterScope = args.filter_scope
@@ -180,6 +181,7 @@ def main():
     filterPath = args.filter_path
     filterStringList = args.filter_string
     noBase = args.noBase
+    varMap = GetCliKeyValueMap(args.var)
 
     if args.verbose:
         console.SetLevel(console.Level.Verbose)
@@ -192,24 +194,9 @@ def main():
 
         console.SetLevel(getattr(logging, str(args.log_level).upper()))
 
-    print(args)
     if args.list_rules:
         ShowRuleList()
     try:
-        try:
-            opts, args = getopt.getopt(
-                classic_args,
-                "",
-                [
-                    "show-url",
-                    "update",
-                    "no-update",
-                ],
-            )
-        except getopt.error as msg:
-            raise ShowMessageAndExit(msg)
-
-        varMap = {}
         extLangMap = {
             "Html": {"htm", "html"},
             "Java": {"java"},
@@ -218,24 +205,9 @@ def main():
             "C/C++": {"cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"},
         }
 
-        updateNsiqCppStyle = False
-        for o, a in opts:
-            if o == "--update":
-                updateNsiqCppStyle = True
-            elif o == "--no-update":
-                updateNsiqCppStyle = False
-            elif o == "--var":
-                varMap = GetCustomKeyValueMap(a, "--var=" + a)
-
         console.Out.Ci(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
-        if updateNsiqCppStyle:
-            console.Out.Ci(console.Separator)
-            try:
-                updateagent.agent.Update(version)
-            except Exception as e:
-                console.Out.Error(e)
 
         multipleTarget = len(targetPaths) > 1
 
@@ -590,6 +562,18 @@ Current File extension and Language Settings
                 continue
             else:
                 self.varMap[eachVar] = varMap[eachVar]
+
+
+def GetCliKeyValueMap(kvList):
+    varMap = {}
+    for kv in kvList:
+        kvPair = kv.split(":", 1)
+        if len(kvPair) != 2:
+            ShowMessageAndExit(
+                "Error!: No key found in {}. Please use KEY:VALUE style to provide key and value".format(kv)
+            )
+        varMap[kvPair[0]] = kvPair[1]
+    return varMap
 
 
 def GetCustomKeyValueMap(keyValuePair, where):

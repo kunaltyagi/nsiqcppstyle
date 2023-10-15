@@ -79,7 +79,7 @@ fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
 all = ["style", "typing"]
 
 [tool.hatch.build.targets.sdist]
-exclude = ["/updateagent"]
+#exclude = [""]
 
 #[tool.hatch.build.targets.wheel]
 #packages = ['.']
