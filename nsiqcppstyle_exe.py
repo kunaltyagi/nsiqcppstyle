@@ -69,7 +69,7 @@ def get_parser():
 * If options like `--filter-string` and `--var` (which accept one or more arguments) are the last option, remember to separate the arguments and targets by adding a `--` before the targets. Eg:
   --var key1:value key2:value -- my_target_path
 
-* By default, it doesn't apply any rules on the source. If you want to apply rule, they should be provided in the 'filefilter.txt' file in following format:
+* By default, it doesn't apply any rules on the source. If you want to apply rule, they should be provided in the 'filefilter.txt' file with the following format:
   ~ RULENAME
 
 * You can  customize the rule behavior by insert key-value pairs in the 'filefilter.txt' with the following format:
