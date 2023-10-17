@@ -83,8 +83,7 @@ def get_parser():
   = LANGUAGE_NAME: EXTENSION,LANGUAGE_NAME: EXTENSION
 
   The filter scope name is the identifier to selectively apply filter. In case of the quality, Maybe only main sources except test should be measured. Otherwise, to measure the productivity, the test code might be measured as well. To keep this information in the same file('filefilter.txt'), you can provide the '* file_scope_name' before the filter configuration starts.
-  You can define multiple filter scope names in the 'filefilter.txt'. In addition, you can run nsiqcollector with -s option to specify the filter scope name used.
-  We recommend you define at least two filter scopes (Productivity, Quality)
+  You can define multiple filter scope names in the 'filefilter.txt'. We recommend you define at least two filter scopes (Productivity, Quality)
 
   The included(+)/excluded(-) paths are applied sequentially from top to bottom
   By default, all files under target directory are included for analysis excluding the version control (cvs, svn, git, mercurial) directories.
