@@ -29,7 +29,6 @@
 #
 from nsiqcppstyle_util import *
 
-
 if __name__ == "__main__":
     sys.path.append(GetRuntimePath())
     module = __import__("nsiqcppstyle_exe")

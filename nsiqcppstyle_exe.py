@@ -35,10 +35,9 @@ import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
 import nsiqcppstyle_rulemanager
 import nsiqcppstyle_state
-import updateagent.agent
+from __about__ import __version__ as version
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_util import *
-from __about__ import __version__ as version
 
 ##########################################################################
 title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
@@ -47,123 +46,167 @@ title = "nsiqcppstyle: N'SIQ Cpp Style ver " + version + "\n"
 def ShowMessageAndExit(msg, usageOutput=True):
     console.Err.Error(msg)
     if usageOutput:
-        Usage()
+        get_parser().print_usage()
+        sys.exit(0)
     sys.exit(-1)
 
 
-def Usage():
-    print(
-        """
-======================================================================================
-Usage: nsiqcppstyle [Options]
-           targetdirectory
+def get_parser():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=title
+        + """Apply custom rules on C/C++ code to report violations of your coding standards
 
 [Example]
    nsiqcppstyle .
    nsiqcppstyle targetdir
    nsiqcppstyle -f filefilterpath targetfilepath
+""",
+        epilog="""
 
-[Options]
-  -h            Show this help
-  -v            Show detail ouput(verbose mode)
-  -r            Show rule list
-  -o path       Set the output path. It's only applied when the output is csv or xml.
-  -f path       Set the filefilter path. If not provided, it uses the default filterpath
-                (target/filefilter.txt)
-                If you provide the file path (not a folder path) for the target,
-                -f option should be provided.
-  --filter-string=<filter string>
-                A single, valid filter file line.  This option may be repeated multiple
-                times.  Enables specifying the contents of a filter file without needing
-                to create one (e.g., in a read-only file system)
-  --var=key: value,key: value
-                provide the variables to customize the rule behavior.
-  --list-rules / -r  Show all rules available.
-                Add file extensions to be counted as assigned languages.
-  -s            Assign Filter scope name to be applied in this analysis
-  --output=     output format 'emacs', 'vs7', 'csv', 'xml' and 'eclipse'. Default value is vs7
-                emacs, vs7, eclipse output the result on the stdout in the form
-                that each tool recognizes.
-                csv and xml outputs the result on the file "nsiqcppstyle_result.csv"
-                "nsiqcppstyle_result.xml" respectively, if you don't provide -o option.
-  --ci          Continuous Integration mode. If this mode is on, this tool only reports summary.
-  --quiet / -q  Quiet mode. If this mode is on, this tool only reports errors.
+* If options like `--filter-string` and `--var` (which accept one or more arguments) are the last option, remember to separate the arguments and targets by adding a `--` before the targets. Eg:
+  --var key1:value key2:value -- my_target_path
 
-* nsiqcppstyle reports coding standard violations on C/C++ source code.
-* In default, it doesn't apply any rules on the source. If you want to apply rule,
-  they should be provided in the filefilter.txt file in following form.
+* By default, it doesn't apply any rules on the source. If you want to apply rule, they should be provided in the 'filefilter.txt' file with the following format:
   ~ RULENAME
 
-* You can customize the rule behavior by providing --var=key: value pair when executing
-  tool and you can put it in the filefilter.txt. The format is following.
+* You can  customize the rule behavior by insert key-value pairs in the 'filefilter.txt' with the following format:
   % key: value
 
-* If you want to filter in or out some source code files in the target directory
-  please locate filefilter.txt file in the target directory in the form of
+* If you want to filter in or out some source code files in the target directory please locate 'filefilter.txt' file in the target directory in the form of
 
   * FILTER_SCOPE_NAME
   + INCLUDE_PATH_PATTERNS
   - EXCLUDE_PATH_PATTERNS
   = LANGUAGE_NAME: EXTENSION,LANGUAGE_NAME: EXTENSION
 
-  The filter scope name is the identifier to selectively apply filter.
-  In case of the quality, Maybe only main sources except test should be measured.
-  Otherwise, to measure the productivity, the test code might be measured as well.
-  To keep this information in the same file(filefilter.txt), you can provide the
-  * file_scope_name before the filter configuration starts.
-  You can define multiple filter scope name in the filefilter.txt. In addition,
-  you can run nsiqcollector with -s option to specify the filter scope name used.
-  We recommend you to define at least two filter scopes (Productivity, Quality)
+  The filter scope name is the identifier to selectively apply filter. In case of the quality, Maybe only main sources except test should be measured. Otherwise, to measure the productivity, the test code might be measured as well. To keep this information in the same file('filefilter.txt'), you can provide the '* file_scope_name' before the filter configuration starts.
+  You can define multiple filter scope names in the 'filefilter.txt'. We recommend you define at least two filter scopes (Productivity, Quality)
 
-  The included(+)/excluded(-) paths are applied sequentially from up to down
-  In default, all files under target directory but under /.cvs/ and /.svn/
-  will be included for analysis.
+  The included(+)/excluded(-) paths are applied sequentially from top to bottom
+  By default, all files under target directory are included for analysis excluding the version control (cvs, svn, git, mercurial) directories.
 
-* It the basefilelist.txt (pair of filename and filesize) is in the target directory,
-  nsiqcppstyle recognizes it and check the file are modified or new.
-  And It checks only new and modified file. Please refer the nsiqcollector
-  to generate basefilelist.txt.
-
+* If the 'basefilelist.txt' (pair of filename and filesize) is in the target directory, nsiqcppstyle recognizes it and checks only the new and modified file
 """,
     )
-    sys.exit(0)
+
+    verbosity_gp = parser.add_mutually_exclusive_group(required=False)
+    verbosity_gp.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Show detail output (verbose mode)",
+    )
+    verbosity_gp.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        default=False,
+        help="Enable quiet mode. If enabled, this tool only reports errors.",
+    )
+    verbosity_gp.add_argument(
+        "--ci",
+        action="store_true",
+        default=False,
+        help="Enable Continuous Integration mode. If enabled, this tool only reports summary.",
+    )
+    verbosity_gp.add_argument(
+        "--log-level",
+        choices=["debug", "info", "warning", "error"],
+        default="info",
+        help="Set a logging level",
+    )
+
+    parser.add_argument("--version", action="version", version="%(prog)s " + version)
+    parser.add_argument("--show-url", action="store_true", default=False)
+    parser.add_argument("-r", "--list-rules", action="store_true", default=False, help="Show rule list")
+    parser.add_argument(
+        "--var",
+        action="extend",
+        nargs="+",
+        help="Provide variables in 'KEY:VALUE' format to customize the rule behavior. Can be used multiple times",
+    )
+    parser.add_argument(
+        "--output",
+        choices=[
+            "csv",
+            "eclipse",
+            "emacs",
+            "vs7",
+            "xml",
+        ],
+        default="vs7",
+        help="'emacs', 'vs7', 'eclipse' output the result on the stdout in the form that each tool recognizes. 'csv' and 'xml' output the result on the file 'nsiqcppstyle_result.<extension>' if you don't provide -o option",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-path",
+        default="",
+        help="Output location, required for multiple targets. If a file is provided, the parent folder is used instead",
+    )
+    parser.add_argument(
+        "-s",
+        "--filter-scope",
+        default="default",
+        help="Assign Filter scope name to be applied in this analysis",
+    )
+
+    filter_gp = parser.add_mutually_exclusive_group(required=False)
+    filter_gp.add_argument(
+        "-f",
+        "--filter-path",
+        default="",
+        help="Custom location of 'filefilter.txt'. By default the directory of the target is searched for  the 'filefilter.txt'",
+    )
+
+    filter_gp.add_argument(
+        "--filter-string",
+        action="extend",
+        nargs="+",
+        help="A single, valid filter file line. Enables specifying the contents of a filter file without creating one (e.g., in a read-only file system). Can be used multiple times",
+    )
+
+    parser.add_argument(
+        "--noBase",
+        action="store_false",
+        help="Use an null base file list instead of creating one from target",
+    )
+    parser.add_argument("target_path", nargs="+")
+    return parser
 
 
-def main(argv=None):
+def main():
     global filename
 
-    if argv is None:
-        argv = sys.argv
-    try:
-        try:
-            opts, args = getopt.getopt(
-                argv[1:],
-                "o: s: hqvrf: ",
-                [
-                    "help",
-                    "csv",
-                    "output=",
-                    "list_rules",
-                    "verbose=",
-                    "show-url",
-                    "no-update",
-                    "ci",
-                    "quiet",
-                    "var=",
-                    "noBase",
-                    "filter-string=",
-                ],
-            )
-        except getopt.error as msg:
-            raise ShowMessageAndExit(msg)
+    parser = get_parser()
+    args = parser.parse_args()
+    _nsiqcppstyle_state.output_format = args.output
+    _nsiqcppstyle_state.showUrl = args.show_url
+    filterScope = args.filter_scope
+    targetPaths = GetRealTargetPaths(args.target_path)
+    outputPath = args.output_path
+    filterPath = args.filter_path
+    filterStringList = args.filter_string
+    noBase = args.noBase
+    varMap = GetCliKeyValueMap(args.var)
 
-        outputPath = ""
-        _nsiqcppstyle_state.output_format = "vs7"
-        filterScope = "default"
-        filterPath = ""
-        filterStringList = []
-        noBase = False
-        varMap = {}
+    if args.verbose:
+        console.SetLevel(console.Level.Verbose)
+    elif args.quiet:
+        console.SetLevel(console.Level.Error)
+    elif args.ci:
+        console.SetLevel(console.Level.Ci)
+    else:
+        import logging
+
+        console.SetLevel(getattr(logging, str(args.log_level).upper()))
+
+    if args.list_rules:
+        ShowRuleList()
+    try:
         extLangMap = {
             "Html": {"htm", "html"},
             "Java": {"java"},
@@ -172,64 +215,11 @@ def main(argv=None):
             "C/C++": {"cpp", "h", "c", "hxx", "cxx", "hpp", "cc", "hh", "m", "mm"},
         }
 
-        updateNsiqCppStyle = False
-        for o, a in opts:
-            if o in ("-h", "--help"):
-                print(title)
-                Usage()
-            elif o in ("-r", "--list-rules"):
-                ShowRuleList()
-            elif o == "-o":
-                outputPath = a.strip().replace('"', "")
-            elif o == "--update":
-                updateNsiqCppStyle = True
-            elif o == "--no-update":
-                updateNsiqCppStyle = False
-            elif o == "-f":
-                filterPath = a.strip().replace('"', "")
-            elif o == "--filter-string":
-                filterStringList.append(a)
-            elif o == "-v":
-                console.SetLevel(console.Level.Verbose)
-            elif o == "-s":
-                filterScope = a
-            elif o == "--show-url":
-                _nsiqcppstyle_state.showUrl = True
-            elif o == "--output":
-                if a not in ("emacs", "vs7", "csv", "xml", "eclipse"):
-                    print(title)
-                    ShowMessageAndExit("The only allowed output formats are emacs, vs7 and csv.")
-                _nsiqcppstyle_state.output_format = a
-            elif o == "--var":
-                varMap = GetCustomKeyValueMap(a, "--var=" + a)
-            elif o == "--ci":
-                console.SetLevel(console.Level.Ci)
-            elif o in ("-q", "--quiet"):
-                console.SetLevel(console.Level.Error)
-            elif o == "--noBase":
-                noBase = True
-
         console.Out.Ci(title)
         runtimePath = GetRuntimePath()
         sys.path.append(runtimePath)
-        if updateNsiqCppStyle:
-            console.Out.Ci(console.Separator)
-            try:
-                updateagent.agent.Update(version)
-            except Exception as e:
-                console.Out.Error(e)
 
-        targetPaths = GetRealTargetPaths(args)
-        if len(targetPaths) == 0:
-            ShowMessageAndExit("No target paths provided")
-
-        multipleTarget = True
-        if len(targetPaths) == 1:
-            multipleTarget = False
-
-        # Check: "-f" and "--filter-string" are mutually exclusive
-        if filterPath and filterStringList:
-            ShowMessageAndExit("'-f' and '--filter-string' command line options are mutually exclusive")
+        multipleTarget = len(targetPaths) > 1
 
         # If multiple target
         if multipleTarget:
@@ -340,14 +330,6 @@ def ProcessFile(ruleManager, file, analyzedFiles):
     console.Out.Info("Processing: ", file)
     nsiqcppstyle_checker.ProcessFile(ruleManager, file)
     analyzedFiles.append(file)
-
-
-def Update():
-    console.Out.Error("Development in progress. Please check manually")
-    """
-    updateagent.agent.Update("http: //nsiqcppstyle.nsiq.nhncorp.com/update",
-                             version)
-    """
 
 
 def GetOutputPath(outputBasePath, outputPath):
@@ -582,6 +564,18 @@ Current File extension and Language Settings
                 continue
             else:
                 self.varMap[eachVar] = varMap[eachVar]
+
+
+def GetCliKeyValueMap(kvList):
+    varMap = {}
+    for kv in kvList:
+        kvPair = kv.split(":", 1)
+        if len(kvPair) != 2:
+            ShowMessageAndExit(
+                f"Error!: No key found in {kv}. Please use KEY:VALUE style to provide key and value",
+            )
+        varMap[kvPair[0]] = kvPair[1]
+    return varMap
 
 
 def GetCustomKeyValueMap(keyValuePair, where):
