@@ -374,7 +374,7 @@ class FilterManager:
 
         if line.startswith("#") or len(line) == 0:
             # Comment or empty line, just return
-            return None
+            return filter
         if line.startswith("*"):
             if len(line[1:].strip()) != 0:
                 filterName = line[1:].strip()
