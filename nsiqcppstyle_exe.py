@@ -567,16 +567,17 @@ Current File extension and Language Settings
 
 
 def GetCliKeyValueMap(kvList):
-    varMap = {}
+    if kvList == None:
+        return {}
 
-    if kvList != None:
-        for kv in kvList:
-            kvPair = kv.split(":", 1)
-            if len(kvPair) != 2:
-                ShowMessageAndExit(
-                    f"Error!: No key found in {kv}. Please use KEY:VALUE style to provide key and value",
-                )
-            varMap[kvPair[0]] = kvPair[1]
+    varMap = {}
+    for kv in kvList:
+        kvPair = kv.split(":", 1)
+        if len(kvPair) != 2:
+            ShowMessageAndExit(
+                f"Error!: No key found in {kv}. Please use KEY:VALUE style to provide key and value",
+            )
+        varMap[kvPair[0]] = kvPair[1]
 
     return varMap
 
