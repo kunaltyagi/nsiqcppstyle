@@ -29,4 +29,4 @@ jobs:
 
       - name: Run NSIQCppStyle App tests
         timeout-minutes: 5
-        run: python nsiqcppstyle_exe.py -f nsiqunittest/resx/filefilter.example.txt --ci nsiqunittest/resx/example.cpp
+        run: python nsiqcppstyle_exe.py -f nsiqunittest/rules/comment_and_empty_lines.txt --ci nsiqunittest/src/simple_main.cpp
