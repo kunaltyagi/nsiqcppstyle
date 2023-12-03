@@ -374,7 +374,7 @@ class FilterManager:
 
         if line.startswith("#") or len(line) == 0:
             # Comment or empty line, just return
-            return None
+            return filter
         if line.startswith("*"):
             if len(line[1:].strip()) != 0:
                 filterName = line[1:].strip()
@@ -567,6 +567,9 @@ Current File extension and Language Settings
 
 
 def GetCliKeyValueMap(kvList):
+    if kvList == None:
+        return {}
+
     varMap = {}
     for kv in kvList:
         kvPair = kv.split(":", 1)
@@ -575,6 +578,7 @@ def GetCliKeyValueMap(kvList):
                 f"Error!: No key found in {kv}. Please use KEY:VALUE style to provide key and value",
             )
         varMap[kvPair[0]] = kvPair[1]
+
     return varMap
 
 

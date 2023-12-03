@@ -26,3 +26,7 @@ jobs:
       - name: Run NSIQCppStyle RULES tests
         timeout-minutes: 5
         run: PYTHONPATH=./:./rules python -m unittest discover -s rules -p "*.py"
+
+      - name: Run NSIQCppStyle App tests
+        timeout-minutes: 5
+        run: python nsiqcppstyle_exe.py -f nsiqunittest/rules/comment_and_empty_lines.txt --ci nsiqunittest/src/simple_main.cpp
