@@ -302,8 +302,7 @@ def main():
 
             # if the target is file, analyze it without condition
             if targetPath.is_file():
-                fileExtension = targetPath.suffix[1:]
-                if check_file_ext(fileExtension, cExtendstionSet):
+                if check_file_ext(targetPath, cExtendstionSet):
                     ProcessFile(ruleManager, targetPath, analyzedFiles)
 
             # if the target is directory, analyze it with filefilter and
@@ -319,11 +318,10 @@ def main():
                     if ".hg" in dirs:
                         dirs.remove(".hg")
                     for fname in files:
-                        fileExtension = fname[fname.rfind(".") + 1 :]
                         eachFile = os.path.join(root, fname)
                         basePart = eachFile[len(targetPath) :]
                         if (
-                            check_file_ext(fileExtension, cExtendstionSet)
+                            check_file_ext(Path(fname), cExtendstionSet)
                             and basefilelist.IsNewOrChanged(eachFile)
                             and filter.CheckFileInclusion(basePart)
                         ):
