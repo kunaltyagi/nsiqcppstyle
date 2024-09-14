@@ -28,6 +28,7 @@
 
 import os
 import traceback
+from copy import deepcopy
 
 from nsiqcppstyle_outputer import _consoleOutputer as console
 from nsiqcppstyle_rulehelper import *  # @UnusedWildImport
@@ -80,6 +81,7 @@ tokens = [
     # Delimeters ( ) [ ] { } , . ; :
     "LPAREN",
     "RPAREN",
+    "PARENS",
     "LBRACKET",
     "RBRACKET",
     "LBRACE",
@@ -425,7 +427,6 @@ class CppLexerNavigator:
             tok.filename = self.filename
             tok.pp = None
         #                self.ProcessIfdef(tok)
-        self.tokenlistsize = len(self.tokenlist)
         self.PushTokenIndex()
         while True:
             t = self.GetNextToken()
@@ -433,6 +434,10 @@ class CppLexerNavigator:
                 break
             t.inactive = self.ProcessIfdef(t)
         self.PopTokenIndex()
+
+    @property
+    def tokenlistsize(self):
+        return len(self.tokenlist)
 
     def ProcessIfdef(self, token):
         if token.type == "PREPROCESSOR":
@@ -1158,6 +1163,7 @@ def ConstructContextInfo(lexer):
 
             # Function Prediction
             elif t.pp is not True and t.type in ("ID", "OPERATOR") and contextPrediction is None:
+                operator_name = None
                 curNotSigContext = contextStack.Peek()
                 if curNotSigContext is not None and curNotSigContext.sig is False:
                     continue
@@ -1166,10 +1172,12 @@ def ConstructContextInfo(lexer):
                 if t.type == "ID":
                     t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
                     t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(2)
-
                 else:
                     t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess()
+                    operator_name = deepcopy(t2)
                     if t2.type == "LPAREN":
+                        operator_name.value = "()"  # call operator
+                        operator_name.type = "PARENS"  # call operator
                         t2 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(3)
                         t4 = lexer.PeekNextTokenSkipWhiteSpaceAndCommentAndPreprocess(4)
                     else:
@@ -1204,7 +1212,18 @@ def ConstructContextInfo(lexer):
                     fullName = t.value
                     lexer.PushTokenIndex()
                     if t.type == "OPERATOR":
-                        fullName = fullName + t3.value
+                        fullName = fullName + operator_name.value
+                        while True:
+                            prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
+                            if prevName is not None:
+                                if prevName.type == "DOUBLECOLON":
+                                    fullName = (
+                                        f"{lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value}::{fullName}"
+                                    )
+                                else:
+                                    break
+                            else:
+                                break
                     else:
                         while True:
                             prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
@@ -1221,8 +1240,8 @@ def ConstructContextInfo(lexer):
                             else:
                                 break
                     lexer.PopTokenIndex()
-                    if Match(r"^[A-Z_][A-Z_0-9][A-Z_0-9]+$", fullName):
-                        continue
+                    # if Match(r"^[A-Z_][A-Z_0-9][A-Z_0-9]+$", fullName):
+                    #     continue
                     impl = lexer.HasBody()
                     if impl:
                         contextStart = lexer.GetNextTokenInType("LBRACE")
@@ -1232,10 +1251,13 @@ def ConstructContextInfo(lexer):
 
                     # RunFunctionRule(lexer, functionName, decl, contextStack, contextPrediction)
                     t.type = "FUNCTION"
+                    t.value = fullName
                     t.fullName = fullName
                     t.context = contextPrediction
                     t.decl = not impl
                     lexer.PopTokenIndex()
+                    if operator_name is not None:
+                        operator_name = None
                     # print "TT", lexer.GetCurTokenLine(), impl,
                     # contextPrediction
             t.contextStack = contextStack
