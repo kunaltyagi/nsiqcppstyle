@@ -1163,6 +1163,7 @@ def ConstructContextInfo(lexer):
 
             # Function Prediction
             elif t.pp is not True and t.type in ("ID", "OPERATOR") and contextPrediction is None:
+                operator_name = None
                 curNotSigContext = contextStack.Peek()
                 if curNotSigContext is not None and curNotSigContext.sig is False:
                     continue
