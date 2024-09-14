@@ -18,6 +18,7 @@ Use reentrant functions. Do not use not reentrant functions.(ctime, strtok, toup
       k = ctime;     <==  Correct. It may be the reentrant function.
   }
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

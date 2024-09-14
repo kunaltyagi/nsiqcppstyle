@@ -95,7 +95,7 @@ tokens = [
     "PREPROCESSOR",
     "SHARPSHARP",
     "SHARP",
-    #
+    # non-macro
     "NUMBER",
     "CHARACTER",
     "STRING",
@@ -645,7 +645,7 @@ class CppLexerNavigator:
             nextToken = self._GetNextToken()
             if nextToken is None:
                 return None
-            elif nextToken.type in ["LT"]:
+            if nextToken.type in ["LT"]:
                 tokenStack.append(nextToken)
 
             elif nextToken.type in ["GT"]:
@@ -758,7 +758,7 @@ class CppLexerNavigator:
             prevToken = self._GetPrevToken()
             if prevToken is None:
                 return None
-            elif prevToken.type in ["GT"]:
+            if prevToken.type in ["GT"]:
                 tokenStack.append(prevToken)
             elif prevToken.type in ["RSHIFT"]:
                 tokenStack.append(prevToken)
@@ -826,8 +826,7 @@ class CppLexerNavigator:
         if self.tokenindex < self.tokenlistsize - 1:
             self.tokenindex = self.tokenindex + 1
             return self.tokenlist[self.tokenindex]
-        else:
-            return None
+        return None
 
     def _GetPrevToken(self):
         if self.tokenindex >= 0:
@@ -835,8 +834,7 @@ class CppLexerNavigator:
             if self.tokenindex == -1:
                 return None
             return self.tokenlist[self.tokenindex]
-        else:
-            return None
+        return None
 
     def GetPrevTokenInType(self, type, keepCur=True, skipPreprocess=True):
         if keepCur:
@@ -846,7 +844,7 @@ class CppLexerNavigator:
             token = self.GetPrevToken()
             if token is None:
                 break
-            elif token.type == type:
+            if token.type == type:
                 if skipPreprocess and token.pp:
                     continue
                 break
@@ -862,7 +860,7 @@ class CppLexerNavigator:
             token = self.GetPrevToken(False, False, skipPreprocess, False)
             if token is None:
                 break
-            elif token.type in typelist:
+            if token.type in typelist:
                 if skipPreprocess and token.pp:
                     continue
                 break
@@ -886,7 +884,7 @@ class CppLexerNavigator:
             token = self.GetNextToken()
             if token is None:
                 break
-            elif token.type == type:
+            if token.type == type:
                 if skipPreprocess and token.pp:
                     continue
                 break
@@ -902,7 +900,7 @@ class CppLexerNavigator:
             token = self.GetNextToken()
             if token is None:
                 break
-            elif token.type in typelist:
+            if token.type in typelist:
                 if skipPreprocess and token.pp:
                     continue
                 break
@@ -1147,9 +1145,8 @@ def ConstructContextInfo(lexer):
                             if token is not None and nextToken is not None and nextToken.type == "DOUBLECOLON":
                                 fullName += token.value + "::"
                                 continue
-                            else:
-                                fullName += token.value
-                                break
+                            fullName += token.value
+                            break
                         contextPrediction = Context(t.type + "_BLOCK", fullName, True, contextStart, contextEnd)
                     lexer.PopTokenIndex()
                 t.type = "TYPE"

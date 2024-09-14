@@ -44,6 +44,7 @@ This rule detect following style file comment.
      * blar blar
      */
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

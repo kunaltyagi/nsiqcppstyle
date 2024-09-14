@@ -27,6 +27,7 @@ Braces inside of function definitions should be located in the end of line.
         }
     }
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

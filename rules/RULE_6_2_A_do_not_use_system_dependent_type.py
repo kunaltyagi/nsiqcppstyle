@@ -12,6 +12,7 @@ Instead use system independent types (int16_t, int64_t, int32_t) respectively.
 
     int32_t b;
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
@@ -28,10 +29,7 @@ def RunRule(lexer, contextStack):
             nsiqcppstyle_reporter.Error(
                 t,
                 __name__,
-                "Do not use system dependent type({}). Use system independent type like ({})".format(
-                    t.value,
-                    systemDependentType[t.type],
-                ),
+                f"Do not use system dependent type({t.value}). Use system independent type like ({systemDependentType[t.type]})",
             )
 
 

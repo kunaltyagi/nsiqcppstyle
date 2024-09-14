@@ -16,6 +16,7 @@ align long function parameters on the first parameter when it's defined in multi
                    int c); <== OK.
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

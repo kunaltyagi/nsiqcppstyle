@@ -23,6 +23,7 @@ It checks if there is doxygen sytle comment in front of each class definition.
 
     class B; <== Don't care. It's forward decl.
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

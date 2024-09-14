@@ -12,6 +12,7 @@ Only alphabets, numbers and underbars can be used for a filename.
     testdir/test.c
     testdir1/test_1.c
 """
+
 from nsiqcppstyle_checker import *  # @UnusedWildImport
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
 from nsiqcppstyle_rulemanager import *  # @UnusedWildImport

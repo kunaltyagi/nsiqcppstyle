@@ -22,4 +22,4 @@ argument_list = [
     os.devnull,
 ]
 argument_list.extend(sys.argv[1:])
-subprocess.run(argument_list)
+subprocess.run(argument_list, check=False)

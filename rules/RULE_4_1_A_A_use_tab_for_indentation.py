@@ -18,6 +18,7 @@ In addition, it suppresses the violation when the line contains only spaces and 
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

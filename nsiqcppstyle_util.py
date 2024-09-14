@@ -56,8 +56,7 @@ def GetRuntimePath():
 def GetSystemKey():
     if sys.platform == "win32":
         return "window"
-    else:
-        return "linux"
+    return "linux"
 
 
 def CmpObjects(a, b):

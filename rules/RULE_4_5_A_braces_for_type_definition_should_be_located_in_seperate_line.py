@@ -22,6 +22,7 @@ Braces for type definition(class / struct / union / enum) should be located in t
         }
     }
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

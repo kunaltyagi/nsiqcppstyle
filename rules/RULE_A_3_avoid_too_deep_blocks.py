@@ -20,6 +20,7 @@ If the block depth in the function is more than 4, it reports a violation.
 
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

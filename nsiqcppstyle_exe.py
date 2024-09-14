@@ -28,8 +28,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 import copy
-import getopt
+import functools
 import re
+import tempfile
+from pathlib import Path
+from typing import List
 
 import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
@@ -178,6 +181,22 @@ def get_parser():
     return parser
 
 
+@functools.lru_cache
+def is_fs_case_sensitive(path: Path):
+    dir = path.parent if path.is_file() else path
+    with tempfile.NamedTemporaryFile(prefix="TmP", dir=dir, delete=True) as tmp_file:
+        return not os.path.exists(tmp_file.name.lower())
+
+
+def check_file_ext(filename: Path, valid_extensions: List[str]):
+    """check if extension of filename is in valid_extensions"""
+    if not filename.is_file():
+        return False
+    suffix = filename.suffix[1:]
+    sufix = suffix if is_fs_case_sensitive(filename.parent) else suffix.lower()
+    return suffix in valid_extensions
+
+
 def main():
     global filename
 
@@ -238,27 +257,24 @@ def main():
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
-            targetName = os.path.basename(targetPath)
+            targetName = targetPath.name
             console.Out.Ci(console.Separator)
             console.Out.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath = filterPath
-            elif os.path.isfile(targetPath):
-                filefilterPath = os.path.join(os.path.dirname(targetPath), "filefilter.txt")
+            elif targetPath.is_file():
+                filefilterPath = targetPath.parent / "filefilter.txt"
             else:
-                filefilterPath = os.path.join(targetPath, "filefilter.txt")
+                filefilterPath = targetPath / "filefilter.txt"
             basefilelist = NullBaseFileList() if noBase else BaseFileList(targetPath)
 
             # Get Active Filter
-            filterManager = FilterManager(filefilterPath, filterStringList, extLangMapCopy, varMap, filterScope)
+            filterManager = FilterManager(str(filefilterPath), filterStringList, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
                 console.Out.Error(
-                    "\n{} filter scope is not available. Instead, use {}\n".format(
-                        filterScope,
-                        filterManager.GetActiveFilter().filterName,
-                    ),
+                    f"\n{filterScope} filter scope is not available. Instead, use {filterManager.GetActiveFilter().filterName}\n",
                 )
 
             filter = filterManager.GetActiveFilter()
@@ -280,9 +296,8 @@ def main():
             console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
-            if os.path.isfile(targetPath):
-                fileExtension = targetPath[targetPath.rfind(".") + 1 :]
-                if fileExtension in cExtendstionSet:
+            if targetPath.is_file():
+                if check_file_ext(targetPath, cExtendstionSet):
                     ProcessFile(ruleManager, targetPath, analyzedFiles)
 
             # if the target is directory, analyze it with filefilter and
@@ -298,11 +313,10 @@ def main():
                     if ".hg" in dirs:
                         dirs.remove(".hg")
                     for fname in files:
-                        fileExtension = fname[fname.rfind(".") + 1 :]
                         eachFile = os.path.join(root, fname)
                         basePart = eachFile[len(targetPath) :]
                         if (
-                            fileExtension in cExtendstionSet
+                            check_file_ext(Path(fname), cExtendstionSet)
                             and basefilelist.IsNewOrChanged(eachFile)
                             and filter.CheckFileInclusion(basePart)
                         ):
@@ -343,12 +357,12 @@ def GetRealTargetPaths(args):
     """extract real target path list from args"""
     if len(args) == 0:
         ShowMessageAndExit("Error!: Target directory must be provided")
-    targetPaths = []
+    targetPaths: List[Path] = []
     for eachTarget in args:
-        realPath = os.path.realpath(eachTarget)
+        realPath = Path(os.path.realpath(eachTarget))
         targetPaths.append(realPath)
         #       CheckPathPermission(realPath, "Target directory")
-        if not os.path.exists(realPath):
+        if not realPath.exists():
             ShowMessageAndExit("Error!: Target directory %s does not exist" % eachTarget)
     return targetPaths
 
@@ -535,9 +549,8 @@ Current File extension and Language Settings
             if eachfilter[2] is True:
                 if eachfile.startswith(eachfilter[1]):
                     inclusion = eachfilter[0]
-            else:
-                if eachfile.find(eachfilter[1]) != -1:
-                    inclusion = eachfilter[0]
+            elif eachfile.find(eachfilter[1]) != -1:
+                inclusion = eachfilter[0]
         return inclusion
 
     def GetLangMap(self):
@@ -549,10 +562,7 @@ Current File extension and Language Settings
             extLangPair = eachExt.split(": ")
             if len(extLangPair) != 2:
                 ShowMessageAndExit(
-                    "Error!: The extension and language pair ({}) is incorrect in {}, please use LANGUAGENAME: EXTENSION style".format(
-                        langMapString,
-                        where,
-                    ),
+                    f"Error!: The extension and language pair ({langMapString}) is incorrect in {where}, please use LANGUAGENAME: EXTENSION style",
                 )
             lang, ext = extLangPair
             self.extLangMap.get(lang).add(ext)
@@ -562,8 +572,7 @@ Current File extension and Language Settings
         for eachVar in varMap:
             if eachVar in self.varMap:
                 continue
-            else:
-                self.varMap[eachVar] = varMap[eachVar]
+            self.varMap[eachVar] = varMap[eachVar]
 
 
 def GetCliKeyValueMap(kvList):
@@ -589,10 +598,7 @@ def GetCustomKeyValueMap(keyValuePair, where):
         customKeyValuePair = eachCustomKeyValue.split(": ")
         if len(customKeyValuePair) != 2:
             ShowMessageAndExit(
-                "Error!: The var key and value pair ({}) is incorrect in {}, please use KEY: VALUE style".format(
-                    keyValuePair,
-                    where,
-                ),
+                f"Error!: The var key and value pair ({keyValuePair}) is incorrect in {where}, please use KEY: VALUE style",
             )
         key, value = customKeyValuePair
         varMap[key] = value

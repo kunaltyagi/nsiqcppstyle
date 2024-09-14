@@ -19,6 +19,7 @@ and it doesn't report a violation on it.
     const int k = 3; <== OK
     const char *t = "EWEE"; <== OK
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

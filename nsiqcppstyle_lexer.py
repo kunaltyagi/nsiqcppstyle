@@ -235,13 +235,12 @@ class Lexer:
     def readtab(self, tabfile, fdict):
         if isinstance(tabfile, types.ModuleType):
             lextab = tabfile
+        elif sys.version_info[0] < 3:
+            exec("import %s as lextab" % tabfile)
         else:
-            if sys.version_info[0] < 3:
-                exec("import %s as lextab" % tabfile)
-            else:
-                env = {}
-                exec("import %s as lextab" % tabfile, env, env)
-                lextab = env["lextab"]
+            env = {}
+            exec("import %s as lextab" % tabfile, env, env)
+            lextab = env["lextab"]
 
         if getattr(lextab, "_tabversion", "0.0") != __version__:
             msg = "Inconsistent PLY version"
@@ -360,9 +359,8 @@ class Lexer:
                     if tok.type:
                         self.lexpos = m.end()
                         return tok
-                    else:
-                        lexpos = m.end()
-                        break
+                    lexpos = m.end()
+                    break
 
                 lexpos = m.end()
 

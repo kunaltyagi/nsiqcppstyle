@@ -53,6 +53,7 @@ void KK::C()  // NS
     void FunctionB();  <== Don't care. It's the declared in the header.
 
 """
+
 import nsiqcppstyle_reporter
 from nsiqcppstyle_rulemanager import *
 from nsiqunittest.nsiqcppstyle_unittestbase import *
