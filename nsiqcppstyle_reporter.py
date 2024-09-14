@@ -75,7 +75,7 @@ def ReportSummaryToScreen(analyzedFiles, nsiqcppstyle_state, filter):
     console.Out.Ci(" ** Total Errors Occurs       : %d" % nsiqcppstyle_state.error_count)
     console.Out.Ci(" ** Total Analyzed Files      : %d" % len(analyzedFiles))
     console.Out.Ci(" ** Total Violated Files Count: %d" % violatedFileCount)
-    console.Out.Ci(" ** Build Quality             : %.2f%%" % buildQuality)
+    console.Out.Ci(f" ** Build Quality             : {buildQuality:.2f}%")
     if console.IsLevelDisplayed(console.Level.Info):
         console.Out.Info("\n================================ Violated Rule Details ===============================")
         for checker in nsiqcppstyle_state.errorPerChecker:
@@ -159,7 +159,7 @@ def EndTarget():
 
 def StartFile(dirname, filename):
     if _nsiqcppstyle_state.output_format == "xml":
-        writer.write("<file name='%s'>\n" % (os.path.join(target, dirname[1:], filename)))
+        writer.write(f"<file name='{os.path.join(target, dirname[1:], filename)}'>\n")
 
 
 def EndFile():

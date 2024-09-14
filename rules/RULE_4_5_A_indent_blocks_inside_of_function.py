@@ -60,7 +60,7 @@ def RunRule(lexer, contextStack):
                 nsiqcppstyle_reporter.Error(
                     nt,
                     __name__,
-                    "Indent in the block. token(%s) seems to be located left column of previsous brace" % nt.value,
+                    f"Indent in the block. token({nt.value}) seems to be located left column of previsous brace",
                 )
 
 

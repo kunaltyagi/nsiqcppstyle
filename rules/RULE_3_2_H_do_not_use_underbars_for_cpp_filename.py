@@ -30,7 +30,7 @@ def RunRule(lexer, filename, dirname):
         nsiqcppstyle_reporter.Error(
             DummyToken(lexer.filename, "", 0, 0),
             __name__,
-            "Do not use underbar for cpp file name (%s)." % filename,
+            f"Do not use underbar for cpp file name ({filename}).",
         )
 
 

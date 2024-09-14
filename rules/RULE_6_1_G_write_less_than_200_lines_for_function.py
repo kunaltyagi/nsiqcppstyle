@@ -35,7 +35,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
             nsiqcppstyle_reporter.Error(
                 context.startToken,
                 __name__,
-                "Do not write function over non blank 200 lines(%s)." % fullName,
+                f"Do not write function over non blank 200 lines({fullName}).",
             )
 
 

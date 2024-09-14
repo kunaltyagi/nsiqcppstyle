@@ -49,7 +49,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
                     nsiqcppstyle_reporter.Error(
                         t2,
                         __name__,
-                        "function (%s) has non named parameter. use named parameter." % fullName,
+                        f"function ({fullName}) has non named parameter. use named parameter.",
                     )
                     break
                 count = 0
@@ -57,7 +57,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
                 nsiqcppstyle_reporter.Error(
                     t2,
                     __name__,
-                    "function (%s) has non named parameter. use named parameter." % fullName,
+                    f"function ({fullName}) has non named parameter. use named parameter.",
                 )
                 break
 

@@ -38,7 +38,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
             return
         if IsOperator(value):
             return
-        nsiqcppstyle_reporter.Error(t, __name__, "Do not start function name(%s) with uppercase" % fullName)
+        nsiqcppstyle_reporter.Error(t, __name__, f"Do not start function name({fullName}) with uppercase")
 
 
 ruleManager.AddFunctionNameRule(RunRule)

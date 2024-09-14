@@ -76,7 +76,7 @@ def RunFileEndRule(lexer, filename, dirname):
         nsiqcppstyle_reporter.Error(
             DummyToken(lexer.filename, "", 0, 0),
             __name__,
-            "The filename does not represent the classnames (%s)" % (classname),
+            f"The filename does not represent the classnames ({classname})",
         )
 
 

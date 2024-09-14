@@ -37,7 +37,7 @@ def RunRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
                 nsiqcppstyle_reporter.Error(
                     t,
                     __name__,
-                    "Enum block should be indented. But the token(%s) seems to be unindented" % t.value,
+                    f"Enum block should be indented. But the token({t.value}) seems to be unindented",
                 )
 
 

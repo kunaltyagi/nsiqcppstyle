@@ -44,7 +44,7 @@ def RunRule(lexer, currentType, fullName, decl, contextStack, context):
         nsiqcppstyle_reporter.Error(
             t,
             __name__,
-            "Doxygen Comment should be provided in front of struct/union def(%s)." % fullName,
+            f"Doxygen Comment should be provided in front of struct/union def({fullName}).",
         )
 
 

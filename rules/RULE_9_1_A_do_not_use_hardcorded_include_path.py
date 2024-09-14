@@ -25,7 +25,7 @@ def RunRule(lexer, contextStack):
         if d is not None and d.type == "STRING":
             value = d.value
             if value.startswith('"/') or Search(r"^\"[a-zA-Z]:", value):
-                nsiqcppstyle_reporter.Error(d, __name__, "Do not use absolute path(%s) in the include path" % value)
+                nsiqcppstyle_reporter.Error(d, __name__, f"Do not use absolute path({value}) in the include path")
 
 
 ruleManager.AddPreprocessRule(RunRule)
