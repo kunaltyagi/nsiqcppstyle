@@ -435,11 +435,13 @@ class FilterManager:
         if len(filter.nsiqCppStyleRules) == 0:
             filter.AddExclude("/.svn/")
             filter.AddExclude("/.cvs/")
+            filter.AddExclude("/.git/")
             return
 
         for eachMapKey in self.filterMap:
             self.filterMap[eachMapKey].AddExclude("/.cvs/")
             self.filterMap[eachMapKey].AddExclude("/.svn/")
+            self.filterMap[eachMapKey].AddExclude("/.git/")
 
         if activeFilterName in self.filterMap:
             self.activeFilterName = activeFilterName
