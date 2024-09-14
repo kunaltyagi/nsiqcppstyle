@@ -1217,7 +1217,9 @@ def ConstructContextInfo(lexer):
                             prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if prevName is not None:
                                 if prevName.type == "DOUBLECOLON":
-                                    fullName = f"{lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value}::{fullName}"
+                                    fullName = (
+                                        f"{lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value}::{fullName}"
+                                    )
                                 else:
                                     break
                             else:

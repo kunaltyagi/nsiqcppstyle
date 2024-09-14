@@ -103,10 +103,10 @@ def IsOperator(value):
     """Check if the passed value is 'operator'"""
     if value is None:
         return False
-    if not value.startswith('operator'):
+    if not value.startswith("operator"):
         return False
-    operator_type = value.removeprefix('operator')
-    if operator_type == '':
+    operator_type = value.removeprefix("operator")
+    if operator_type == "":
         return True
     if operator_type[0].isalnum():
         return False
