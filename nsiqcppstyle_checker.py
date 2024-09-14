@@ -1240,7 +1240,27 @@ def ConstructContextInfo(lexer):
                     #     continue
                     impl = lexer.HasBody()
                     if impl:
-                        contextStart = lexer.GetNextTokenInType("LBRACE")
+                        while True:
+                            # handle ctor list initializers
+                            contextStart = lexer.GetNextTokenInType("LBRACE")
+                            if t.type != "ID" or prevName is None:
+                                break
+                            if curContext is not None and curContext.type in ["CLASS_BLOCK", "STRUCT_BLOCK"]:
+                                # we are in a class
+                                if t.value != curContext.name or fullName[0] == "~":
+                                    break  # not a ctor
+                            elif "::" in fullName:
+                                # checking for a ctor outside a class
+                                names = fullName.split("::")
+                                if len(names) == 1 or names[-1] != names[0]:
+                                    break
+                            else:
+                                # just a normal scope, no need to iterate
+                                break
+                            bracePrevToken = lexer.PeekPrevTokenSkipWhiteSpaceAndComment()
+                            if bracePrevToken.type in ["RPAREN", "RBRACE", "COMMA"]:
+                                # we reached the end of initializer list
+                                break
                         contextEnd = lexer.GetNextMatchingToken(contextStart)
                         if contextEnd is not None:
                             contextPrediction = Context("FUNCTION_BLOCK", fullName, True, contextStart, contextEnd)
