@@ -60,8 +60,9 @@ def RunRule(lexer, fullName, decl, contextStack, context):
         lexer.PushTokenIndex()
         t3 = lexer.GetPrevTokenInTypeList(["SEMI", "PREPROCESSOR"], False, True)
         lexer.PopTokenIndex()
-        if t2 is not None and t2.additional == "DOXYGEN" and (t3 is None or t2.lexpos > t3.lexpos):
-            return
+        if t2 is not None and (t3 is None or t2.lexpos > t3.lexpos):
+            if t2.additional in ["DOXYGEN_JAVADOC", "DOXYGEN_QT", "DOXYGEN_CPP"]:
+                return
         nsiqcppstyle_reporter.Error(
             t,
             __name__,
