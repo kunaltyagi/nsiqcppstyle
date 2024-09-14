@@ -16,6 +16,7 @@ It checks the first element and see there is = token.
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

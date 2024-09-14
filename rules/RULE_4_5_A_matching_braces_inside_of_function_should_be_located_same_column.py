@@ -24,6 +24,7 @@ Matching braces inside of function definitions should be the same column.
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

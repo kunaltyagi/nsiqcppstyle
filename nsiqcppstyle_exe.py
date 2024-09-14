@@ -29,10 +29,10 @@
 #
 import copy
 import functools
-import getopt
-from pathlib import Path
 import re
 import tempfile
+from pathlib import Path
+from typing import List
 
 import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
@@ -184,19 +184,17 @@ def get_parser():
 @functools.lru_cache
 def is_fs_case_sensitive(path: Path):
     dir = path.parent if path.is_file() else path
-    with tempfile.NamedTemporaryFile(prefix='TmP',dir=dir, delete=True) as tmp_file:
-        return(not os.path.exists(tmp_file.name.lower()))
+    with tempfile.NamedTemporaryFile(prefix="TmP", dir=dir, delete=True) as tmp_file:
+        return not os.path.exists(tmp_file.name.lower())
 
 
-def check_file_ext(filename: Path, valid_extensions):
-    """check if extension of filename is in valid_extensions
-    """
+def check_file_ext(filename: Path, valid_extensions: List[str]):
+    """check if extension of filename is in valid_extensions"""
     if not filename.is_file():
         return False
     suffix = filename.suffix[1:]
     sufix = suffix if is_fs_case_sensitive(filename.parent) else suffix.lower()
     return suffix in valid_extensions
-
 
 
 def main():
@@ -276,10 +274,7 @@ def main():
 
             if filterScope != filterManager.GetActiveFilter().filterName:
                 console.Out.Error(
-                    "\n{} filter scope is not available. Instead, use {}\n".format(
-                        filterScope,
-                        filterManager.GetActiveFilter().filterName,
-                    ),
+                    f"\n{filterScope} filter scope is not available. Instead, use {filterManager.GetActiveFilter().filterName}\n",
                 )
 
             filter = filterManager.GetActiveFilter()
@@ -362,7 +357,7 @@ def GetRealTargetPaths(args):
     """extract real target path list from args"""
     if len(args) == 0:
         ShowMessageAndExit("Error!: Target directory must be provided")
-    targetPaths = []
+    targetPaths: List[Path] = []
     for eachTarget in args:
         realPath = Path(os.path.realpath(eachTarget))
         targetPaths.append(realPath)
@@ -554,9 +549,8 @@ Current File extension and Language Settings
             if eachfilter[2] is True:
                 if eachfile.startswith(eachfilter[1]):
                     inclusion = eachfilter[0]
-            else:
-                if eachfile.find(eachfilter[1]) != -1:
-                    inclusion = eachfilter[0]
+            elif eachfile.find(eachfilter[1]) != -1:
+                inclusion = eachfilter[0]
         return inclusion
 
     def GetLangMap(self):
@@ -568,10 +562,7 @@ Current File extension and Language Settings
             extLangPair = eachExt.split(": ")
             if len(extLangPair) != 2:
                 ShowMessageAndExit(
-                    "Error!: The extension and language pair ({}) is incorrect in {}, please use LANGUAGENAME: EXTENSION style".format(
-                        langMapString,
-                        where,
-                    ),
+                    f"Error!: The extension and language pair ({langMapString}) is incorrect in {where}, please use LANGUAGENAME: EXTENSION style",
                 )
             lang, ext = extLangPair
             self.extLangMap.get(lang).add(ext)
@@ -581,8 +572,7 @@ Current File extension and Language Settings
         for eachVar in varMap:
             if eachVar in self.varMap:
                 continue
-            else:
-                self.varMap[eachVar] = varMap[eachVar]
+            self.varMap[eachVar] = varMap[eachVar]
 
 
 def GetCliKeyValueMap(kvList):
@@ -608,10 +598,7 @@ def GetCustomKeyValueMap(keyValuePair, where):
         customKeyValuePair = eachCustomKeyValue.split(": ")
         if len(customKeyValuePair) != 2:
             ShowMessageAndExit(
-                "Error!: The var key and value pair ({}) is incorrect in {}, please use KEY: VALUE style".format(
-                    keyValuePair,
-                    where,
-                ),
+                f"Error!: The var key and value pair ({keyValuePair}) is incorrect in {where}, please use KEY: VALUE style",
             )
         key, value = customKeyValuePair
         varMap[key] = value

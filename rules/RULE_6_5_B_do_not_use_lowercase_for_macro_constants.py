@@ -13,6 +13,7 @@ However, it's ok to write a macro function using lower case letters.
     #define kk(A) (A)*3 <== Don't care. It's the macro function.
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

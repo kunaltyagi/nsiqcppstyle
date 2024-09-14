@@ -12,6 +12,7 @@ All conditions should be aligned in the same column with the first condition.
     if (a == b &&
         a == c) <== OK!
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

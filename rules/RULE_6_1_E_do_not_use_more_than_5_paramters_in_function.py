@@ -22,6 +22,7 @@ When you have to use such sentence, please // NS in the end of line to ignore th
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

@@ -87,8 +87,7 @@ class RuleManager:
             if count == 0:
                 console.Out.Error("%s does not exist or incompatible." % ruleName)
                 continue
-            else:
-                console.Out.Info("  - ", ruleName, "is applied.")
+            console.Out.Info("  - ", ruleName, "is applied.")
             ruleModule = __import__("rules." + ruleName)
             self.loadedRule.append(ruleModule)
         if len(self.loadedRule) == 0:

@@ -18,6 +18,7 @@ Do not use same filenames more than once.
     testdir/stadfx.*
     testdir1/stdafx.*
 """
+
 from typing import Dict, List
 
 from nsiqcppstyle_reporter import *  # @UnusedWildImport
@@ -32,7 +33,7 @@ def RunRule(lexer, filename, dirname):
         return
     if filename.startswith("main.c"):
         return
-    filelist = filenameMap.get(filename, None)
+    filelist = filenameMap.get(filename)
     if filelist is None:
         filenameMap[filename] = []
         filenameMap[filename].append(os.path.join(dirname, filename))

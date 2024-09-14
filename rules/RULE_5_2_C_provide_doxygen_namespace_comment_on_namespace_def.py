@@ -25,6 +25,7 @@ It checks if there is doxygen sytle comment in front of each 'namespace' keyword
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

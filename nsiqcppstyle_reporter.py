@@ -105,8 +105,7 @@ def CloseReport(format):
 def IsRuleUsed(ruleName, ruleNames):
     if ruleNames.count(ruleName) == 0:
         return "false"
-    else:
-        return "true"
+    return "true"
 
 
 def ReportRules(availRuleName, ruleNames):

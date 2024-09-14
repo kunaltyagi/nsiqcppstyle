@@ -15,6 +15,7 @@ Locate the each enum item in seperate lines.
         A_B
     }
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

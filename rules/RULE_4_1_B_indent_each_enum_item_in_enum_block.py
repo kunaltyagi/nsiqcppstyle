@@ -16,6 +16,7 @@ Indent the each enum item in the enum block.
         A_B
     }
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

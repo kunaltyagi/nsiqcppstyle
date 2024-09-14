@@ -20,6 +20,7 @@ if it's shown... this rule reports a violation.
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

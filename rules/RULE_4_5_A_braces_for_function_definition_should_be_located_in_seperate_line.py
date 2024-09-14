@@ -24,6 +24,7 @@ Braces for function definition should be located in the seperate line.
     }
 
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *

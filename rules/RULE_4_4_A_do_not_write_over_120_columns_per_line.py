@@ -11,6 +11,7 @@ This rule doesn't recognize tabs. It only think each character as 1 column.
 
     int K; <== OK. It's short.
 """
+
 from nsiqcppstyle_reporter import *
 from nsiqcppstyle_rulehelper import *
 from nsiqcppstyle_rulemanager import *
