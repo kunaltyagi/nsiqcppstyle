@@ -186,11 +186,11 @@ class Lexer:
     # ------------------------------------------------------------
     def _writetab_impl(self, tabfile, tf):
         tf.write(f"# {tabfile}.py. This file automatically created by PLY (version {__version__}). Don't edit!\n")
-        tf.write("_tabversion   = %s\n" % repr(__version__))
-        tf.write("_lextokens    = %s\n" % repr(self.lextokens))
-        tf.write("_lexreflags   = %s\n" % repr(self.lexreflags))
-        tf.write("_lexliterals  = %s\n" % repr(self.lexliterals))
-        tf.write("_lexstateinfo = %s\n" % repr(self.lexstateinfo))
+        tf.write(f"_tabversion   = {__version__!r}\n")
+        tf.write(f"_lextokens    = {self.lextokens!r}\n")
+        tf.write(f"_lexreflags   = {self.lexreflags!r}\n")
+        tf.write(f"_lexliterals  = {self.lexliterals!r}\n")
+        tf.write(f"_lexstateinfo = {self.lexstateinfo!r}\n")
 
         tabre = {}
         # Collect all functions in the initial state
@@ -207,8 +207,8 @@ class Lexer:
                 titem.append((self.lexstateretext[key][i], _funcs_to_names(lre[i][1], self.lexstaterenames[key][i])))
             tabre[key] = titem
 
-        tf.write("_lexstatere   = %s\n" % repr(tabre))
-        tf.write("_lexstateignore = %s\n" % repr(self.lexstateignore))
+        tf.write(f"_lexstatere   = {tabre!r}\n")
+        tf.write(f"_lexstateignore = {self.lexstateignore!r}\n")
 
         taberr = {}
         for key, ef in self.lexstateerrorf.items():
@@ -216,7 +216,7 @@ class Lexer:
                 taberr[key] = ef.__name__
             else:
                 taberr[key] = None
-        tf.write("_lexstateerrorf = %s\n" % repr(taberr))
+        tf.write(f"_lexstateerrorf = {taberr!r}\n")
 
     # ------------------------------------------------------------
     # writetab() - Write lexer information to a table file
@@ -236,10 +236,10 @@ class Lexer:
         if isinstance(tabfile, types.ModuleType):
             lextab = tabfile
         elif sys.version_info[0] < 3:
-            exec("import %s as lextab" % tabfile)
+            exec(f"import {tabfile} as lextab")
         else:
             env = {}
-            exec("import %s as lextab" % tabfile, env, env)
+            exec(f"import {tabfile} as lextab", env, env)
             lextab = env["lextab"]
 
         if getattr(lextab, "_tabversion", "0.0") != __version__:
@@ -414,7 +414,8 @@ class Lexer:
                     if lexpos == self.lexpos:
                         # Error method didn't change text position at all. This
                         # is an error.
-                        raise LexError("Scanning error. Illegal character '%s'" % (lexdata[lexpos]), lexdata[lexpos:])
+                        msg = f"Scanning error. Illegal character '{lexdata[lexpos]}'"
+                        raise LexError(msg, lexdata[lexpos:])
                     lexpos = self.lexpos
                     if not newtok:
                         continue
@@ -656,7 +657,7 @@ class LexerReflect:
                     continue
 
         except TypeError:
-            self.log.error("Invalid literals specification. literals must be a sequence of characters")
+            self.log.exception("Invalid literals specification. literals must be a sequence of characters")
             self.error = 1
 
     def get_states(self):
@@ -680,7 +681,7 @@ class LexerReflect:
                         self.log.error("State name %s must be a string", repr(name))
                         self.error = 1
                         continue
-                    if not (statetype == "inclusive" or statetype == "exclusive"):
+                    if statetype not in ("inclusive", "exclusive"):
                         self.log.error("State type for state %s must be 'inclusive' or 'exclusive'", name)
                         self.error = 1
                         continue
@@ -803,9 +804,9 @@ class LexerReflect:
                         self.error = 1
                 except re.error:
                     _etype, e, _etrace = sys.exc_info()
-                    self.log.error("%s:%d: Invalid regular expression for rule '%s'. %s", file, line, f.__name__, e)
+                    self.log.exception("%s:%d: Invalid regular expression for rule '%s'. %s", file, line, f.__name__, e)
                     if "#" in f.__doc__:
-                        self.log.error(
+                        self.log.exception(
                             "%s:%d. Make sure '#' in rule '%s' is escaped with '\\#'",
                             file,
                             line,
@@ -833,9 +834,9 @@ class LexerReflect:
                         self.error = 1
                 except re.error:
                     _etype, e, _etrace = sys.exc_info()
-                    self.log.error("Invalid regular expression for rule '%s'. %s", name, e)
+                    self.log.exception("Invalid regular expression for rule '%s'. %s", name, e)
                     if "#" in r:
-                        self.log.error("Make sure '#' in rule '%s' is escaped with '\\#'", name)
+                        self.log.exception("Make sure '#' in rule '%s' is escaped with '\\#'", name)
                     self.error = 1
 
             if not self.funcsym[state] and not self.strsym[state]:
@@ -883,7 +884,7 @@ class LexerReflect:
                 lines = f.readlines()
         except UnicodeDecodeError as ex:
             console.Out.Ci("[ERROR] UnicodeDecodeError in validate_file: " + str(ex))
-            console.Out.Ci("[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename))
+            console.Out.Ci(f"[ERROR] Exception occurred reading file '{filename}', convert from UTF16LE to UTF8")
             raise
         except OSError:
             return  # Couldn't find the file.  Don't worry about it

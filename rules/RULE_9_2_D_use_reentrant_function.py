@@ -45,7 +45,7 @@ def RunRule(lexer, contextStack):
                 and nsiqcppstyle_state._nsiqcppstyle_state.GetVar("ignore_toupper", "false") == "true"
             ):
                 return
-            nsiqcppstyle_reporter.Error(t, __name__, "Do not use not reentrant function(%s)." % t.value)
+            nsiqcppstyle_reporter.Error(t, __name__, f"Do not use not reentrant function({t.value}).")
 
 
 ruleManager.AddFunctionScopeRule(RunRule)

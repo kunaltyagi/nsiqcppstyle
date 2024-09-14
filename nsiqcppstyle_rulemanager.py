@@ -85,7 +85,7 @@ class RuleManager:
         for ruleName in checkingRuleNames:
             count = self.availRuleNames.count(ruleName)
             if count == 0:
-                console.Out.Error("%s does not exist or incompatible." % ruleName)
+                console.Out.Error(f"{ruleName} does not exist or incompatible.")
                 continue
             console.Out.Info("  - ", ruleName, "is applied.")
             ruleModule = __import__("rules." + ruleName)

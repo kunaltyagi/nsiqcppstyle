@@ -66,12 +66,12 @@ def RunRule(lexer, contextStack):
                     unsafe_alternative = True
                 # elif unknown namespace => unknown safety
             if unsafe_alternative:
-                nsiqcppstyle_reporter.Error(t, __name__, "Do not use bufferoverflow risky function(%s)" % t.value)
+                nsiqcppstyle_reporter.Error(t, __name__, f"Do not use bufferoverflow risky function({t.value})")
             elif not safe_alternative:
                 nsiqcppstyle_reporter.Error(
                     t,
                     __name__,
-                    "Caution: Uknown imlementation of a bufferoverflow risky function(%s)" % t.value,
+                    f"Caution: Uknown imlementation of a bufferoverflow risky function({t.value})",
                 )
 
 

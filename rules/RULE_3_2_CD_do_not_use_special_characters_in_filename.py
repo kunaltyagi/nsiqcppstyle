@@ -24,7 +24,7 @@ def RunRule(lexer, filename, dirname):
         nsiqcppstyle_reporter.Error(
             DummyToken(lexer.filename, "", 0, 0),
             __name__,
-            "Do not use special characters in file name (%s)." % filename,
+            f"Do not use special characters in file name ({filename}).",
         )
 
 

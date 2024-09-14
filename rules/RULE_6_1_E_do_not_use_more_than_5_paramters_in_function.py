@@ -44,7 +44,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
                 nsiqcppstyle_reporter.Error(
                     t,
                     __name__,
-                    "function (%s) has more than 5 parameters. please use struct instead." % fullName,
+                    f"function ({fullName}) has more than 5 parameters. please use struct instead.",
                 )
             break
 

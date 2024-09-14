@@ -79,7 +79,7 @@ def RunRule(lexer, contextStack):
             if t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"] or t3.type not in ["SPACE", "LINEFEED"]:
                 t3 = lexer.GetPrevTokenSkipWhiteSpaceAndComment()
                 if t3 is not None and t3.type != "OPERATOR" and not Match(r"^\w*#include", t.line):
-                    nsiqcppstyle_reporter.Error(t, __name__, "Provide spaces b/w operator '%s'" % t.value)
+                    nsiqcppstyle_reporter.Error(t, __name__, f"Provide spaces b/w operator '{t.value}'")
     elif t.type in nextoperator:
         t2 = lexer.PeekNextToken()
         if (
@@ -87,7 +87,7 @@ def RunRule(lexer, contextStack):
             and t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"]
             and not Match(r"^\w*#include", t.line)
         ):
-            nsiqcppstyle_reporter.Error(t, __name__, "Provide spaces after operator '%s'" % t.value)
+            nsiqcppstyle_reporter.Error(t, __name__, f"Provide spaces after operator '{t.value}'")
     elif t.type in unaryoperator:
         t2 = lexer.PeekPrevToken()
         t3 = lexer.PeekNextToken()
@@ -109,7 +109,7 @@ def RunRule(lexer, contextStack):
             ]
             and t3.type not in ["SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]
         ):
-            nsiqcppstyle_reporter.Error(t, __name__, "Provide spaces before operator '%s'" % t.value)
+            nsiqcppstyle_reporter.Error(t, __name__, f"Provide spaces before operator '{t.value}'")
 
         if (
             t2 is not None
@@ -126,7 +126,7 @@ def RunRule(lexer, contextStack):
             ]
             and t3.type not in ["SEMI", "SPACE", "LINEFEED", "RBRACE", "RPAREN", "RBRACKET"]
         ):
-            nsiqcppstyle_reporter.Error(t, __name__, "Provide spaces after operator '%s'" % t.value)
+            nsiqcppstyle_reporter.Error(t, __name__, f"Provide spaces after operator '{t.value}'")
 
 
 ruleManager.AddRule(RunRule)

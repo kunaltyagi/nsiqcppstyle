@@ -33,7 +33,7 @@ def RunRule(lexer, contextStack):
         k2 = lexer.GetNextTokenSkipWhiteSpaceAndComment()
         if d.type == "ID" and k2 is not None and k2.type in ["NUMBER", "STRING", "CHARACTOR"] and d.lineno == k2.lineno:
             if not Search("^_", d.value):
-                nsiqcppstyle_reporter.Error(d, __name__, "Do not use macro(%s) for constant" % d.value)
+                nsiqcppstyle_reporter.Error(d, __name__, f"Do not use macro({d.value}) for constant")
 
 
 ruleManager.AddPreprocessRule(RunRule)

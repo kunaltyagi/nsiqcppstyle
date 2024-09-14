@@ -380,7 +380,7 @@ def t_CPPCOMMENT(t):
 
 
 def t_error(t):
-    console.Out.Verbose("Illegal character '%s'" % t.value[0], t.lexer.lineno)
+    console.Out.Verbose(f"Illegal character '{t.value[0]}'", t.lexer.lineno)
     t.lexer.skip(1)
 
 
@@ -408,7 +408,7 @@ class CppLexerNavigator:
                 except UnicodeDecodeError as ex:
                     console.Out.Ci("[ERROR] UnicodeDecodeError in CppLexerNavigator: " + str(ex))
                     console.Out.Ci(
-                        "[ERROR] Exception occurred reading file '%s', convert from UTF16LE to UTF8" % (filename),
+                        f"[ERROR] Exception occurred reading file '{filename}', convert from UTF16LE to UTF8",
                     )
                     raise
         self.lines = self.data.splitlines()
@@ -922,9 +922,7 @@ class CppLexerNavigator:
 
         if token_id3 is None and token_id2 is not None:
             return True
-        if token_id2 is not None and token_id2.lexpos < token_id3.lexpos:
-            return True
-        return False
+        return bool(token_id2 is not None and token_id2.lexpos < token_id3.lexpos)
 
 
 class Context:
@@ -946,9 +944,7 @@ class Context:
         return token == self.endToken
 
     def InScope(self, token):
-        if token.lexpos >= self.startToken.lexpos and token.lexpos <= self.endToken.lexpos:
-            return True
-        return False
+        return bool(token.lexpos >= self.startToken.lexpos and token.lexpos <= self.endToken.lexpos)
 
 
 class ContextStack:

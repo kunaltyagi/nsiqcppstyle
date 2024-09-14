@@ -45,7 +45,7 @@ def RunRule(lexer, contextStack):
                 nsiqcppstyle_reporter.Error(
                     t,
                     __name__,
-                    "Braces inside of function should be located in the next of previous token(%s)" % prevToken.value,
+                    f"Braces inside of function should be located in the next of previous token({prevToken.value})",
                 )
 
 

@@ -44,7 +44,7 @@ def RunRule(lexer, currentType, fullName, decl, contextStack, typeContext):
         nsiqcppstyle_reporter.Error(
             t,
             __name__,
-            "Doxygen Comment should be provided in front of class def(%s)." % fullName,
+            f"Doxygen Comment should be provided in front of class def({fullName}).",
         )
 
 

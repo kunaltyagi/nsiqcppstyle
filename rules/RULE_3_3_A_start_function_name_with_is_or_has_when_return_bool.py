@@ -40,7 +40,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
                 nsiqcppstyle_reporter.Error(
                     t,
                     __name__,
-                    "The function name(%s) should start with has or is when returinning bool" % fullName,
+                    f"The function name({fullName}) should start with has or is when returinning bool",
                 )
             break
         k += 1

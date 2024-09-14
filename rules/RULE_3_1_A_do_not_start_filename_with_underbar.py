@@ -22,7 +22,7 @@ def RunRule(lexer, filename, dirname):
         nsiqcppstyle_reporter.Error(
             nsiqcppstyle_reporter.DummyToken(lexer.filename, "", 0, 0),
             __name__,
-            "File name(%s) should not start with underbar." % filename,
+            f"File name({filename}) should not start with underbar.",
         )
 
 

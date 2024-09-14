@@ -36,7 +36,7 @@ def RunRule(lexer, fullName, decl, contextStack, context):
     if IsOperator(value):
         return
     if upperBlock is not None and upperBlock.additional == "PRIVATE" and not value.startswith("_"):
-        nsiqcppstyle_reporter.Error(t, __name__, "Start private function name(%s) with underbar" % fullName)
+        nsiqcppstyle_reporter.Error(t, __name__, f"Start private function name({fullName}) with underbar")
 
 
 def RunTypeScopeRule(lexer, contextStack):

@@ -40,7 +40,7 @@ def RunRule(lexer, typeName, typeFullName, decl, contextStack, typeContext):
                     nsiqcppstyle_reporter.Error(
                         nt2,
                         __name__,
-                        "Each enum item(%s) should be located in the different line" % nt2.value,
+                        f"Each enum item({nt2.value}) should be located in the different line",
                     )
 
 

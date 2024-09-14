@@ -92,7 +92,7 @@ def RunRule(lexer, contextStack):
         if t2 is not None and t2.type == "LPAREN":
             t3 = lexer.PeekPrevTokenSkipWhiteSpaceAndComment()
             if t3 is None or t3.type != "PERIOD":
-                nsiqcppstyle_reporter.Error(t, __name__, "Do not use burfferoverflow risky function(%s)" % t.value)
+                nsiqcppstyle_reporter.Error(t, __name__, f"Do not use buffer-overflow risky function({t.value})")
 
 
 ruleManager.AddFunctionScopeRule(RunRule)

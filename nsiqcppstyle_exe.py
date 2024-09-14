@@ -259,7 +259,7 @@ def main():
             extLangMapCopy = copy.deepcopy(extLangMap)
             targetName = targetPath.name
             console.Out.Ci(console.Separator)
-            console.Out.Ci("=  Analyzing %s " % targetName)
+            console.Out.Ci(f"=  Analyzing {targetName} ")
 
             if filterPath != "":
                 filefilterPath = filterPath
@@ -281,7 +281,7 @@ def main():
             # Load Rule
 
             if len(filter.nsiqCppStyleRules) == 0:
-                ShowMessageAndExit("Error!. Rules must be set in %s" % filefilterPath, False)
+                ShowMessageAndExit(f"Error!. Rules must be set in {filefilterPath}", False)
                 continue
 
             ruleManager.LoadRules(filter.nsiqCppStyleRules)
@@ -293,7 +293,7 @@ def main():
 
             console.Out.Info(filter.to_string())
             console.Out.Ci(console.Separator)
-            console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
+            console.Out.Verbose(f"* run nsiqcppstyle analysis on {targetName}")
 
             # if the target is file, analyze it without condition
             if targetPath.is_file():
@@ -363,7 +363,7 @@ def GetRealTargetPaths(args):
         targetPaths.append(realPath)
         #       CheckPathPermission(realPath, "Target directory")
         if not realPath.exists():
-            ShowMessageAndExit("Error!: Target directory %s does not exist" % eachTarget)
+            ShowMessageAndExit(f"Error!: Target directory {eachTarget} does not exist")
     return targetPaths
 
 
@@ -578,7 +578,7 @@ Current File extension and Language Settings
 
 
 def GetCliKeyValueMap(kvList):
-    if kvList == None:
+    if kvList is None:
         return {}
 
     varMap = {}

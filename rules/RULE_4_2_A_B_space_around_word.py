@@ -48,7 +48,7 @@ def RunRule(lexer, contextStack):
         if t2 is not None and t3 is not None:
             if t2.type not in ["SPACE", "LINEFEED", "PREPROCESSORNEXT"] or t3.type not in ["SPACE", "LINEFEED"]:
                 if not Search("^[ ]*#[ ]*include", t.line):
-                    nsiqcppstyle_reporter.Error(t, __name__, "Put space before/after word '%s'." % t.value)
+                    nsiqcppstyle_reporter.Error(t, __name__, f"Put space before/after word '{t.value}'.")
 
 
 ruleManager.AddFunctionScopeRule(RunRule)
