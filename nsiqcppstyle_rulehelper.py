@@ -83,6 +83,10 @@ def GetIndentation(token):
 
 def IsConstructor(value, fullName, context):
     """Check if the passed value is the constructor or destructor"""
+    if "::" in value and "::" in fullName:
+        if value == fullName:
+            return True
+    value = value.replace("~", "").split("::")[-1]  # remove class and dtor if needed
     fullName = fullName.replace("~", "")
     names = fullName.split("::")
     if len(names) != 1 and names[-1] == value:
@@ -97,6 +101,13 @@ def IsConstructor(value, fullName, context):
 
 def IsOperator(value):
     """Check if the passed value is 'operator'"""
-    if value is not None and value == "operator":
+    if value is None:
+        return False
+    if not value.startswith('operator'):
+        return False
+    operator_type = value.removeprefix('operator')
+    if operator_type == '':
         return True
-    return False
+    if operator_type[0].isalnum():
+        return False
+    return True
