@@ -362,7 +362,9 @@ def t_COMMENT(t):
     r"/\*(.|\n)*?\*/"
     t.lexer.lineno += t.value.count("\n")
     if Search(r"/\*\*\s", t.value):
-        t.additional = "DOXYGEN"
+        t.additional = "DOXYGEN_JAVADOC"
+    elif Search(r"/\*\!\s", t.value):
+        t.additional = "DOXYGEN_QT"
     return t
 
 
@@ -372,9 +374,9 @@ def t_COMMENT(t):
 def t_CPPCOMMENT(t):
     r"//.*"
     if Search(r"^///\b", t.value):
-        t.additional = "DOXYGEN"
+        t.additional = "DOXYGEN_CPP"
     if Search(r"^///<", t.value):
-        t.additional = "DOXYGENPOST"
+        t.additional = "DOXYGEN_POST"
 
     return t
 
