@@ -146,7 +146,7 @@ def StartTarget(targetname):
     """Write Report when each target is analyzed"""
     if _nsiqcppstyle_state.output_format == "xml":
         global target
-        target = targetname
+        target = targetname if isinstance(targetname, str) else str(targetname)
 
 
 #  writer.write("<target name='%s'>\n" % (targetname))

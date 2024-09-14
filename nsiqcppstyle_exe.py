@@ -28,8 +28,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 import copy
+import functools
 import getopt
+from pathlib import Path
 import re
+import tempfile
 
 import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
@@ -178,6 +181,24 @@ def get_parser():
     return parser
 
 
+@functools.lru_cache
+def is_fs_case_sensitive(path: Path):
+    dir = path.parent if path.is_file() else path
+    with tempfile.NamedTemporaryFile(prefix='TmP',dir=dir, delete=True) as tmp_file:
+        return(not os.path.exists(tmp_file.name.lower()))
+
+
+def check_file_ext(filename: Path, valid_extensions):
+    """check if extension of filename is in valid_extensions
+    """
+    if not filename.is_file():
+        return False
+    suffix = filename.suffix[1:]
+    sufix = suffix if is_fs_case_sensitive(filename.parent) else suffix.lower()
+    return suffix in valid_extensions
+
+
+
 def main():
     global filename
 
@@ -238,20 +259,20 @@ def main():
         for targetPath in targetPaths:
             nsiqcppstyle_reporter.StartTarget(targetPath)
             extLangMapCopy = copy.deepcopy(extLangMap)
-            targetName = os.path.basename(targetPath)
+            targetName = targetPath.name
             console.Out.Ci(console.Separator)
             console.Out.Ci("=  Analyzing %s " % targetName)
 
             if filterPath != "":
                 filefilterPath = filterPath
-            elif os.path.isfile(targetPath):
-                filefilterPath = os.path.join(os.path.dirname(targetPath), "filefilter.txt")
+            elif targetPath.is_file():
+                filefilterPath = targetPath.parent / "filefilter.txt"
             else:
-                filefilterPath = os.path.join(targetPath, "filefilter.txt")
+                filefilterPath = targetPath / "filefilter.txt"
             basefilelist = NullBaseFileList() if noBase else BaseFileList(targetPath)
 
             # Get Active Filter
-            filterManager = FilterManager(filefilterPath, filterStringList, extLangMapCopy, varMap, filterScope)
+            filterManager = FilterManager(str(filefilterPath), filterStringList, extLangMapCopy, varMap, filterScope)
 
             if filterScope != filterManager.GetActiveFilter().filterName:
                 console.Out.Error(
@@ -280,9 +301,9 @@ def main():
             console.Out.Verbose("* run nsiqcppstyle analysis on %s" % targetName)
 
             # if the target is file, analyze it without condition
-            if os.path.isfile(targetPath):
-                fileExtension = targetPath[targetPath.rfind(".") + 1 :]
-                if fileExtension in cExtendstionSet:
+            if targetPath.is_file():
+                fileExtension = targetPath.suffix[1:]
+                if check_file_ext(fileExtension, cExtendstionSet):
                     ProcessFile(ruleManager, targetPath, analyzedFiles)
 
             # if the target is directory, analyze it with filefilter and
@@ -302,7 +323,7 @@ def main():
                         eachFile = os.path.join(root, fname)
                         basePart = eachFile[len(targetPath) :]
                         if (
-                            fileExtension in cExtendstionSet
+                            check_file_ext(fileExtension, cExtendstionSet)
                             and basefilelist.IsNewOrChanged(eachFile)
                             and filter.CheckFileInclusion(basePart)
                         ):
@@ -345,10 +366,10 @@ def GetRealTargetPaths(args):
         ShowMessageAndExit("Error!: Target directory must be provided")
     targetPaths = []
     for eachTarget in args:
-        realPath = os.path.realpath(eachTarget)
+        realPath = Path(os.path.realpath(eachTarget))
         targetPaths.append(realPath)
         #       CheckPathPermission(realPath, "Target directory")
-        if not os.path.exists(realPath):
+        if not realPath.exists():
             ShowMessageAndExit("Error!: Target directory %s does not exist" % eachTarget)
     return targetPaths
 
