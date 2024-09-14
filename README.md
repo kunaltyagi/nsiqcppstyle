@@ -150,6 +150,7 @@ Current Filter Setting (Following is applied sequentially)
   3. \tet\ is excluded
   4. \.cvs\ is excluded
   5. \.svn\ is excluded
+  6. \.git\ is excluded
 
 Current File extension and Language Settings
   C/C++=c,cxx,h,hpp,cpp,hxx
