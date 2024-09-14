@@ -306,6 +306,7 @@ reserved = {
     "__finally": "IGNORE",
     "__inline": "IGNORE",
     "__attribute": "IGNORE",
+    "__attribute__": "IGNORE",
     "_based": "IGNORE",
     "__stdcall": "IGNORE",
     "__try": "IGNORE",
