@@ -1211,6 +1211,7 @@ def ConstructContextInfo(lexer):
                     lexer.PushTokenIndex()
                     if t.type == "OPERATOR":
                         fullName = fullName + operator_name.value
+                        t.value = t.value + operator_name.value
                         while True:
                             prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if prevName is not None:
@@ -1269,7 +1270,6 @@ def ConstructContextInfo(lexer):
 
                     # RunFunctionRule(lexer, functionName, decl, contextStack, contextPrediction)
                     t.type = "FUNCTION"
-                    t.value = fullName
                     t.fullName = fullName
                     t.context = contextPrediction
                     t.decl = not impl
