@@ -27,6 +27,12 @@ Some handy commands:
 
 ## Known limitations
 AFAIK, C++98, C++11 and C++14 code doesn't produce false positives. If you encounter some, please create an issue.
+Several features of C++20 onwards are not implemented yet. A non-exhaustive list is provided here:
+* Spaceship operator `<=>`
+* `requires`
+* concepts
+* modules
+
 There are a few corner cases where false positives are generated on a pure C code.
 
 One such known case is while returning ```struct``` from a function (See Issue #8).
