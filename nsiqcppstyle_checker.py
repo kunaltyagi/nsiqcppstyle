@@ -1216,9 +1216,8 @@ def ConstructContextInfo(lexer):
                             prevName = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess()
                             if prevName is not None:
                                 if prevName.type == "DOUBLECOLON":
-                                    fullName = (
-                                        f"{lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value}::{fullName}"
-                                    )
+                                    value_to_prepend = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value
+                                    fullName = f"{value_to_prepend}::{fullName}"
                                 else:
                                     break
                             else:
@@ -1230,10 +1229,8 @@ def ConstructContextInfo(lexer):
                                 if prevName.type == "NOT":
                                     fullName = "~" + fullName
                                 elif prevName.type == "DOUBLECOLON":
-                                    fullName = "::" + fullName
-                                    fullName = (
-                                        lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value + fullName
-                                    )
+                                    value_to_prepend = lexer.GetPrevTokenSkipWhiteSpaceAndCommentAndPreprocess().value
+                                    fullName = f"{value_to_prepend}::{fullName}"
                                 else:
                                     break
                             else:
