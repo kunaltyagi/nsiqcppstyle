@@ -7,18 +7,18 @@ name = "nsiqcppstyle"
 dynamic = ["version"]
 description = 'One of the most customizable cpp style checkers about'
 readme = "README.md"
-requires-python = ">3.7"
+requires-python = ">3.8"
 license = "GPL-2.0-or-later"
 keywords = []
 authors = [{ name = "Kunal Tyagi", email = "kunal.tyagi@live.com" }]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -26,7 +26,7 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pip_search"]
-test = ["pytest == 7.4.*"]
+test = ["pytest == 8.3.*"]
 
 [project.urls]
 Documentation = "https://github.com/kunaltyagi/nsiqcppstyle/blob/master/README.md"
@@ -42,7 +42,7 @@ allow-direct-references = true
 [tool.hatch.envs.default]
 dependencies = []
 features = ["dev"]
-python = "3.8"
+python = "3.9"
 [tool.hatch.envs.default.scripts]
 search = "pip_search {args:.}"
 update = "python --version; echo Updated packages"
@@ -67,7 +67,7 @@ cov = ["test-cov", "cov-report"]
 python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.lint]
-extra-dependencies = ["black>=23.9.0", "mypy>=1.5.0", "ruff>=0.0.290"]
+extra-dependencies = ["black>=24.10.0", "mypy>=1.13.0", "ruff>=0.7.1"]
 features = ["test"]
 python = "3.9"
 [tool.hatch.envs.lint.scripts]
