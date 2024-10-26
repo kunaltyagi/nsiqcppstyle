@@ -478,7 +478,7 @@ class FileFilter:
         self.include = include
         self.filter_string = filter_string
 
-        if sys.version_info >= (3, 13) and '*' in self.filter_string:
+        if sys.version_info >= (3, 13) and "*" in self.filter_string:
             from glob import translate  # type: ignore[attr-defined] # sys version already checked
 
             regex = translate(self.filter_string, recursive=True, include_hidden=True)
