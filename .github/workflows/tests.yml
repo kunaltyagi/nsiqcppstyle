@@ -18,8 +18,6 @@ jobs:
         uses: actions/setup-python@v4.7.1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Hatch
-        run: pipx install hatch
 
       - name: Run NSIQCppStyle tests
         timeout-minutes: 5
@@ -33,6 +31,15 @@ jobs:
         timeout-minutes: 5
         run: python nsiqcppstyle_exe.py -f nsiqunittest/rules/comment_and_empty_lines.txt --ci nsiqunittest/src/simple_main.cpp
 
-      - name: Run pytest
-        timeout-minutes: 5
+  run-pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Set up Python
+        uses: actions/setup-python@v4.7.1
+        with:
+          python-version: 3.13  # any python is ok
+      - name: Install Hatch
+        run: pipx install hatch
+      - name: Check style and typing
         run: hatch run test:test
