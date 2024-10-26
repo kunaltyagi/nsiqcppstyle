@@ -67,15 +67,15 @@ cov = ["test-cov", "cov-report"]
 python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.lint]
-extra-dependencies = ["black>=24.10.0", "mypy>=1.13.0", "ruff>=0.7.1"]
+extra-dependencies = ["mypy>=1.13.0", "ruff>=0.7.1"]
 features = ["test"]
 python = "3.9"
 [tool.hatch.envs.lint.scripts]
 typing_all = "mypy --install-types --non-interactive --check-untyped-defs {args:.}"
 typing = "mypy --install-types --non-interactive {args:.}"
 # style = ["ruff {args:.}", "black --check --diff {args:.}"]
-style = ["black --check --diff {args:.}"]
-fmt = ["black {args:.}", "ruff check --fix {args:.}", "style"]
+style = ["ruff format --check --diff {args:.}"]
+fmt = ["ruff format {args:.}", "ruff check --fix {args:.}", "style"]
 # fmt = ["black {args:.}"]
 all = ["style", "typing"]
 
@@ -91,6 +91,7 @@ all = ["style", "typing"]
 # mypy-args = ["--no-warn-unused-ignores"]
 
 [tool.black]
+# Kept for other workflows
 target-version = ["py39"]
 line-length = 120
 skip-string-normalization = true
@@ -101,6 +102,7 @@ temp/
 [tool.ruff]
 target-version = "py39"
 line-length = 120
+[tool.ruff.lint]
 select = [
   "A",
   # "ANN", too verbose, useless
@@ -176,13 +178,13 @@ unfixable = [
   "F401",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["nsiqcppstyle"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
