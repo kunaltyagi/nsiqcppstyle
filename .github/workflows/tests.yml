@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-python@v4.7.1
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Hatch
+        run: pipx install hatch
 
       - name: Run NSIQCppStyle tests
         timeout-minutes: 5
@@ -30,3 +32,7 @@ jobs:
       - name: Run NSIQCppStyle App tests
         timeout-minutes: 5
         run: python nsiqcppstyle_exe.py -f nsiqunittest/rules/comment_and_empty_lines.txt --ci nsiqunittest/src/simple_main.cpp
+
+      - name: Run pytest
+        timeout-minutes: 5
+        run: hatch run test:test
