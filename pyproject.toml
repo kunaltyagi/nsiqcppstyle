@@ -64,12 +64,12 @@ cov-report = [
 cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.lint]
 extra-dependencies = ["black>=23.9.0", "mypy>=1.5.0", "ruff>=0.0.290"]
 features = ["test"]
-python = "3.8"
+python = "3.9"
 [tool.hatch.envs.lint.scripts]
 typing_all = "mypy --install-types --non-interactive --check-untyped-defs {args:.}"
 typing = "mypy --install-types --non-interactive {args:.}"
@@ -91,7 +91,7 @@ all = ["style", "typing"]
 # mypy-args = ["--no-warn-unused-ignores"]
 
 [tool.black]
-target-version = ["py38"]
+target-version = ["py39"]
 line-length = 120
 skip-string-normalization = true
 extend-exclude = """
@@ -99,7 +99,7 @@ temp/
 """
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 120
 select = [
   "A",
