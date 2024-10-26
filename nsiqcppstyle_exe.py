@@ -30,9 +30,12 @@
 import copy
 import functools
 import re
+import sys
 import tempfile
+from dataclasses import dataclass
+from enum import Flag, auto
 from pathlib import Path
-from typing import List
+from typing import List, Set
 
 import nsiqcppstyle_checker
 import nsiqcppstyle_reporter
@@ -470,6 +473,33 @@ class FilterManager:
 ##############################################################################
 
 
+class FileFilter:
+    def __init__(self, filter_string: str, include: bool = True):
+        self.include = include
+        self.filter_string = filter_string
+
+        if sys.version_info >= (3, 13) and "*" in self.filter_string:
+            from glob import translate  # type: ignore[attr-defined] # sys version already checked
+
+            regex = translate(self.filter_string, recursive=True, include_hidden=True)
+        else:
+            # prefix search capability only
+            regex = rf"^{re.escape(filter_string)}"
+        self.filter_regex: re.Pattern = re.compile(regex)
+
+    def __hash__(self):
+        return hash(self.filter_string)
+
+    def __eq__(self, other):
+        if not isinstance(other, FileFilter):
+            return False
+        return self.filter_string == other.filter_string
+
+    def __repr__(self):
+        status = "included" if self.include else "excluded"
+        return f"{self.filter_string} is {status}"
+
+
 class Filter:
     """
     Filter
@@ -481,7 +511,7 @@ class Filter:
         self.extLangMap = baseExtLangMap
         self.varMap = baseVarMap
         self.filterName = filterName
-        self.filefilter = []
+        self.filefilter: List[FileFilter] = []
         self.match = re.compile("^(\\\\|//)")
         self.nsiqCppStyleRules = []
 
@@ -492,40 +522,32 @@ Current Filter Setting (Following is applied sequentially)
 Current File extension and Language Settings
 %s"""
         s = ""
-        count = 1
-        for eachfilter in self.filefilter:
-            filterment = ""
-            filterment = "is included" if eachfilter[0] else "is excluded"
-            s = s + (f"  {count}. {eachfilter[1]} {filterment}\n")
-            count = count + 1
+        for count, eachfilter in enumerate(self.filefilter):
+            s = s + (f"  {count+1}. {eachfilter}\n")
         return template % (self.filterName, s, self.GetLangString())
 
-    def NormalizePath(self, eachFilter):
-        replacedpath = eachFilter.replace("/", os.path.sep)
+    def NormalizePath(self, filter_string):
+        replacedpath = filter_string.replace("/", os.path.sep)
         replacedpath = replacedpath.replace("\\\\", os.path.sep)
         return replacedpath.replace("\\", os.path.sep)
 
-    def CheckExist(self, includeOrExclude, eachFilter, startwith):
-        return self.filefilter.count([includeOrExclude, eachFilter, startwith]) == 1
+    def AddInclude(self, filter_string):
+        self.AddFilter(True, filter_string)
 
-    def AddInclude(self, eachFilter):
-        self.AddFilter(True, eachFilter)
-
-    def AddExclude(self, eachFilter):
-        self.AddFilter(False, eachFilter)
+    def AddExclude(self, filter_string):
+        self.AddFilter(False, filter_string)
 
     def AddCppChecker(self, eachChecker):
         self.nsiqCppStyleRules.append(eachChecker)
 
-    def AddFilter(self, inclusion, eachFilter):
-        startwith = False
-        if eachFilter.startswith(("\\\\", "//")):
-            eachFilter = self.match.sub("", eachFilter)
+    def AddFilter(self, inclusion, filter_string):
+        if filter_string.startswith(("\\\\", "//")):
+            filter_string = self.match.sub("", filter_string)
 
-        filterString = self.NormalizePath(eachFilter)
-        if self.CheckExist(inclusion, filterString, startwith):
-            self.filefilter.remove([inclusion, filterString, startwith])
-        self.filefilter.append([inclusion, filterString, startwith])
+        filterString = self.NormalizePath(filter_string)
+        if filter_string in self.filefilter:
+            self.filefilter.remove(FileFilter(filter_string=filterString))
+        self.filefilter.append(FileFilter(filterString, inclusion))
 
     def GetFileFilter(self):
         return self.filefilter
@@ -545,14 +567,12 @@ Current File extension and Language Settings
         return s
 
     def CheckFileInclusion(self, fileStr):
-        eachfile = self.NormalizePath(fileStr)
+        filename = self.NormalizePath(fileStr)
         inclusion = True
         for eachfilter in self.filefilter:
-            if eachfilter[2] is True:
-                if eachfile.startswith(eachfilter[1]):
-                    inclusion = eachfilter[0]
-            elif eachfile.find(eachfilter[1]) != -1:
-                inclusion = eachfilter[0]
+            if eachfilter.filter_regex.match(filename) is None:
+                continue
+            inclusion = eachfilter.include
         return inclusion
 
     def GetLangMap(self):
