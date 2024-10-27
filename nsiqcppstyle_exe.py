@@ -471,6 +471,42 @@ class FilterManager:
 # - Represent each Filter
 # - Check if the file is included or not
 ##############################################################################
+def recursive_star_replace(string):
+    recursive_star = re.compile(rf"(.*)\*\*{os.sep}(.*)")  # search for **/
+    split = recursive_star.split(string)
+    if len(split) != 1:
+        _empty, remainder, post_star, _empty2 = split
+        top_level = remainder == ""
+        if not (top_level or remainder.endswith(os.sep)):
+            msg = f"Except the beginning, the pattern (**) must be sandwitched between directory separator ({os.sep})"
+            raise ValueError(msg)
+        post_star = post_star.removeprefix(os.sep)  # ** = recursive, including no subdirectories
+        if not top_level:
+            pre_star = recursive_star_replace(remainder)
+            pre_star = pre_star.removesuffix(os.sep)
+            string = rf"{pre_star}({os.sep}.*{os.sep}|{os.sep}){post_star}"
+        else:
+            string = rf"(.*{os.sep}|){post_star}"
+    return string
+
+
+def single_star_replace(string):
+    single_star = re.compile(r"([^*]+)\*([^*]+)")
+    split = single_star.split(string)
+    if len(split) != 1:
+        start, pre_star, post_star, remainder = split
+        post_star_full = single_star_replace(post_star + remainder) if remainder != "" else post_star
+        string = rf"{start}{pre_star}[^{os.sep}]*{post_star_full}"
+    return string
+
+
+def generate_regex(string):
+    string = string.replace(".", "\\.")  # escape extension
+    single_star_start = re.compile(r"^\*([^*].*)")
+    string = single_star_replace(string)
+    if match_item := single_star_start.match(string):
+        string = rf"[^{os.sep}]*".join([""] + list(match_item.groups()))
+    return recursive_star_replace(string)
 
 
 class FileFilter:
@@ -478,13 +514,20 @@ class FileFilter:
         self.include = include
         self.filter_string = filter_string
 
-        if sys.version_info >= (3, 13) and "*" in self.filter_string:
-            from glob import translate  # type: ignore[attr-defined] # sys version already checked
-
-            regex = translate(self.filter_string, recursive=True, include_hidden=True)
-        else:
+        if "*" not in self.filter_string:
             # prefix search capability only
             regex = rf"^{re.escape(filter_string)}"
+        else:
+            console.Out.Info(
+                "Found '*', using new pattern matching method. Please use Python 3.13 if you have * in your filename",
+            )
+            if sys.version_info >= (3, 13):
+                from glob import translate  # type: ignore[attr-defined] # sys version already checked
+
+                regex = translate(self.filter_string, recursive=True, include_hidden=True)
+            else:
+                # use custom technique, might have bugs
+                regex = generate_regex(self.filter_string)
         self.filter_regex: re.Pattern = re.compile(regex)
 
     def __hash__(self):
@@ -525,6 +568,9 @@ Current File extension and Language Settings
         for count, eachfilter in enumerate(self.filefilter):
             s = s + (f"  {count+1}. {eachfilter}\n")
         return template % (self.filterName, s, self.GetLangString())
+
+    def __repr__(self):
+        return self.to_string()
 
     def NormalizePath(self, filter_string):
         replacedpath = filter_string.replace("/", os.path.sep)

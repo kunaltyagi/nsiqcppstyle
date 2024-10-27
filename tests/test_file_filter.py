@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 from nsiqcppstyle_exe import Filter
@@ -10,7 +8,6 @@ def simple_filter():
     return Filter("simple_test", {}, {})
 
 
-@pytest.mark.skipif(sys.version_info < (3, 13), reason="Needs new glob features from 3.13")
 def test_non_recursive_exclude(simple_filter: Filter):
     simple_filter.AddExclude("*.py")
     assert not simple_filter.CheckFileInclusion("hello.py")
@@ -22,7 +19,6 @@ def test_non_recursive_exclude(simple_filter: Filter):
     assert simple_filter.CheckFileInclusion("ParentDir/SomeDir/hello.py")
 
 
-@pytest.mark.skipif(sys.version_info < (3, 13), reason="Needs new glob features from 3.13")
 def test_recursive_exclude(simple_filter: Filter):
     simple_filter.AddExclude("**/*.py")
     assert not simple_filter.CheckFileInclusion("hello.py")
@@ -30,7 +26,6 @@ def test_recursive_exclude(simple_filter: Filter):
     assert not simple_filter.CheckFileInclusion("ParentDir/SomeDir/hello.py")
 
 
-@pytest.mark.skipif(sys.version_info < (3, 13), reason="Needs new glob features from 3.13")
 def test_mix_exclude(simple_filter: Filter):
     simple_filter.AddExclude("test/**/*.py")
     assert simple_filter.CheckFileInclusion("hello.py")
