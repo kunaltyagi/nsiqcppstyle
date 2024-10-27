@@ -263,11 +263,24 @@ For example, If you provide
 * default
 - \
 + \src\
-- \src\test
+- **\test\
++ \src\*\test\
 ~ RULES....
 ```
 
-Above filefilter.txt make nsiqcppstyle analyze all source under \src\ except \src\test\.
+The filter rules (starting with `+` and `-`) are applied sequentially. This this situation, nsiqcppstyle will:
+
+* all source files under `src`
+* excluding any file under a `test` dir, top level or under `src` or any other folder/sub-folder
+* except in the `\src\<some directory>\test` directory
+
+This will reject `\src\test\main.cpp` and `\third_party\test` but accept `\src\third_party\test\main.cpp`
+
+### Pattern Maching
+Please use Python 3.13 or higher if you intend to make use of pattern matching for filter files. Backported functionality has limitations and will change behavior depending on python version.
+
+* `**` matches none or one-or-more sub-directories, irrespective of what characters they contain in their name
+* `*` matches any filename, except one with a directory separator
 
 ## Integration with CI
 
