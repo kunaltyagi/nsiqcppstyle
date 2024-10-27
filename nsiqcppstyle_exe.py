@@ -481,12 +481,8 @@ def recursive_star_replace(string):
             msg = f"Except the beginning, the pattern (**) must be sandwitched between directory separator ({os.sep})"
             raise ValueError(msg)
         post_star = post_star.removeprefix(os.sep)  # ** = recursive, including no subdirectories
-        if not top_level:
-            pre_star = recursive_star_replace(remainder)
-            pre_star = pre_star.removesuffix(os.sep)
-            string = rf"{pre_star}({os.sep}.*{os.sep}|{os.sep}){post_star}"
-        else:
-            string = rf"(.*{os.sep}|){post_star}"
+        pre_star = recursive_star_replace(remainder) if not top_level else ''
+        string = rf"{pre_star}(.+{os.sep})?{post_star}"
     return string
 
 
