@@ -25,7 +25,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sre_compile
+import re
 
 import nsiqcppstyle_state
 
@@ -38,21 +38,21 @@ def Match(pattern, s):
     # performance reasons; factoring it out into a separate function turns out
     # to be noticeably expensive.
     if pattern not in _regexp_compile_cache:
-        _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+        _regexp_compile_cache[pattern] = re.compile(pattern)
     return _regexp_compile_cache[pattern].match(s)
 
 
 def Search(pattern, s):
     """Searches the string for the pattern, caching the compiled regexp."""
     if pattern not in _regexp_compile_cache:
-        _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+        _regexp_compile_cache[pattern] = re.compile(pattern)
     return _regexp_compile_cache[pattern].search(s)
 
 
 def FindAll(pattern, s):
     """Searches the string for the pattern, caching the compiled regexp."""
     if pattern not in _regexp_compile_cache:
-        _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+        _regexp_compile_cache[pattern] = re.compile(pattern)
     return _regexp_compile_cache[pattern].findall(s)
 
 
